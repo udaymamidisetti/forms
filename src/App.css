@@ -1,3 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
 .App {
   text-align: center;
 }
@@ -6,6 +11,7 @@
   height: 40vmin;
   pointer-events: none;
 }
+
 
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
@@ -35,4 +41,52 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+@keyframes slideInFromTop {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+.ql-toolbar.ql-snow {
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+  font-family: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+  padding: 8px;
+  width: 372px;
+  height: 40px;
+}
+.ql-toolbar.ql-snow + .ql-container.ql-snow {
+  height: 33px;
+}
+.ql-editor {
+  padding: 10px;
+}
+
+
+.tox .tox-statusbar__text-container {
+  display: none;
+}
+
+.mce-content-body{
+  flex: 1;
+
+  padding-top: 9px;
+  padding-bottom: 6px;
+  padding-right: 6px;
+  padding-left: 6px;
+  border-width: 1px;
+  border-color: black;
+  border-style: solid;
+  font-size: 12px;
+  border-radius: 5px;
+}
+.mce-content-body :focus{
+  outline: none;
+}
+.mce-edit-box{
+  border: 1;
 }

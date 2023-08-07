@@ -5,6 +5,17 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-image: url('https://res.cloudinary.com/drjnmxyd5/image/upload/v1685015329/login-background_wckga7.png');
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: cover;
+  background-repeat: no-repeat;
+  object-fit: cover;
+  padding: 0;
+  font-family: 'Open Sans', sans-serif;
+}
+::-webkit-scrollbar {
+  display: none;
 }
 
 code {
