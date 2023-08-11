@@ -26,7 +26,7 @@ const Ranking = ({ onDelete }) => {
   return (
     <div>
       <div>
-        <div className="flex mt-[15px] bg-white">
+        <div className="flex mt-[15px] bg-white w-[750px]">
           <div className="w-[40px] bg-[#43AED8]"></div>
           <div className="flex-1 p-[20px]">
             <div className="flex justify-between flex-1">

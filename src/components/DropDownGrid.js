@@ -9,7 +9,7 @@ import { RiDragMove2Fill } from "react-icons/ri";
 import data from "../data";
 import { Box, Modal } from "@mui/material";
 
-const DropDownGrid = ({onDelete}) => {
+const DropDownGrid = ({ onDelete }) => {
   const [showFull, setShowFull] = useState(false);
   const [jData, setjData] = useState([...data]);
   const [open, setOpen] = useState(false);
@@ -39,7 +39,7 @@ const DropDownGrid = ({onDelete}) => {
   return (
     <div>
       <div>
-        <div className="flex transition-opacity duration-200 ease-in-expo mt-[15px] bg-white">
+        <div className="w-[750px] flex transition-opacity duration-200 ease-in-expo mt-[15px] bg-white">
           <div className="w-[40px] bg-[#43AED8]"></div>
           <div className="flex-1 p-[20px] transition-all duration-200 ease-in-expo ">
             <div className="flex justify-between flex-1">

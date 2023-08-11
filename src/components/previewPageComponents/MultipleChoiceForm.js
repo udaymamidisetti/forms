@@ -6,7 +6,9 @@ const MultipleChoiceForm = (props) => {
   const { index } = props;
   const question = useSelector((state) => state.MultipleChoice.questionInput);
   const hideNumber = useSelector((state) => state.MultipleChoice.hideNumber);
-  const requiredOption = useSelector((state) => state.textField.requiredOption);
+  const requiredOption = useSelector(
+    (state) => state.MultipleChoice.requiredOption
+  );
   const choiceLayout = useSelector(
     (state) => state.MultipleChoice.choiceLayout
   );
@@ -29,46 +31,58 @@ const MultipleChoiceForm = (props) => {
           ) : (
             ""
           )}
+          {requiredOption ? <span className="text-[red]">*</span> : ""}
           <div
             className="text-[13px]"
             dangerouslySetInnerHTML={{ __html: question }}
           />
-          {requiredOption ? <span className="text-[red]">*</span> : ""}
           {/* {question} */}
         </div>
         {image === null ? "" : <img src={image} alt="image" />}
         <div className={choiceLayout === "horizontal" ? "flex" : ""}>
           {randomChoice
             ? shuffle(options).map((e, index) => (
-                <div
-                  className="flex gap-[5px] ml-[40px] mt-[10px] cursor-pointer hover:bg-[#3a9cea80] hover:border-[1px] hover:border-[#3a9cea80] h-[30px] p-[5px] items-center"
-                  key={index}
-                >
-                  <input
-                    type={multipleAnswers ? "checkbox" : "radio"}
-                    id={index}
-                  />
+                <>
                   <div
-                    className="text-[16px]"
-                    htmlFor={index}
-                    dangerouslySetInnerHTML={{ __html: e.title }}
-                  />
-                </div>
+                    className="flex gap-[5px] ml-[40px] mt-[10px] cursor-pointer hover:bg-[#3a9cea80] hover:border-[1px] hover:border-[#3a9cea80] h-[30px] p-[5px] items-center"
+                    key={index}
+                  >
+                    <input
+                      type={multipleAnswers ? "checkbox" : "radio"}
+                      id={index}
+                    />
+                    <div
+                      className="text-[16px]"
+                      htmlFor={index}
+                      dangerouslySetInnerHTML={{ __html: e.title }}
+                    />
+                  </div>
+                  {e.includeOtherTextField && <input />}
+                </>
               ))
             : options.map((e, index) => (
-                <div
-                  className="flex gap-[5px] ml-[40px] mt-[10px] cursor-pointer hover:bg-[#3a9cea80] hover:border-[1px] hover:border-[#3a9cea80] h-[30px] p-[5px] items-center"
-                  key={index}
-                >
-                  <input
-                    type={multipleAnswers ? "checkbox" : "radio"}
-                    id={index}
-                  />
+                <div>
                   <div
-                    className="text-[16px]"
-                    htmlFor={index}
-                    dangerouslySetInnerHTML={{ __html: e.title }}
-                  />
+                    className="flex gap-[5px] ml-[40px] mt-[10px] cursor-pointer hover:bg-[#3a9cea80] hover:border-[1px] hover:border-[#3a9cea80] h-[30px] p-[5px] items-center"
+                    key={index}
+                  >
+                    {e.image === null ? "" : <img src={e.image} />}
+                    <input
+                      type={multipleAnswers ? "checkbox" : "radio"}
+                      id={index}
+                    />
+                    <div
+                      className="text-[16px]"
+                      htmlFor={index}
+                      dangerouslySetInnerHTML={{ __html: e.title }}
+                    />
+                  </div>
+                  {e.includeOtherTextField && (
+                    <input
+                      className="border focus:outline-none ml-[60px] text-[14px] p-[5px] focus:w-[840px]"
+                      placeholder="Text goes here"
+                    />
+                  )}
                 </div>
               ))}
         </div>

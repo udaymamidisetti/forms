@@ -73,7 +73,6 @@
 
 .mce-content-body{
   flex: 1;
-
   padding-top: 9px;
   padding-bottom: 6px;
   padding-right: 6px;
@@ -83,10 +82,11 @@
   border-style: solid;
   font-size: 12px;
   border-radius: 5px;
+  width: 670px;
 }
 .mce-content-body :focus{
   outline: none;
 }
 .mce-edit-box{
-  border: 1;
+  border: .5;
 }

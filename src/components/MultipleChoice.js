@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { BiSolidChevronDown } from "react-icons/bi";
 import { BsTrashFill } from "react-icons/bs";
 import { CgMenu } from "react-icons/cg";
@@ -27,6 +27,9 @@ import {
   handleBulkAdd,
   reorderOptions,
   setOrder,
+  setOtherTextField,
+  setIncludeImage,
+  handleSetImage,
 } from "../redux/slices/MultipleChoiceSlice";
 import { deleteToken } from "../redux/slices/FormSlice";
 import {
@@ -40,13 +43,14 @@ import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import { Editor } from "@tinymce/tinymce-react";
 import "react-quill/dist/quill.snow.css";
 import { useRef } from "react";
+// import { v4 as uuidv4 } from "uuid";
 
 const MultipleChoice = ({ onDelete }) => {
+  // const instanceId = uuidv4();
+  // console.log(instanceId);
   const editorRef = useRef(null);
   const dispatch = useDispatch();
   const question = useSelector((state) => state.MultipleChoice.questionInput);
-  const id = useSelector((state) => state.MultipleChoice.id);
-  console.log(id);
   const requiredOption = useSelector(
     (state) => state.MultipleChoice.requiredOption
   );
@@ -67,11 +71,11 @@ const MultipleChoice = ({ onDelete }) => {
   const [bulkInputText, setBulkInputText] = useState("");
   const [showFull, setShowFull] = useState(false);
   const [open, setOpen] = useState(false);
-  const [otherText, setOtherText] = useState(false);
+  const [otherText, setOtherText] = useState("");
   const [bulkArray, setBulkArray] = useState([]);
   const [minimize, setMinimize] = useState(false);
   const [quillText, setQuillText] = useState("");
-  const [includeImage, setIncludeImage] = useState(false);
+  // const [includeImage, setIncludeImage] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const handleBulkInputChange = (event) => {
@@ -102,6 +106,9 @@ const MultipleChoice = ({ onDelete }) => {
       addNewOption({
         ...newOption,
         expanded: false,
+        includeImage: false,
+        includeOtherTextField: false,
+        image: "",
       })
     );
   };
@@ -118,7 +125,7 @@ const MultipleChoice = ({ onDelete }) => {
     return (
       <div>
         {showFull ? (
-          <div className="transition-opacity duration-200 ease-in-expo">
+          <div className="w-[750px] transition-opacity duration-200 ease-in-expo">
             <div className="flex mt-[15px]">
               <p className="text-[#7D848C] text-[13px] w-[180px]">
                 Display order
@@ -128,6 +135,7 @@ const MultipleChoice = ({ onDelete }) => {
                   type="checkbox"
                   id="random"
                   onChange={() => dispatch(handleRandomChoice())}
+                  checked={randomChoice}
                 />
                 <label htmlFor="random" className="cursor-pointer text-[13px]">
                   Randomize choices
@@ -256,10 +264,8 @@ const MultipleChoice = ({ onDelete }) => {
     }
   };
 
-  const handleEditorOptionChange = (index) => (content, editor) => {
-    console.log(index);
+  const handleEditorOptionChange = (index) => (content) => {
     dispatch(handleOptionChange({ index, value: content }));
-    console.log(content);
   };
 
   const style = {
@@ -288,26 +294,27 @@ const MultipleChoice = ({ onDelete }) => {
       })
     );
   };
+
   return (
     <div>
       <div>
-        <div className="flex transition-opacity duration-200 ease-in-expo mt-[15px] bg-white">
+        <div className="w-[750px] flex transition-opacity duration-200 ease-in-expo mt-[15px] bg-white">
           <div className="w-[40px] bg-[#43AED8]">
             {minimize ? (
               <HiMiniArrowsPointingIn
-                className="text-[white] ml-[10px] mt-[10px] text-[19px] cursor-pointer"
+                className="text-[white] ml-[10px] mt-[10px] mr-[10px] text-[19px] cursor-pointer"
                 onClick={() => setMinimize(false)}
               />
             ) : (
               <HiArrowsPointingOut
-                className="text-[white] ml-[10px] mt-[10px] text-[19px] cursor-pointer"
+                className="text-[white] ml-[10px] mt-[10px] mr-[10px] text-[19px] cursor-pointer"
                 onClick={() => setMinimize(true)}
               />
             )}
           </div>
           {minimize ? (
             <div className="flex-1 p-[20px] transition-all duration-200 ease-in-expo ">
-              <div className="flex justify-between flex-1">
+              <div className="flex justify-between flex-1 w-[670px]">
                 <h1 className="text-[22px] text-[#333]">Multiple Choice</h1>
                 <div className="flex">
                   <div className="mr-[5px]">
@@ -404,6 +411,7 @@ const MultipleChoice = ({ onDelete }) => {
                     type="checkbox"
                     id="required"
                     onChange={() => dispatch(handleRequiredOption())}
+                    checked={requiredOption}
                   />
                   <label
                     htmlFor="required"
@@ -422,6 +430,7 @@ const MultipleChoice = ({ onDelete }) => {
                     type="checkbox"
                     id="hide"
                     onChange={() => dispatch(handleHideNumber())}
+                    checked={hideNumber}
                   />
                   <label htmlFor="hide" className="cursor-pointer text-[13px]">
                     Hide the question number
@@ -452,7 +461,6 @@ const MultipleChoice = ({ onDelete }) => {
                 <Droppable droppableId="ChoiceDrops">
                   {(provided) => (
                     <div {...provided.droppableProps} ref={provided.innerRef}>
-                      <p>Options</p>
                       {optionData.map((e, index) => (
                         <Draggable
                           draggableId={String(index)}
@@ -466,11 +474,15 @@ const MultipleChoice = ({ onDelete }) => {
                               ref={provided.innerRef}
                             >
                               <div
-                                className="flex items-center gap-[5px] mt-[5px]"
+                                className="flex items-center gap-[5px] mt-[5px] w-[670px]"
                                 key={index}
                                 draggable
                               >
-                                <RiDragMove2Fill color="#777" size={19} />
+                                <RiDragMove2Fill
+                                  color="#777"
+                                  size={19}
+                                  className="cursor-all-scroll"
+                                />
                                 {/* <input
                        className="text-[12px] h-[34px] border focus:outline-none pt-[6px] pr-[12px] pl-[12px] pb-[6px] flex-1"
                        placeholder={e.title}
@@ -501,6 +513,7 @@ const MultipleChoice = ({ onDelete }) => {
                                 <button
                                   className="border p-[8px] text-[#777] h-[34px] w-[34px]"
                                   onClick={() => handleToggleExpansion(index)}
+                                  // {...provided.dragHandleProps}
                                   // onClick={() => dispatch(toggleExpansion(index))}
                                 >
                                   <BiSolidChevronDown />
@@ -535,19 +548,18 @@ const MultipleChoice = ({ onDelete }) => {
                                     />
                                   </div>
                                   <div className="flex items-center gap-[5px] ml-[17px] mt-[14px]">
-                                    <input
-                                      type="checkbox"
-                                      id={index}
-                                      onChange={() => setOtherText(!otherText)}
-                                    />
-                                    <label
-                                      htmlFor={index}
-                                      className="text-[13px] text-[#333]"
-                                    >
+                                    <label className="text-[13px] text-[#333] flex items-center gap-[5px]">
+                                      <input
+                                        type="checkbox"
+                                        onChange={() =>
+                                          dispatch(setOtherTextField(index))
+                                        }
+                                        checked={e.includeOtherTextField}
+                                      />
                                       Include an "Other" text field{" "}
                                     </label>
                                   </div>
-                                  {otherText && (
+                                  {e.includeOtherTextField && (
                                     <div className="ml-[17px] mt-[10px] flex gap-[39px] items-center">
                                       <p className="text-[#333] text-[13px]">
                                         Identifier
@@ -559,29 +571,35 @@ const MultipleChoice = ({ onDelete }) => {
                                     </div>
                                   )}
                                   <div className="flex items-center gap-[5px] ml-[17px] mt-[10px] pb-[15px]">
-                                    <input
-                                      type="checkbox"
-                                      id={index}
-                                      onChange={() =>
-                                        setIncludeImage(!includeImage)
-                                      }
-                                    />
-                                    <label
-                                      htmlFor={index}
-                                      className="text-[13px] text-[#333]"
-                                    >
+                                    <label className="text-[13px] text-[#333] flex items-center gap-[5px]">
+                                      <input
+                                        type="checkbox"
+                                        onChange={() =>
+                                          dispatch(setIncludeImage(index))
+                                        }
+                                      />
                                       Include an image
                                     </label>
                                   </div>
-                                  {includeImage && (
+                                  {e.includeImage && (
                                     <div>
-                                      <div className="flex items-center gap-[39px] ml-[17px] mt-[10px] pb-[15px]">
+                                      <div className="flex items-center gap-[58px] ml-[17px] mt-[10px] pb-[15px]">
                                         <p className="text-[13px] text-[#333]">
                                           Image
                                         </p>
-                                        <input type="file" />
+                                        <input
+                                          type="file"
+                                          onChange={(e) =>
+                                            dispatch(
+                                              handleSetImage({
+                                                url: e.target.files[0],
+                                                index: index,
+                                              })
+                                            )
+                                          }
+                                        />
                                       </div>
-                                      <div className="flex items-center gap-[39px] ml-[17px] mt-[10px] pb-[15px]">
+                                      <div className="flex items-center gap-[47px] ml-[17px] mt-[10px] pb-[15px]">
                                         <p className="text-[13px] text-[#333]">
                                           Position
                                         </p>
@@ -691,7 +709,7 @@ const MultipleChoice = ({ onDelete }) => {
                   </label>
                 </div>
               </DragDropContext>
-              <section className="mt-[40px] flex justify-end">
+              <section className="mt-[40px] flex justify-end w-[670px]">
                 <button
                   className="leading-[20px] text-[12px] pt-[8px] pb-[8px] pl-[18px] pr-[18px] text-[#3c8dd5]"
                   // onClick={() => handleDeleteContent()}
@@ -705,20 +723,23 @@ const MultipleChoice = ({ onDelete }) => {
               </section>
             </div>
           ) : (
-            <div className="transition-opacity duration-200 ease-in-expo">
+            <div
+              className="transition-opacity duration-200 ease-in-expo"
+              // onClick={setMinimize(() => !minimize)}
+            >
               <div
                 dangerouslySetInnerHTML={{ __html: question }}
-                className="text-[13px] font-bold mt-[5px] ml-[4px]"
+                className="text-[13px] font-bold mt-[5px] ml-[4px] transition-opacity duration-200 ease-in-expo"
               />
               {optionData.map((e, index) => (
                 <div
                   key={index}
-                  className="flex gap-[5px] items-center mt-[10px] ml-[10px]"
+                  className="flex gap-[5px] items-center mt-[10px] ml-[10px] mb-[10px]"
                 >
                   <input type="radio" />
                   <div
                     dangerouslySetInnerHTML={{ __html: e.title }}
-                    className="text-[12px]"
+                    className="text-[12px] text-[#555]"
                   />
                 </div>
               ))}

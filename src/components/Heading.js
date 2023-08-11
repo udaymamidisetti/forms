@@ -1,18 +1,19 @@
-import React from "react";
+import React, { useState } from "react";
 import { FaTrashCan } from "react-icons/fa6";
 import { HiOutlineClipboardDocument } from "react-icons/hi2";
 import { useDispatch, useSelector } from "react-redux";
 import { handleHeading } from "../redux/slices/HeadingSlice";
 
-const Heading = ({ onDelete }) => {
+const Heading = ({ onDelete, componentId }) => {
   const dispatch = useDispatch();
+  const [headingText, setHeadingText] = useState("");
 
   const onChangeHeading = (event) => {
-    dispatch(handleHeading(event.target.value));
+    dispatch(handleHeading({ componentId, value: event.target.value }));
   };
   return (
     <div>
-      <div className="flex mt-[15px] bg-white">
+      <div className="flex mt-[15px] bg-white w-[750px]">
         <div className="w-[40px] bg-[#43AED8] h-[420px]"></div>
         <div className="flex-1 p-[20px]">
           <div className="flex justify-between flex-1">
@@ -61,6 +62,7 @@ const Heading = ({ onDelete }) => {
             className="border w-[100%] h-[80px] placeholder:text-[13px] p-[10px] focus:outline-none"
             //   onChange={handleChange}
             onChange={onChangeHeading}
+            // onChange={(e) => setHeadingText(e.target.value)}
           ></textarea>
           <div className="border mt-[20px]"></div>
           <section className="mt-[30px] flex justify-end">

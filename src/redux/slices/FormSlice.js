@@ -1,5 +1,4 @@
 import { createSlice } from "@reduxjs/toolkit";
-import Cookies from "js-cookie";
 
 const formSlice = createSlice({
   name: "formData",
@@ -14,6 +13,7 @@ const formSlice = createSlice({
       const optionId = action.payload;
       console.log(optionId);
       state.selectedOptions.push(optionId);
+      console.log(state.selectedOptions.length);
       localStorage.setItem(
         "selectedOptions",
         JSON.stringify(state.selectedOptions)
@@ -41,6 +41,11 @@ const formSlice = createSlice({
     setOption: (state, action) => {
       state.options = state.options;
     },
+    setChoicesOrder: (state, action) => {
+      const { sourceIndex, destinationIndex } = action.payload;
+      const [removedOption] = state.selectedOptions.splice(sourceIndex, 1);
+      state.selectedOptions.splice(destinationIndex, 0, removedOption);
+    },
   },
 });
 
@@ -51,5 +56,6 @@ export const {
   setTokenId,
   deleteToken,
   setOption,
+  setChoicesOrder,
 } = formSlice.actions;
 export default formSlice.reducer;

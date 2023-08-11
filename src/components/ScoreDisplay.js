@@ -9,7 +9,7 @@ const ScoreDisplay = ({ onDelete }) => {
   const scoreValue = useSelector((state) => state.ScoreDisplay.score);
   return (
     <div>
-      <div className="flex mt-[15px] bg-white">
+      <div className="flex mt-[15px] bg-white w-[750px]">
         <div className="w-[40px] bg-[#43AED8] h-[420px]"></div>
         <div className="flex-1 p-[20px]">
           <div className="flex justify-between flex-1">

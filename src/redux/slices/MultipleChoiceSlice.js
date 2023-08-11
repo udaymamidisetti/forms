@@ -1,9 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import data from "../../data";
-import { v4 as uuidv4 } from "uuid";
 
 const initialState = {
-  id: uuidv4(),
   questionInput: "What question would you like to ask?",
   answerText: null,
   requiredOption: false,
@@ -22,13 +20,13 @@ export const MultipleChoiceSlice = createSlice({
   initialState,
   reducers: {
     handleInputChange: (state, action) => {
+      // const { componentId, value } = action.payload;
+      // state.questionInput[componentId] = value;
       state.questionInput = action.payload;
     },
     handleOptionChange: (state, action) => {
-      const updated = [...state.options];
       const { index, value } = action.payload;
       state.options[index] = { ...state.options[index], title: value };
-      console.log(value);
     },
     handleRequiredOption: (state) => {
       state.requiredOption = !state.requiredOption;
@@ -74,6 +72,19 @@ export const MultipleChoiceSlice = createSlice({
       const [removedOption] = state.options.splice(sourceIndex, 1);
       state.options.splice(destinationIndex, 0, removedOption);
     },
+    setOtherTextField: (state, action) => {
+      const index = action.payload;
+      state.options[index].includeOtherTextField =
+        !state.options[index].includeOtherTextField;
+    },
+    setIncludeImage: (state, action) => {
+      const index = action.payload;
+      state.options[index].includeImage = !state.options[index].includeImage;
+    },
+    handleSetImage: (state, action) => {
+      const { url, index } = action.payload;
+      state.options[index].image = URL.createObjectURL(url);
+    },
   },
 });
 
@@ -93,6 +104,9 @@ export const {
   handleBulkAdd,
   reorderOptions,
   setOrder,
+  setOtherTextField,
+  setIncludeImage,
+  handleSetImage,
 } = MultipleChoiceSlice.actions;
 
 export default MultipleChoiceSlice.reducer;

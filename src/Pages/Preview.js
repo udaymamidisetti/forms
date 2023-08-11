@@ -98,9 +98,9 @@ const Preview = () => {
       });
   };
 
-  useEffect(() => {
-    getAllConditions();
-  }, []);
+  // useEffect(() => {
+  //   getAllConditions();
+  // }, []);
 
   const getAllConditions = async () => {
     const data = {
