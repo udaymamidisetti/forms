@@ -18,6 +18,7 @@ const Preview = () => {
   const selectedOptions = useSelector(
     (state) => state.formData.selectedOptions
   );
+  const sortedOptions = [...new Set(selectedOptions)];
   const options = useSelector((state) => state.formData.options);
   const ref_id = Cookies.get("tokenId");
   console.log(ref_id);
@@ -39,7 +40,7 @@ const Preview = () => {
 
   const htmlStructure = (
     <div>
-      {selectedOptions.map((optionId, index) => {
+      {sortedOptions.map((optionId, index) => {
         switch (optionId) {
           case "TextField":
             return <TextFieldForm key={`${optionId}-${index}`} index={index} />;

@@ -33,7 +33,6 @@ import PageBreak from "./PageBreak";
 import TemplatePreview from "./TemplatePreview";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 const TemplateBody = () => {
-  console.log(DragDropContext, Draggable, Droppable);
   const dispatch = useDispatch();
   const array = useSelector((state) => state.formData.previewArray);
   const [drag, setDrag] = useState(true);
@@ -71,6 +70,7 @@ const TemplateBody = () => {
     if (!result.destination) return;
 
     const { source, destination } = result;
+    // console.log(destination.droppableId);
     // dispatch(
     //   setChoicesOrder({
     //     sourceIndex: source.index,
@@ -78,12 +78,30 @@ const TemplateBody = () => {
     //   })
     // );
 
-    const droppedOption = result.draggableId;
-    console.log(droppedOption);
-    if (droppedOption === null) {
-      return;
-    } else {
-      dispatch(addOption(droppedOption));
+    // const droppedOption = result.draggableId;
+    // console.log(droppedOption);
+    // if (droppedOption === null) {
+    //   return;
+    // } else {
+    //   dispatch(addOption(droppedOption));
+    // }
+    switch (source.droppableId) {
+      case destination.droppableId:
+        dispatch(
+          setChoicesOrder({
+            sourceIndex: source.index,
+            destinationIndex: destination.index,
+          })
+        );
+        break;
+      case "ITEMS":
+      // const droppedOption = result.draggableId;
+      // dispatch(addOption(droppedOption));
+      // break;
+      default:
+        const droppedOption = result.draggableId;
+        dispatch(addOption(droppedOption));
+        break;
     }
   };
 

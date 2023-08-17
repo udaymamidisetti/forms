@@ -11,12 +11,12 @@ const HeadingForm = () => {
             <p>{componentData.value}</p>
           </div>
         ))}
-        {/* {heading.map((component) => ( */}
-        {/* <div key={component.componentId}> */}
-        {/* <h3>Component ID: {component.componentId}</h3> */}
-        {/* <p>Heading: {component.value}</p> */}
-        {/* </div> */}
-        {/* ))} */}
+        {/* {heading.map((component) => (
+          <div key={component.componentId}>
+            <h3>Component ID: {component.componentId}</h3>
+            <p>Heading: {component.value}</p>
+          </div>
+        ))} */}
       </h1>
     </div>
   );

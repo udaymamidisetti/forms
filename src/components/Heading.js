@@ -6,6 +6,7 @@ import { handleHeading } from "../redux/slices/HeadingSlice";
 
 const Heading = ({ onDelete, componentId }) => {
   const dispatch = useDispatch();
+  const heading = useSelector((state) => state.Heading.heading.componentId);
   const [headingText, setHeadingText] = useState("");
 
   const onChangeHeading = (event) => {
@@ -60,6 +61,7 @@ const Heading = ({ onDelete, componentId }) => {
           <textarea
             placeholder="Enter you heading here"
             className="border w-[100%] h-[80px] placeholder:text-[13px] p-[10px] focus:outline-none"
+            value="What question would you like to ask?"
             //   onChange={handleChange}
             onChange={onChangeHeading}
             // onChange={(e) => setHeadingText(e.target.value)}

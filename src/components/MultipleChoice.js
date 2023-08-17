@@ -45,12 +45,13 @@ import "react-quill/dist/quill.snow.css";
 import { useRef } from "react";
 // import { v4 as uuidv4 } from "uuid";
 
-const MultipleChoice = ({ onDelete }) => {
+const MultipleChoice = ({ onDelete, dragHandleProps, componentId }) => {
+  console.log(componentId);
   // const instanceId = uuidv4();
   // console.log(instanceId);
   const editorRef = useRef(null);
   const dispatch = useDispatch();
-  const question = useSelector((state) => state.MultipleChoice.questionInput);
+  const question = useSelector((state) => state.MultipleChoice.question);
   const requiredOption = useSelector(
     (state) => state.MultipleChoice.requiredOption
   );
@@ -97,7 +98,7 @@ const MultipleChoice = ({ onDelete }) => {
     dispatch(handleInputChange(quillText));
   };
   const handleChange = (content) => {
-    dispatch(handleInputChange(content));
+    dispatch(handleInputChange({ componentId, value: content }));
   };
   const addOptionsHandler = () => {
     const newOption = { title: `Option ${optionData.length + 1}` };
@@ -298,7 +299,7 @@ const MultipleChoice = ({ onDelete }) => {
   return (
     <div>
       <div>
-        <div className="w-[750px] flex transition-opacity duration-200 ease-in-expo mt-[15px] bg-white">
+        <div className="w-[750px] flex transition-opacity duration-200 ease-in-expo mt-[15px] bg-white relative">
           <div className="w-[40px] bg-[#43AED8]">
             {minimize ? (
               <HiMiniArrowsPointingIn
@@ -367,9 +368,8 @@ const MultipleChoice = ({ onDelete }) => {
 
               <Editor
                 onInit={(evt, editor) => (editorRef.current = editor)}
-                apiKey="u8s0kpnynauqep4jcjbazdlr6oc2ievgmotd3w7z8a6r4vqt"
                 inline={true}
-                value={`${question}`}
+                // value={`${question}`}
                 init={{
                   menubar: false,
                   plugins: [
@@ -482,6 +482,7 @@ const MultipleChoice = ({ onDelete }) => {
                                   color="#777"
                                   size={19}
                                   className="cursor-all-scroll"
+                                  {...dragHandleProps}
                                 />
                                 {/* <input
                        className="text-[12px] h-[34px] border focus:outline-none pt-[6px] pr-[12px] pl-[12px] pb-[6px] flex-1"
@@ -494,7 +495,6 @@ const MultipleChoice = ({ onDelete }) => {
                                   onInit={(evt, editor) =>
                                     (editorRef.current = editor)
                                   }
-                                  apiKey="u8s0kpnynauqep4jcjbazdlr6oc2ievgmotd3w7z8a6r4vqt"
                                   // initialValue={`<p class='tinymce-heading'>${e.title}</p>`}
                                   value={`${e.title}`}
                                   inline={true}
@@ -727,22 +727,28 @@ const MultipleChoice = ({ onDelete }) => {
               className="transition-opacity duration-200 ease-in-expo"
               // onClick={setMinimize(() => !minimize)}
             >
-              <div
-                dangerouslySetInnerHTML={{ __html: question }}
-                className="text-[13px] font-bold mt-[5px] ml-[4px] transition-opacity duration-200 ease-in-expo"
-              />
-              {optionData.map((e, index) => (
+              {" "}
+              <div>
                 <div
-                  key={index}
-                  className="flex gap-[5px] items-center mt-[10px] ml-[10px] mb-[10px]"
-                >
-                  <input type="radio" />
+                  dangerouslySetInnerHTML={{ __html: question }}
+                  className="text-[13px] font-bold mt-[5px] ml-[4px] transition-opacity duration-200 ease-in-expo"
+                />
+                {optionData.map((e, index) => (
                   <div
-                    dangerouslySetInnerHTML={{ __html: e.title }}
-                    className="text-[12px] text-[#555]"
-                  />
-                </div>
-              ))}
+                    key={index}
+                    className="flex gap-[5px] items-center mt-[10px] ml-[10px] mb-[10px]"
+                  >
+                    <input type="radio" />
+                    <div
+                      dangerouslySetInnerHTML={{ __html: e.title }}
+                      className="text-[12px] text-[#555]"
+                    />
+                  </div>
+                ))}
+              </div>
+              {/* <div>
+                <RiDragMove2Fill {...dragHandleProps} />
+              </div> */}
             </div>
           )}
         </div>

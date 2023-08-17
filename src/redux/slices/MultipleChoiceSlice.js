@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import data from "../../data";
 
 const initialState = {
-  questionInput: "What question would you like to ask?",
+  question: {},
   answerText: null,
   requiredOption: false,
   hideNumber: true,
@@ -20,9 +20,14 @@ export const MultipleChoiceSlice = createSlice({
   initialState,
   reducers: {
     handleInputChange: (state, action) => {
-      // const { componentId, value } = action.payload;
-      // state.questionInput[componentId] = value;
-      state.questionInput = action.payload;
+      const { componentId, value } = action.payload;
+
+      // Initialize the string value if not present
+      if (!state.question.hasOwnProperty(componentId)) {
+        state.question[componentId] = "What question would you like to ask?";
+      }
+
+      state.question[componentId] = { value };
     },
     handleOptionChange: (state, action) => {
       const { index, value } = action.payload;

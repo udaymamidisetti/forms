@@ -1,9 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
-
+import { v4 as uuid } from "uuid";
 const formSlice = createSlice({
   name: "formData",
   initialState: {
     selectedOptions: [],
+    [uuid()]: [],
     options: [{ id: "textField" }],
     previewArray: [],
     tokenId: null,
@@ -46,6 +47,38 @@ const formSlice = createSlice({
       const [removedOption] = state.selectedOptions.splice(sourceIndex, 1);
       state.selectedOptions.splice(destinationIndex, 0, removedOption);
     },
+    reorderItems: (state, action) => {
+      const { droppableId, sourceIndex, destinationIndex } = action.payload;
+      const list = state[droppableId];
+      const result = Array.from(list);
+      const [removed] = result.splice(sourceIndex, 1);
+      result.splice(destinationIndex, 0, removed);
+      state[droppableId] = result;
+    },
+    copyItems: (state, action) => {
+      const { source, destination, droppableSource, droppableDestination } =
+        action.payload;
+      const sourceClone = Array.from(state[source.droppableId]);
+      const destClone = Array.from(state[destination.droppableId]);
+      const item = sourceClone[droppableSource.index];
+      destClone.splice(droppableDestination.index, 0, { ...item, id: uuid() });
+      state[source.droppableId] = sourceClone;
+      state[destination.droppableId] = destClone;
+    },
+    moveItems: (state, action) => {
+      const {
+        sourceDroppableId,
+        destinationDroppableId,
+        sourceIndex,
+        destinationIndex,
+      } = action.payload;
+      const sourceClone = Array.from(state[sourceDroppableId]);
+      const destClone = Array.from(state[destinationDroppableId]);
+      const [removed] = sourceClone.splice(sourceIndex, 1);
+      destClone.splice(destinationIndex, 0, removed);
+      state[sourceDroppableId] = sourceClone;
+      state[destinationDroppableId] = destClone;
+    },
   },
 });
 
@@ -57,5 +90,8 @@ export const {
   deleteToken,
   setOption,
   setChoicesOrder,
+  reorderItems,
+  moveItems,
+  copyItems,
 } = formSlice.actions;
 export default formSlice.reducer;

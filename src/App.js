@@ -7,8 +7,8 @@ function App() {
   return (
     <BrowserRouter basename="uday">
       <Routes>
-        {/* <Route path="/" element={<TemplateBody />} /> */}
-        <Route path="/" element={<NewTemplate />} />
+        <Route path="/" element={<TemplateBody />} />
+        {/* <Route path="/" element={<NewTemplate />} /> */}
         <Route path="/uday/preview" element={<Preview />} />
       </Routes>
     </BrowserRouter>
