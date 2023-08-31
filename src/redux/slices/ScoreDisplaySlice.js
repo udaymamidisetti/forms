@@ -1,18 +1,32 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+const initialState = {
+  initialData: { score: "Your score is :", hide: false },
+  byId: {},
+};
+
 const ScoreDisplaySlice = createSlice({
   name: "scoreDisplay",
-  initialState: {
-    score: "Your score is :",
-    hide: false,
-  },
+  initialState,
   reducers: {
+    addScoreDisplayInstance: (state, action) => {
+      const { componentId } = action.payload;
+      state.byId[componentId] = {
+        ...state.initialData,
+      };
+    },
     handleScore: (state, action) => {
-      state.score = action.payload;
+      const { componentId, value } = action.payload;
+      state.byId[componentId].score = value;
+    },
+    handleHide: (state, action) => {
+      const { componentId } = action.payload;
+      state.byId[componentId].hide = !state.byId[componentId].hide;
     },
   },
 });
 
-export const { handleScore } = ScoreDisplaySlice.actions;
+export const { addScoreDisplayInstance, handleScore, handleHide } =
+  ScoreDisplaySlice.actions;
 
 export default ScoreDisplaySlice.reducer;

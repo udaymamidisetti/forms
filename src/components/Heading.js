@@ -1,17 +1,32 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaTrashCan } from "react-icons/fa6";
 import { HiOutlineClipboardDocument } from "react-icons/hi2";
 import { useDispatch, useSelector } from "react-redux";
-import { handleHeading } from "../redux/slices/HeadingSlice";
+import {
+  addHeadingInstance,
+  handleHeading,
+} from "../redux/slices/HeadingSlice";
 
 const Heading = ({ onDelete, componentId }) => {
   const dispatch = useDispatch();
-  const heading = useSelector((state) => state.Heading.heading.componentId);
+  // const heading = useSelector((state) => state.Heading.heading.componentId);
+  const heading = useSelector((state) => {
+    const instance = state.Heading.byId[componentId];
+    if (!instance) {
+      return;
+    }
+    return instance.heading;
+  });
   const [headingText, setHeadingText] = useState("");
 
   const onChangeHeading = (event) => {
     dispatch(handleHeading({ componentId, value: event.target.value }));
   };
+
+  useEffect(() => {
+    dispatch(addHeadingInstance({ componentId }));
+  }, []);
+
   return (
     <div>
       <div className="flex mt-[15px] bg-white w-[750px]">
@@ -61,7 +76,7 @@ const Heading = ({ onDelete, componentId }) => {
           <textarea
             placeholder="Enter you heading here"
             className="border w-[100%] h-[80px] placeholder:text-[13px] p-[10px] focus:outline-none"
-            value="What question would you like to ask?"
+            value={heading}
             //   onChange={handleChange}
             onChange={onChangeHeading}
             // onChange={(e) => setHeadingText(e.target.value)}

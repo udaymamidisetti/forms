@@ -1,13 +1,23 @@
 import { createSlice } from "@reduxjs/toolkit";
-
-const CustomTextSlice = createSlice({
-  name: "CustomTextSlice",
-  initialState: {
+const initialState = {
+  initialData: {
     customText: "",
   },
+  byId: {},
+};
+const CustomTextSlice = createSlice({
+  name: "CustomTextSlice",
+  initialState,
   reducers: {
+    addustomTextInstance: (state, action) => {
+      const { componentId } = action.payload;
+      state.byId[componentId] = {
+        ...state.initialData,
+      };
+    },
     handleCustomText: (state, action) => {
-      state.customText = action.payload;
+      const { componentId, value } = action.payload;
+      state.byId[componentId].customText = value;
     },
   },
 });

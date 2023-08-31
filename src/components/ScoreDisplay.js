@@ -1,12 +1,27 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { FaTrashCan } from "react-icons/fa6";
 import { HiOutlineClipboardDocument } from "react-icons/hi2";
-import { handleScore } from "../redux/slices/ScoreDisplaySlice";
+import {
+  addScoreDisplayInstance,
+  handleHide,
+  handleScore,
+} from "../redux/slices/ScoreDisplaySlice";
 import { useDispatch, useSelector } from "react-redux";
 
-const ScoreDisplay = ({ onDelete }) => {
+const ScoreDisplay = ({ onDelete, componentId }) => {
   const dispatch = useDispatch();
-  const scoreValue = useSelector((state) => state.ScoreDisplay.score);
+  // const scoreValue = useSelector((state) => state.ScoreDisplay.score);
+  const scoreValue = useSelector((state) => {
+    const instance = state.ScoreDisplay.byId[componentId];
+    if (!instance) {
+      return;
+    }
+    return instance.score;
+  });
+  useEffect(() => {
+    dispatch(addScoreDisplayInstance({ componentId }));
+  }, []);
+
   return (
     <div>
       <div className="flex mt-[15px] bg-white w-[750px]">
@@ -50,7 +65,11 @@ const ScoreDisplay = ({ onDelete }) => {
             className="text-[13px] border-[1px] focus:outline-none h-[100px] w-[100%] placeholder:text-[13px] p-[7px] mt-[20px]"
             placeholder="Your score is: %SURVEY_SCORE%"
             value={scoreValue}
-            onChange={(e) => dispatch(handleScore(e.target.value))}
+            onChange={(e) =>
+              dispatch(
+                handleScore({ componentId: componentId, value: e.target.value })
+              )
+            }
           ></textarea>
           <p className="text-[13px] text-[#737373] mt-[20px]">
             <span className="font-bold">Note:</span>Make sure that this element
@@ -60,11 +79,12 @@ const ScoreDisplay = ({ onDelete }) => {
           <div className="flex mt-[20px]">
             <p className="w-[180px] text-[#7D848C] text-[13px]">Hide score</p>
             <div className="flex items-center gap-[5px]">
-              <input type="checkbox" id="scoreDisplay" />
-              <label
-                htmlFor="scoreDisplay"
-                className="text-[13px] text-[#7d848c]"
-              >
+              <label className="text-[13px] text-[#7d848c] flex items-center gap-[5px]">
+                {" "}
+                <input
+                  type="checkbox"
+                  onChange={() => dispatch(handleHide({ componentId }))}
+                />
                 Hide the score element in the survey (score will still be shown
                 in reporting).
               </label>
