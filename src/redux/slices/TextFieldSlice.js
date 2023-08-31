@@ -7,6 +7,7 @@ const initialState = {
     requiredOption: false,
     hideNumber: true,
     initialValue: "",
+    image: null,
   },
   byId: {},
 };
@@ -41,6 +42,14 @@ export const TextFieldSlice = createSlice({
       const { componentId } = action.payload;
       state.byId[componentId].hideNumber = !state.byId[componentId].hideNumber;
     },
+    handleInitialValue: (state, action) => {
+      const { componentId, value } = action.payload;
+      state.byId[componentId].initialValue = value;
+    },
+    handleImages: (state, action) => {
+      const { componentId, value } = action.payload;
+      state.byId[componentId].image = URL.createObjectURL(value);
+    },
   },
 });
 export const {
@@ -50,6 +59,8 @@ export const {
   handleAnswerText2,
   handleRequiredOption,
   handleHideNumber,
+  handleInitialValue,
+  handleImages
 } = TextFieldSlice.actions;
 
 export default TextFieldSlice.reducer;

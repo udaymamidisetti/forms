@@ -12,7 +12,7 @@ const initialState = {
     isExpanded: false,
     randomChoice: false,
     choiceLayout: "Vertical",
-    images: null,
+    image: null,
     multipleAnswers: false,
     bulkOptions: [],
     position: "",

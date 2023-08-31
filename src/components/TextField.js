@@ -9,6 +9,8 @@ import {
   handleAnswerText2,
   handleRequiredOption,
   handleHideNumber,
+  handleInitialValue,
+  handleImages,
 } from "../redux/slices/TextFieldSlice";
 import { Editor } from "@tinymce/tinymce-react";
 
@@ -205,7 +207,15 @@ const TextField = ({ onDelete, componentId }) => {
               <div className="flex mt-[20px] items-center">
                 <p className="text-[#7D848C] text-[13px] w-[180px]">Media</p>
                 <div>
-                  <input type="file" className="" />
+                  <input
+                    type="file"
+                    className=""
+                    onChange={(e) =>
+                      dispatch(
+                        handleImages({ componentId, value: e.target.files[0] })
+                      )
+                    }
+                  />
                 </div>
               </div>
               <div className="flex mt-[20px] items-center">
@@ -217,6 +227,14 @@ const TextField = ({ onDelete, componentId }) => {
                     <input
                       className="w-[450px] border focus:outline-none p-[5px]  placeholder:text-[13px]"
                       placeholder="Optional- a prefilled text value"
+                      onChange={(e) =>
+                        dispatch(
+                          handleInitialValue({
+                            componentId: componentId,
+                            value: e.target.value,
+                          })
+                        )
+                      }
                     />
                   </div>
                 </div>
