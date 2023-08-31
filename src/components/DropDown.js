@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { BiSolidChevronDown } from "react-icons/bi";
 import { BsTrashFill } from "react-icons/bs";
 import { CgMenu } from "react-icons/cg";
@@ -18,13 +18,44 @@ import {
   addNewOption,
   addOtherChoice,
   deleteOptionContent,
+  addDropdownInstance,
+  handleRandomChoices,
+  handleImages,
+  handleBulkAdd,
 } from "../redux/slices/DropDownSlice";
+import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
+import { Editor } from "@tinymce/tinymce-react";
+import { useRef } from "react";
+import data from "../data";
+import { setAllStateValues, setTokenId } from "../redux/slices/FormSlice";
+import axios from "axios";
+import Cookies from "js-cookie";
 
-const DropDown = ({ onDelete }) => {
+const DropDown = ({ onDelete, componentId }) => {
   const dispatch = useDispatch();
-  const question = useSelector((state) => state.DropDown.questionInput);
-  const optionData = useSelector((state) => state.DropDown.options);
+  const dropDownState = useSelector((state) => state.DropDown.byId);
+  const applicationState = useSelector(
+    (state) => state.formData.allStateValues
+  );
+  const question = useSelector((state) => {
+    const instance = state.DropDown.byId[componentId];
+    if (!instance) {
+      return;
+    }
+    return instance.question;
+  });
+  console.log(question);
+  const optionData = useSelector((state) => {
+    const instance = state.DropDown.byId[componentId];
+    if (!instance) {
+      return data;
+    }
+    return instance.options;
+  });
+  const tokenId = useSelector((state) => state.formData.tokenId);
   const [showAll, setShowAll] = useState(false);
+  const [bulkInputText, setBulkInputText] = useState("");
+  const [bulkArray, setBulkArray] = useState([]);
   // const [jData, setjData] = useState([...data]);
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
@@ -40,23 +71,33 @@ const DropDown = ({ onDelete }) => {
   //     return updatedData;
   //   });
   // };
+
+  const handleBulkInputChange = (event) => {
+    setBulkInputText(event.target.value);
+  };
+  const handleSaveBulkChoices = () => {
+    dispatch(handleBulkAdd({ componentId, bulkArray }));
+    handleClose();
+  };
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      const words = bulkInputText.trim(" ");
+      setBulkArray((p) => [...p, { title: bulkInputText }]);
+    }
+  };
+
   const addOptionsHandler = () => {
     const newOption = { title: `Option ${optionData.length + 1}` };
     // setJdata(() => [...jData, ...newOption]);
-    dispatch(
-      addNewOption({
-        ...newOption,
-        expanded: false,
-      })
-    );
+    dispatch(addNewOption({ componentId, value: { ...newOption } }));
   };
-  const handleChange = useCallback(
-    (e) => {
-      const { value } = e.target;
-      dispatch(handleInputChange(value));
-    },
-    [dispatch]
-  );
+  const handleChange = (componentId) => (content) => {
+    dispatch(handleInputChange({ componentId, value: content }));
+  };
+  const handleEditorOptionChange = (componentId, index) => (content) => {
+    dispatch(handleOptionChange({ componentId, index, value: content }));
+  };
   const handleTitleInput = (index, event) => {
     const value = event.target.value;
     console.log(value);
@@ -71,6 +112,45 @@ const DropDown = ({ onDelete }) => {
     bgcolor: "background.paper",
     boxShadow: 24,
     p: 4,
+  };
+  const onDndEnd = (result) => {
+    if (!result.destination) return;
+
+    const { source, destination } = result;
+    dispatch(
+      setOrder({
+        sourceIndex: source.index,
+        destinationIndex: destination.index,
+      })
+    );
+  };
+  useEffect(() => {
+    dispatch(addDropdownInstance({ componentId }));
+  }, []);
+  const handleSave = async () => {
+    const values = {
+      form_data: applicationState,
+      tokenId: tokenId,
+    };
+
+    await axios
+      .post("https://demo.sending.app/react-api", values)
+      .then((response) => {
+        console.log("Response:", response.data);
+        dispatch(setTokenId(response.data.tokenId));
+        Cookies.set("tokenId", response.data);
+      })
+      .catch((error) => {
+        console.error("Error submitting form:", error);
+      });
+  };
+  const saveOverallState = () => {
+    handleSave();
+    dispatch(
+      setAllStateValues({
+        overallStates: dropDownState,
+      })
+    );
   };
   return (
     <div>
@@ -97,6 +177,7 @@ const DropDown = ({ onDelete }) => {
                       boxShadow: "0 1px 3px 0 rgba(40,60,70,0.2)",
                     }}
                     className="h-[36px] leading-[20px] text-[12px] pt-[8px] pb-[8px] pl-[10px] pr-[10px] bg-[#5cb85c] text-[white]"
+                    onClick={saveOverallState}
                   >
                     Save
                   </button>
@@ -113,25 +194,54 @@ const DropDown = ({ onDelete }) => {
               </div>
             </div>
             <p className="text-[#7D848C] pt-[7px] text-[14px]">Question</p>
-            <input
-              className="border w-[95%] focus:outline-none p-[10px] pt-[5px] pb-[5px] mt-[7px] text-[12px]"
-              placeholder="What question would you like to ask?"
-              onChange={handleChange}
-              value={question}
+            <Editor
+              // onInit={(evt, editor) => (editorRef.current = editor)}
+              inline={true}
+              value={`${question}`}
+              init={{
+                menubar: false,
+                plugins: [
+                  "advlist",
+                  "autolink",
+                  "lists",
+                  "link",
+                  "image",
+                  "charmap",
+                  "preview",
+                  "anchor",
+                  "searchreplace",
+                  "visualblocks",
+                  "code",
+                  "fullscreen",
+                  "insertdatetime",
+                  "media",
+                  "table",
+                  "code",
+                  "help",
+                  "wordcount",
+                ],
+                toolbar:
+                  "bold italic forecolor | alignleft aligncenter " +
+                  "alignright alignjustify | bullist numlist outdent indent | " +
+                  "removeformat | help",
+                toolbar_mode: "wrap",
+                ui_mode: "split",
+                directionality: "ltr",
+              }}
+              onEditorChange={handleChange(componentId)}
+              // value={question}
             />
             <h1 className="mt-[30px] text-[22px] mb-[10px]">Options</h1>
             <div className="flex">
               <p className="text-[#7D848C] text-[13px] w-[180px]">Required</p>
               <div className="flex items-center gap-[5px]">
-                <input
-                  type="checkbox"
-                  id="required"
-                  onChange={() => dispatch(handleRequiredOption())}
-                />
-                <label
-                  htmlFor="required"
-                  className="cursor-pointer text-[13px]"
-                >
+                <label className="cursor-pointer text-[13px] flex items-center gap-[5px]">
+                  <input
+                    type="checkbox"
+                    onChange={() =>
+                      dispatch(handleRequiredOption({ componentId }))
+                    }
+                  />
                   Respondents must answer this question
                 </label>
               </div>
@@ -141,25 +251,30 @@ const DropDown = ({ onDelete }) => {
                 Hide number
               </p>
               <div className="flex items-center gap-[5px]">
-                <input
-                  type="checkbox"
-                  id="required"
-                  onChange={() => dispatch(handleHideNumber())}
-                />
-                <label
-                  htmlFor="required"
-                  className="cursor-pointer text-[13px]"
-                >
+                <label className="cursor-pointer text-[13px] flex items-center gap-[5px]">
+                  <input
+                    type="checkbox"
+                    onChange={() => dispatch(handleHideNumber({ componentId }))}
+                  />
                   Hide the question number
                 </label>
               </div>
             </div>
-            <p
-              className="text-[#2366a2] text-[12px] mt-[20px] cursor-pointer"
-              onClick={() => setShowAll(!showAll)}
-            >
-              Show all Options
-            </p>
+            {showAll ? (
+              <p
+                className="text-[#2366a2] text-[12px] mt-[20px] cursor-pointer"
+                onClick={() => setShowAll(!showAll)}
+              >
+                Hide all Options
+              </p>
+            ) : (
+              <p
+                className="text-[#2366a2] text-[12px] mt-[20px] cursor-pointer"
+                onClick={() => setShowAll(!showAll)}
+              >
+                Show all Options
+              </p>
+            )}
             {showAll ? (
               <>
                 <div className="flex mt-[30px]">
@@ -167,11 +282,14 @@ const DropDown = ({ onDelete }) => {
                     Display Order
                   </p>
                   <div className="flex items-center gap-[5px]">
-                    <input type="checkbox" id="required" />
-                    <label
-                      htmlFor="required"
-                      className="cursor-pointer text-[13px]"
-                    >
+                    <label className="cursor-pointer text-[13px] flex items-center gap-[5px]">
+                      <input
+                        type="checkbox"
+                        id="required"
+                        onChange={() =>
+                          dispatch(handleRandomChoices({ componentId }))
+                        }
+                      />
                       Randomize choices
                     </label>
                   </div>
@@ -193,7 +311,18 @@ const DropDown = ({ onDelete }) => {
                 <div className="flex mt-[20px] items-center">
                   <p className="text-[#7D848C] text-[13px] w-[180px]">Media</p>
                   <div>
-                    <input type="file" className="" />
+                    <input
+                      type="file"
+                      className=""
+                      onChange={(e) =>
+                        dispatch(
+                          handleImages({
+                            componentId,
+                            value: e.target.files[0],
+                          })
+                        )
+                      }
+                    />
                   </div>
                 </div>
               </>
@@ -202,45 +331,88 @@ const DropDown = ({ onDelete }) => {
             )}
             <h1 className="mt-[30px] text-[22px] mb-[10px]">Choices</h1>
             <p className="pl-[30px] text-[#777] text-[13px]">Label</p>
-            <div>
-              {optionData.map((e, index) => (
-                <>
-                  <div
-                    className="flex items-center gap-[5px] mt-[5px]"
-                    key={index}
-                  >
-                    <RiDragMove2Fill color="#777" size={19} />
-                    <input
-                      className="text-[12px] h-[34px] border focus:outline-none pt-[6px] pr-[12px] pl-[12px] pb-[6px] flex-1"
-                      placeholder={e.title}
-                      onChange={(event) => handleTitleInput(index, event)}
-                      // value={e.title}
-                    />
-                    <button
-                      className="border p-[8px] text-[#777] flex items-center h-[34px] w-[34px]"
-                      // onClick={() => deleteOption(index)}
-                    >
-                      <BsTrashFill />
-                    </button>
+            <DragDropContext onDragEnd={onDndEnd}>
+              <Droppable droppableId="ChoiceDrops">
+                {(provided) => (
+                  <div {...provided.droppableProps} ref={provided.innerRef}>
+                    {optionData.map((e, index) => (
+                      <Draggable
+                        draggableId={String(index)}
+                        key={index}
+                        index={index}
+                      >
+                        {(provided) => (
+                          <div
+                            {...provided.dragHandleProps}
+                            {...provided.draggableProps}
+                            ref={provided.innerRef}
+                          >
+                            <div
+                              className="flex items-center gap-[5px] mt-[5px] w-[670px]"
+                              key={index}
+                              draggable
+                            >
+                              <RiDragMove2Fill
+                                color="#777"
+                                size={19}
+                                className="cursor-all-scroll"
+                                // {...dragHandleProps}
+                              />
+                              {/* <input
+                       className="text-[12px] h-[34px] border focus:outline-none pt-[6px] pr-[12px] pl-[12px] pb-[6px] flex-1"
+                       placeholder={e.title}
+                       // onChange={(e) => optionsChange(index, e.target.value)}
+                       onChange={(event) => handleTitleInput(index, event)}
+                       // value={e.title}
+                     /> */}
+                              <Editor
+                                // initialValue={`<p>${e.title}</p>`}
+                                value={`${e.title}`}
+                                inline={true}
+                                init={{
+                                  // placeholder: `${e.title}`,
+                                  menubar: false,
+                                  plugins: "lists help",
+                                  toolbar:
+                                    "bold italic forecolor underline link removeformat",
+                                  toolbar_mode: "wrap",
+                                  ui_mode: "split",
+                                }}
+                                onEditorChange={handleEditorOptionChange(
+                                  index,
+                                  componentId
+                                )}
+                              />
+                              <button
+                                className="border p-[8px] text-[#777] flex items-center h-[34px] w-[34px]"
+                                onClick={() =>
+                                  dispatch(
+                                    deleteOptionContent({
+                                      componentId,
+                                      i: index,
+                                    })
+                                  )
+                                }
+                              >
+                                <BsTrashFill />
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
                   </div>
-                  {/* {isExpanded ? <div>Set</div> : null} */}
-                </>
-              ))}
+                )}
+              </Droppable>
               <div className="pl-[24px] flex gap-[3px] mt-[5px]">
                 <button
                   className="border text-[14px] flex items-center gap-[5px] pl-[12px] pr-[12px] pt-[6px] pb-[6px] hover:bg-[#e6e6e6]"
-                  // onClick={addOptionsHandler}
                   onClick={addOptionsHandler}
                 >
                   <LuPlus size={18} />
                   <p className="text-[12px]">Add Choice</p>
                 </button>
-                {/* <button className="border text-[14px] flex items-center gap-[5px] pl-[12px] pr-[12px] pt-[6px] pb-[6px] hover:bg-[#e6e6e6]">
-                                <LuPlus size={18} />
-                                <p className="text-[12px]">
-                                  Add 'Other' Choice
-                                </p>
-                              </button> */}
                 <button
                   className="border text-[14px] flex items-center gap-[5px] pl-[12px] pr-[12px] pt-[6px] pb-[6px] hover:bg-[#e6e6e6]"
                   onClick={handleOpen}
@@ -254,41 +426,47 @@ const DropDown = ({ onDelete }) => {
                   aria-labelledby="modal-modal-title"
                   aria-describedby="modal-modal-description"
                   style={{
-                    animation: "slideInFromTop 0.3s ease-in-out",
+                    animation: "slideInFromTop 0.05s ease-in-out",
                   }}
+                  className="w-[600px] m-auto"
                 >
                   <Box sx={style}>
                     <h4 className="font-[500]">Quick Entry</h4>
                     <p className="text-[12px] mt-[10px]">
                       Enter one choice per line
                     </p>
-                    <textarea className=" focus:outline-none w-full border h-[200px] mt-[5px] p-[10px] placeholder:text-[12px]"></textarea>
+                    <textarea
+                      wrap="soft"
+                      className=" focus:outline-none w-full border h-[200px] mt-[5px] p-[10px] placeholder:text-[12px] text-[12px]"
+                      // onChange={handleBulkInputChange}
+                      // onKeyDown={handleKeyDown}
+                      // onKeyPress={handleKeyDown}
+                      onChange={handleBulkInputChange}
+                      onKeyDown={handleKeyDown}
+                    ></textarea>
                     <p className="text-[#737373] text-[12px]">
                       Adding in bulk will replace your existing choices with
                       those entered.
                     </p>
                     <div>
-                      <button className="bg-transparent text-[#2366a2] text-[12px] pt-[6px] pb-[6px] pr-[12px] pl-[12px]">
+                      <button
+                        className="bg-transparent text-[#2366a2] text-[12px] pt-[6px] pb-[6px] pr-[12px] pl-[12px]"
+                        onClick={() => setOpen(false)}
+                      >
                         Close
                       </button>
-                      <button className="bg-[#2773b7] text-white text-[12px] pt-[6px] pb-[6px] pr-[12px] pl-[12px]">
+                      <button
+                        className="bg-[#2773b7] text-white text-[12px] pt-[6px] pb-[6px] pr-[12px] pl-[12px]"
+                        // onClick={handleSaveBulkChoices}
+                        onClick={handleSaveBulkChoices}
+                      >
                         Save choices
                       </button>
                     </div>
                   </Box>
                 </Modal>
               </div>
-              {/* <div className="flex items-center gap-[5px] pl-[24px] mt-[20px] pt-[7px]">
-                              <input type="checkbox" id="check" />
-                              <label htmlFor="check" className="text-[12px]">
-                                Allow more than one answer to this question
-                                <span className="font-bold">
-                                  {" "}
-                                  (use checkboxes)
-                                </span>
-                              </label>
-                            </div> */}
-            </div>
+            </DragDropContext>
             <section className="mt-[40px] flex justify-end">
               <button
                 className="leading-[20px] text-[12px] pt-[8px] pb-[8px] pl-[18px] pr-[18px] text-[#3c8dd5]"

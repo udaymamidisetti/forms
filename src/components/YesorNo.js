@@ -1,24 +1,44 @@
-import { useCallback } from "react";
+import { useEffect } from "react";
 import React from "react";
 import { FaTrashCan } from "react-icons/fa6";
 import { HiOutlineClipboardDocument } from "react-icons/hi2";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  addYesorNoInstance,
   handleHideNumber,
   handleQuestionInput,
   handleRequiredOption,
 } from "../redux/slices/YesorNoslice";
+import { setAllStateValues } from "../redux/slices/FormSlice";
+import { Editor } from "@tinymce/tinymce-react";
 
-const YesorNo = ({ onDelete }) => {
+const YesorNo = ({ onDelete, componentId }) => {
   const dispatch = useDispatch();
-  const question = useSelector((state) => state.YesorNO.yesorNoQuestion);
-  const handleChange = useCallback(
-    (e) => {
-      const { value } = e.target;
-      dispatch(handleQuestionInput(value));
-    },
-    [dispatch]
-  );
+  const question = useSelector((state) => {
+    const instance = state.YesorNO.byId[componentId];
+    if (!instance) {
+      return;
+    }
+    return instance.yesorNoQuestion;
+  });
+  console.log(question);
+  const yesornoStates = useSelector((state) => state.YesorNO.byId);
+  // const handleChange = useCallback(
+  //   (e) => {
+  //     const { value } = e.target;
+  //     dispatch(handleQuestionInput(value));
+  //   },
+  //   [dispatch]
+  // );
+  const handleChange = (componentId) => (content) => {
+    dispatch(handleQuestionInput({ componentId, value: content }));
+  };
+  const handleEditorOptionChange = (componentId, index) => (content) => {
+    // dispatch(handleOptionChange({ componentId, index, value: content }));
+  };
+  useEffect(() => {
+    dispatch(addYesorNoInstance({ componentId }));
+  }, []);
 
   return (
     <div>
@@ -46,6 +66,11 @@ const YesorNo = ({ onDelete }) => {
                         boxShadow: "0 1px 3px 0 rgba(40,60,70,0.2)",
                       }}
                       className="h-[36px] leading-[20px] text-[12px] pt-[8px] pb-[8px] pl-[10px] pr-[10px] bg-[#5cb85c] text-[white]"
+                      onClick={() =>
+                        dispatch(
+                          setAllStateValues({ overallStates: yesornoStates })
+                        )
+                      }
                     >
                       Save
                     </button>
@@ -62,11 +87,47 @@ const YesorNo = ({ onDelete }) => {
                 </div>
               </div>
               <p className="text-[#7D848C] pt-[7px] text-[14px]">Question</p>
-              <input
+              {/* <input
                 className="border w-[95%] focus:outline-none p-[10px] pt-[5px] pb-[5px] mt-[7px] text-[13px]"
                 placeholder="What question would you like to ask?"
                 onChange={handleChange}
                 value={question}
+              /> */}
+              <Editor
+                // onInit={(evt, editor) => (editorRef.current = editor)}
+                inline={true}
+                value={`${question}`}
+                init={{
+                  menubar: false,
+                  plugins: [
+                    "advlist",
+                    "autolink",
+                    "lists",
+                    "link",
+                    "image",
+                    "charmap",
+                    "preview",
+                    "anchor",
+                    "searchreplace",
+                    "visualblocks",
+                    "code",
+                    "fullscreen",
+                    "insertdatetime",
+                    "media",
+                    "table",
+                    "code",
+                    "help",
+                    "wordcount",
+                  ],
+                  toolbar:
+                    "bold italic forecolor | alignleft aligncenter " +
+                    "alignright alignjustify | bullist numlist outdent indent | " +
+                    "removeformat | help",
+                  toolbar_mode: "wrap",
+                  ui_mode: "split",
+                  directionality: "ltr",
+                }}
+                onEditorChange={handleChange(componentId)}
               />
               <h1 className="mt-[30px] text-[22px] mb-[10px]">Options</h1>
               <div className="flex">
@@ -75,7 +136,9 @@ const YesorNo = ({ onDelete }) => {
                   <input
                     type="checkbox"
                     id="required"
-                    onChange={() => dispatch(handleRequiredOption())}
+                    onChange={() =>
+                      dispatch(handleRequiredOption({ componentId }))
+                    }
                   />
                   <label
                     htmlFor="required"
@@ -93,7 +156,7 @@ const YesorNo = ({ onDelete }) => {
                   <input
                     type="checkbox"
                     id="required"
-                    onChange={() => dispatch(handleHideNumber())}
+                    onChange={() => dispatch(handleHideNumber({ componentId }))}
                   />
                   <label
                     htmlFor="required"

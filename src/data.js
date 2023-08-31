@@ -5,6 +5,7 @@ const data = [
     includeImage: false,
     includeOtherTextField: false,
     image: null,
+    position: "",
   },
   {
     title: "Option 2",
@@ -12,6 +13,7 @@ const data = [
     includeImage: false,
     includeOtherTextField: false,
     image: null,
+    position: "",
   },
   {
     title: "Option 3",
@@ -19,6 +21,7 @@ const data = [
     includeImage: false,
     includeOtherTextField: false,
     image: null,
+    position: "",
   },
   {
     title: "Option 4",
@@ -26,6 +29,7 @@ const data = [
     includeImage: false,
     includeOtherTextField: false,
     image: null,
+    position: "",
   },
 ];
 export default data;

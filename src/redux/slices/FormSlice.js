@@ -7,13 +7,15 @@ const formSlice = createSlice({
     [uuid()]: [],
     options: [{ id: "textField" }],
     previewArray: [],
-    tokenId: null,
+    tokenId: 0,
+    allStateValues: [],
   },
   reducers: {
     addOption: (state, action) => {
       const optionId = action.payload;
       console.log(optionId);
-      state.selectedOptions.push(optionId);
+      // state.selectedOptions.push(optionId);
+      state.selectedOptions = [...state.selectedOptions, optionId];
       console.log(state.selectedOptions.length);
       localStorage.setItem(
         "selectedOptions",
@@ -79,6 +81,46 @@ const formSlice = createSlice({
       state[sourceDroppableId] = sourceClone;
       state[destinationDroppableId] = destClone;
     },
+    setAllStateValues: (state, action) => {
+      const { overallStates, componentId } = action.payload;
+      console.log(componentId);
+      const key = Object.keys(overallStates)[0];
+      const index = state.allStateValues.findIndex((obj) => key in obj);
+      // console.log(
+      //   Object.keys(state.allStateValues).includes(Object.keys(overallStates))
+      // );
+      // if (
+      //   Object.keys(state.allStateValues).includes(Object.keys(overallStates))
+      // ) {
+      //   return;
+      // } else {
+      //   state.allStateValues = [...state.allStateValues, overallStates];
+      // }
+      // const index = state.allStateValues.findIndex(
+      //   (obj) => obj.key === componentId
+      // );
+      console.log(index);
+      if (index !== -1) {
+        state.allStateValues[index] = overallStates;
+      } else {
+        state.allStateValues.push(overallStates);
+      }
+      // const doesObjExist = overallStates.some((obj) => {
+      //   for (const prop in state.allStateValues) {
+      //     if (obj[prop] !== state.allStateValues[prop]) {
+      //       return false;
+      //     }
+      //   }
+      //   return true;
+      // });
+      // console.log(doesObjExist);
+      // if (doesObjExist) {
+      //   state.allStateValues = [...state.allStateValues, overallStates];
+      // } else {
+      //   return;
+      // }
+      // console.log(state.allStateValues);
+    },
   },
 });
 
@@ -93,5 +135,6 @@ export const {
   reorderItems,
   moveItems,
   copyItems,
+  setAllStateValues,
 } = formSlice.actions;
 export default formSlice.reducer;

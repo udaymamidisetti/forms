@@ -32,8 +32,12 @@ import { deleteOptionByIndex } from "../redux/slices/FormSlice";
 import PageBreak from "./PageBreak";
 import TemplatePreview from "./TemplatePreview";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
+import { addInstance } from "../redux/slices/MultipleChoiceSlice";
+import Header from "./Header";
 const TemplateBody = () => {
   const dispatch = useDispatch();
+  const id = useSelector((state) => state.formData.tokenId);
+  console.log(id);
   const array = useSelector((state) => state.formData.previewArray);
   const [drag, setDrag] = useState(true);
   const [display, setDisplay] = useState();
@@ -41,6 +45,7 @@ const TemplateBody = () => {
   const selectedOptions = useSelector(
     (state) => state.formData.selectedOptions
   );
+  console.log(selectedOptions);
   const [dataArray, setDataArray] = useState([]);
 
   // const contentRef = useRef(null);
@@ -70,7 +75,7 @@ const TemplateBody = () => {
     if (!result.destination) return;
 
     const { source, destination } = result;
-    // console.log(destination.droppableId);
+    console.log(destination.droppableId);
     // dispatch(
     //   setChoicesOrder({
     //     sourceIndex: source.index,
@@ -95,12 +100,23 @@ const TemplateBody = () => {
         );
         break;
       case "ITEMS":
-      // const droppedOption = result.draggableId;
-      // dispatch(addOption(droppedOption));
-      // break;
+        // const droppedOption = result.draggableId;
+        // dispatch(addOption(droppedOption));
+        // break;
+        dispatch(
+          setChoicesOrder({
+            sourceIndex: source.index,
+            destinationIndex: destination.index,
+          })
+        );
       default:
         const droppedOption = result.draggableId;
-        dispatch(addOption(droppedOption));
+        dispatch(
+          addOption({
+            droppedOption: droppedOption,
+            componentId: droppedOption + destination.index,
+          })
+        );
         break;
     }
   };
@@ -161,131 +177,131 @@ const TemplateBody = () => {
                       ref={provided.innerRef}
                     >
                       <div className="flex items-center gap-[5px] mt-[5px]">
-                        {optionId === "MultipleChoice" && (
+                        {optionId.droppedOption === "MultipleChoice" && (
                           <MultipleChoice
                             key={`${optionId}-${index}`}
                             index={index}
-                            componentId={`component${index + 1}`}
+                            componentId={`Multiplechoice${index + 1}`}
                             onDelete={() => deleteOption(index)}
                           />
                         )}
-                        {optionId === "MultipleChoiceGrid" && (
+                        {optionId.droppedOption === "MultipleChoiceGrid" && (
                           <MultipleChoiceGrid
                             key={`${optionId}-${index}`}
                             index={index}
-                            componentId={`component${index + 1}`}
+                            componentId={`MultipleChoiceGrid${index + 1}`}
                             onDelete={() => deleteOption(index)}
                           />
                         )}
-                        {optionId === "DropDown" && (
+                        {optionId.droppedOption === "DropDown" && (
                           <DropDown
                             key={`${optionId}-${index}`}
                             index={index}
-                            componentId={`component${index + 1}`}
+                            componentId={`DropDown${index + 1}`}
                             onDelete={() => deleteOption(index)}
                           />
                         )}
-                        {optionId === "DropDownGrid" && (
+                        {optionId.droppedOption === "DropDownGrid" && (
                           <DropDownGrid
                             key={`${optionId}-${index}`}
                             index={index}
-                            componentId={`component${index + 1}`}
+                            componentId={`DropDownGrid${index + 1}`}
                             onDelete={() => deleteOption(index)}
                           />
                         )}
-                        {optionId === "YesNo" && (
+                        {optionId.droppedOption === "YesNo" && (
                           <YesorNo
                             key={`${optionId}-${index}`}
                             index={index}
-                            componentId={`component${index + 1}`}
+                            componentId={`YesNo${index + 1}`}
                             onDelete={() => deleteOption(index)}
                           />
                         )}
-                        {optionId === "NetPromoter" && (
+                        {optionId.droppedOption === "NetPromoter" && (
                           <NetPromoter
                             key={`${optionId}-${index}`}
                             index={index}
-                            componentId={`component${index + 1}`}
+                            componentId={`NetPromoter${index + 1}`}
                             onDelete={() => deleteOption(index)}
                           />
                         )}
-                        {optionId === "TextField" && (
+                        {optionId.droppedOption === "TextField" && (
                           <TextField
                             key={`${optionId}-${index}`}
                             index={index}
-                            componentId={`component${index + 1}`}
+                            componentId={`TextField${index + 1}`}
                             onDelete={() => deleteOption(index)}
                           />
                         )}
-                        {optionId === "TextFieldGrid" && (
+                        {optionId.droppedOption === "TextFieldGrid" && (
                           <TextFieldGrid
                             key={`${optionId}-${index}`}
                             index={index}
-                            componentId={`component${index + 1}`}
+                            componentId={`TextFieldGrid${index + 1}`}
                             onDelete={() => deleteOption(index)}
                           />
                         )}
-                        {optionId === "RatingScale" && (
+                        {optionId.droppedOption === "RatingScale" && (
                           <RatingScale
                             key={`${optionId}-${index}`}
                             index={index}
-                            componentId={`component${index + 1}`}
+                            componentId={`RatingScale${index + 1}`}
                             onDelete={() => deleteOption(index)}
                           />
                         )}
-                        {optionId === "RatingScaleMatrix" && (
+                        {optionId.droppedOption === "RatingScaleMatrix" && (
                           <RatingScaleMatrix
                             key={`${optionId}-${index}`}
                             index={index}
-                            componentId={`component${index + 1}`}
+                            componentId={`RatingScaleMatrix${index + 1}`}
                             onDelete={() => deleteOption(index)}
                           />
                         )}
-                        {optionId === "Ranking" && (
+                        {optionId.droppedOption === "Ranking" && (
                           <Ranking
                             key={`${optionId}-${index}`}
                             index={index}
-                            componentId={`component${index + 1}`}
+                            componentId={`Ranking${index + 1}`}
                             onDelete={() => deleteOption(index)}
                           />
                         )}
-                        {optionId === "PercentageSum" && (
+                        {optionId.droppedOption === "PercentageSum" && (
                           <PercentageSum
                             key={`${optionId}-${index}`}
                             index={index}
-                            componentId={`component${index + 1}`}
+                            componentId={`PercentageSum${index + 1}`}
                             onDelete={() => deleteOption(index)}
                           />
                         )}
-                        {optionId === "Heading" && (
+                        {optionId.droppedOption === "Heading" && (
                           <Heading
                             key={`${optionId}-${index}`}
                             index={index}
-                            componentId={`component${index + 1}`}
+                            componentId={`Heading${index + 1}`}
                             onDelete={() => deleteOption(index)}
                           />
                         )}
-                        {optionId === "CustomText" && (
+                        {optionId.droppedOption === "CustomText" && (
                           <CustomText
                             key={`${optionId}-${index}`}
                             index={index}
-                            componentId={`component${index + 1}`}
+                            componentId={`CustomText${index + 1}`}
                             onDelete={() => deleteOption(index)}
                           />
                         )}
-                        {optionId === "ScoreDisplay" && (
+                        {optionId.droppedOption === "ScoreDisplay" && (
                           <ScoreDisplay
                             key={`${optionId}-${index}`}
                             index={index}
-                            componentId={`component${index + 1}`}
+                            componentId={`ScoreDisplay${index + 1}`}
                             onDelete={() => deleteOption(index)}
                           />
                         )}
-                        {optionId === "PageBreak" && (
+                        {optionId.droppedOption === "PageBreak" && (
                           <PageBreak
                             key={`${optionId}-${index}`}
                             index={index}
-                            componentId={`component${index + 1}`}
+                            componentId={`PageBreak${index + 1}`}
                             onDelete={() => deleteOption(index)}
                           />
                         )}
@@ -326,8 +342,9 @@ const TemplateBody = () => {
   return (
     <div>
       {/* {optionContent ? <div>Set</div> : <div></div>} */}
+      {/* <Header /> */}
       <div
-        className="bg-[black]/[0.2] max-w-[1120px] m-auto pl-[30px] pr-[30px] pb-[30px]"
+        className="bg-[black]/[0.2] max-w-[1120px] m-auto pl-[30px] pr-[30px] pb-[30px] mt-[30px]"
         // onDragOver={handleDragEnter}
         // onDragLeave={() => setDisplay(false)}
         // onDragEnd={() => setDisplay(true)}
@@ -764,7 +781,7 @@ const TemplateBody = () => {
                 Create a Template
               </button>
               {/* {array.length > 0 && ( */}
-              <Link to="/uday/preview">
+              <Link to={`/uday/preview/${id}`} target="__blank">
                 <button className="bg-[#3c8dd5] w-full text-[white] mt-[20px] text-[14px] pt-[8px] pb-[8px]">
                   Preview
                 </button>

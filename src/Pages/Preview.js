@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import TextFieldForm from "../components/previewPageComponents/TextFieldForm";
 import YesorNoForm from "../components/previewPageComponents/YesorNoForm";
 import MultipleChoiceForm from "../components/previewPageComponents/MultipleChoiceForm";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import DropDownForm from "../components/previewPageComponents/DropDownForm";
 import RatingScaleForm from "../components/previewPageComponents/RatingScaleForm";
 import HeadingForm from "../components/previewPageComponents/HeadingForm";
@@ -15,15 +15,37 @@ import Cookies from "js-cookie";
 
 const Preview = () => {
   const navigate = useNavigate();
+  const { id } = useParams();
+  console.log(id);
+  const tokenId = useSelector((state) => state.formData.tokenId);
   const selectedOptions = useSelector(
     (state) => state.formData.selectedOptions
   );
+
   const sortedOptions = [...new Set(selectedOptions)];
+  console.log(sortedOptions);
   const options = useSelector((state) => state.formData.options);
   const ref_id = Cookies.get("tokenId");
   console.log(ref_id);
   console.log(selectedOptions);
   console.log(...options);
+
+  useEffect(() => {
+    console.log("Running");
+    getAllOptionValues();
+  }, []);
+
+  const getAllOptionValues = async () => {
+    const values = {
+      tokenId: id,
+    };
+    axios
+      .post("https://demo.sending.app/react-api", values)
+      .then((response) => {
+        console.log(response.data);
+      })
+      .catch((e) => console.log(e));
+  };
 
   const getOptionContent = (optionId) => {
     const option = options.find((opt) => opt.id === optionId);
@@ -41,7 +63,7 @@ const Preview = () => {
   const htmlStructure = (
     <div>
       {sortedOptions.map((optionId, index) => {
-        switch (optionId) {
+        switch (optionId.droppedOption) {
           case "TextField":
             return <TextFieldForm key={`${optionId}-${index}`} index={index} />;
           case "YesNo":

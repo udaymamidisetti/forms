@@ -1,9 +1,51 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaTrashCan } from "react-icons/fa6";
 import { HiOutlineClipboardDocument } from "react-icons/hi2";
+import {
+  addNetPromoterInstance,
+  setHideNumber,
+  setRequired,
+  setLeftLabel,
+  setRightLabel,
+  setDisplayTextFields,
+  handleImages,
+  handleInputChange,
+} from "../redux/slices/NetPromoterSlice";
+import { Editor } from "@tinymce/tinymce-react";
+import { useSelector, useDispatch } from "react-redux";
 
-const NetPromoter = ({ onDelete }) => {
+const NetPromoter = ({ onDelete, componentId }) => {
+  const dispatch = useDispatch();
+  const question = useSelector((state) => {
+    const instance = state.NetPromoter.byId[componentId];
+    if (!instance) {
+      return;
+    }
+    return instance.question;
+  });
+  console.log(question);
+  const leftLabel = useSelector((state) => {
+    const instance = state.NetPromoter.byId[componentId];
+    if (!instance) {
+      return;
+    }
+    return instance.leftLabel;
+  });
+  const rightLabel = useSelector((state) => {
+    const instance = state.NetPromoter.byId[componentId];
+    if (!instance) {
+      return;
+    }
+    return instance.rightLabel;
+  });
   const [showFull, setShowFull] = useState(false);
+  const handleChange = (componentId) => (content) => {
+    dispatch(handleInputChange({ componentId, value: content }));
+  };
+
+  useEffect(() => {
+    dispatch(addNetPromoterInstance({ componentId }));
+  }, []);
   return (
     <div>
       <div className="flex transition-opacity duration-200 ease-in-expo mt-[15px] bg-white">
@@ -44,15 +86,51 @@ const NetPromoter = ({ onDelete }) => {
             </div>
           </div>
           <p className="text-[#7D848C] pt-[7px] text-[14px]">Question</p>
-          <input
-            className="border w-[95%] focus:outline-none p-[10px] pt-[5px] pb-[5px] mt-[7px] text-[12px]"
-            placeholder="What question would you like to ask?"
+          <Editor
+            inline={true}
+            value={question}
+            init={{
+              menubar: false,
+              plugins: [
+                "advlist",
+                "autolink",
+                "lists",
+                "link",
+                "image",
+                "charmap",
+                "preview",
+                "anchor",
+                "searchreplace",
+                "visualblocks",
+                "code",
+                "fullscreen",
+                "insertdatetime",
+                "media",
+                "table",
+                "code",
+                "help",
+                "wordcount",
+              ],
+              toolbar:
+                "bold italic forecolor | alignleft aligncenter " +
+                "alignright alignjustify | bullist numlist outdent indent | " +
+                "removeformat | help",
+              toolbar_mode: "wrap",
+              ui_mode: "split",
+              directionality: "ltr",
+            }}
+            onEditorChange={handleChange(componentId)}
           />
           <div className="flex mt-[30px]">
             <p className="text-[#7D848C] text-[13px] w-[180px]">Labels</p>
             <div className="flex items-center gap-[5px]">
-              <input type="checkbox" id="required" />
-              <label htmlFor="required" className="cursor-pointer text-[13px]">
+              <label className="cursor-pointer text-[13px] flex items-center gap-[5px]">
+                <input
+                  type="checkbox"
+                  onChange={() =>
+                    dispatch(setDisplayTextFields({ componentId }))
+                  }
+                />
                 Display text labels
               </label>
             </div>
@@ -64,7 +142,15 @@ const NetPromoter = ({ onDelete }) => {
                 type="text"
                 id="required"
                 className="border focus:outline-none text-[12px] pl-[6px] pt-[3px] pb-[3px] w-[480px]"
-                value="Not at all likely"
+                value={leftLabel}
+                onChange={(e) =>
+                  dispatch(
+                    setLeftLabel({
+                      componentId: componentId,
+                      value: e.target.value,
+                    })
+                  )
+                }
               />
             </div>
           </div>
@@ -75,7 +161,15 @@ const NetPromoter = ({ onDelete }) => {
                 type="text"
                 id="required"
                 className="border focus:outline-none text-[12px] pl-[6px] pt-[3px] pb-[3px] w-[480px]"
-                value="Extremely likely"
+                value={rightLabel}
+                onChange={(e) =>
+                  dispatch(
+                    setRightLabel({
+                      componentId: componentId,
+                      value: e.target.value,
+                    })
+                  )
+                }
               />
             </div>
           </div>
@@ -83,8 +177,11 @@ const NetPromoter = ({ onDelete }) => {
           <div className="flex">
             <p className="text-[#7D848C] text-[13px] w-[180px]">Required</p>
             <div className="flex items-center gap-[5px]">
-              <input type="checkbox" id="required" />
-              <label htmlFor="required" className="cursor-pointer text-[13px]">
+              <label className="cursor-pointer text-[13px] flex items-center gap-[5px]">
+                <input
+                  type="checkbox"
+                  onChange={() => dispatch(setRequired({ componentId }))}
+                />
                 Respondents must answer this question
               </label>
             </div>
@@ -92,18 +189,30 @@ const NetPromoter = ({ onDelete }) => {
           <div className="flex mt-[30px]">
             <p className="text-[#7D848C] text-[13px] w-[180px]">Hide number</p>
             <div className="flex items-center gap-[5px]">
-              <input type="checkbox" id="required" />
-              <label htmlFor="required" className="cursor-pointer text-[13px]">
+              <label className="cursor-pointer text-[13px] flex items-center gap-[5px]">
+                <input
+                  type="checkbox"
+                  onChange={() => dispatch(setHideNumber({ componentId }))}
+                />
                 Hide the question number
               </label>
             </div>
           </div>
-          <p
-            className="text-[#2366a2] text-[12px] mt-[20px] cursor-pointer"
-            onClick={() => setShowFull(!showFull)}
-          >
-            Show all Options
-          </p>
+          {showFull ? (
+            <p
+              className="text-[#2366a2] text-[12px] mt-[20px] cursor-pointer"
+              onClick={() => setShowFull(!showFull)}
+            >
+              Hide all Options
+            </p>
+          ) : (
+            <p
+              className="text-[#2366a2] text-[12px] mt-[20px] cursor-pointer"
+              onClick={() => setShowFull(!showFull)}
+            >
+              Show all Options
+            </p>
+          )}
           {showFull ? (
             <>
               <div className="flex mt-[20px] items-center">
@@ -122,7 +231,15 @@ const NetPromoter = ({ onDelete }) => {
               <div className="flex mt-[20px] items-center">
                 <p className="text-[#7D848C] text-[13px] w-[180px]">Media</p>
                 <div>
-                  <input type="file" className="" />
+                  <input
+                    type="file"
+                    className=""
+                    onChange={(e) =>
+                      dispatch(
+                        handleImages({ componentId, value: e.target.files[0] })
+                      )
+                    }
+                  />
                 </div>
               </div>
             </>

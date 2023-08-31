@@ -9,7 +9,7 @@ function App() {
       <Routes>
         <Route path="/" element={<TemplateBody />} />
         {/* <Route path="/" element={<NewTemplate />} /> */}
-        <Route path="/uday/preview" element={<Preview />} />
+        <Route path="/uday/preview/:id" element={<Preview />} />
       </Routes>
     </BrowserRouter>
   );

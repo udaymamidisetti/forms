@@ -1,35 +1,50 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  questionInput: "What question would you like to ask?",
-  answerText: null,
-  requiredOption: false,
-  hideNumber: true,
+  initialData: {
+    question: "What question would you like to ask?",
+    answerText: null,
+    requiredOption: false,
+    hideNumber: true,
+    initialValue: "",
+  },
+  byId: {},
 };
 export const TextFieldSlice = createSlice({
   name: "textField",
   initialState,
   reducers: {
+    addTextFieldInstance: (state, action) => {
+      const { componentId } = action.payload;
+      state.byId[componentId] = {
+        ...state.initialData,
+      };
+    },
     handleInputChange: (state, action) => {
-      state.questionInput = action.payload;
-      console.log(state.questionInput);
+      const { componentId, value } = action.payload;
+      state.byId[componentId].question = value;
     },
-    handleAnswerText1: (state) => {
-      state.answerText = "single";
+    handleAnswerText1: (state, action) => {
+      const { componentId } = action.payload;
+      state.byId[componentId].answerText = "single";
     },
-    handleAnswerText2: (state) => {
-      state.answerText = "multiple";
+    handleAnswerText2: (state, action) => {
+      const { componentId } = action.payload;
+      state.byId[componentId].answerText = "multiple";
     },
-    handleRequiredOption: (state) => {
-      state.requiredOption = !state.requiredOption;
-      console.log(state.requiredOption);
+    handleRequiredOption: (state, action) => {
+      const { componentId } = action.payload;
+      state.byId[componentId].requiredOption =
+        !state.byId[componentId].requiredOption;
     },
-    handleHideNumber: (state) => {
-      state.hideNumber = !state.hideNumber;
+    handleHideNumber: (state, action) => {
+      const { componentId } = action.payload;
+      state.byId[componentId].hideNumber = !state.byId[componentId].hideNumber;
     },
   },
 });
 export const {
+  addTextFieldInstance,
   handleInputChange,
   handleAnswerText1,
   handleAnswerText2,

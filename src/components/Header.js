@@ -5,7 +5,7 @@ const Header = () => {
     <div className="w-full bg-[#3b3b3be6]/[0.9]">
       <div className="h-[80px] max-w-[1120px] m-auto flex items-center justify-between">
         <div className="">
-          <h1 className="text-[white] font-semibold">Our Logo</h1>
+          <h1 className="text-[white] font-semibold"></h1>
         </div>
         <div className="flex gap-[50px] items-center">
           <button className="bg-[#ec971f] text-[14px] pl-[20px] pr-[20px] pt-[7px] pb-[7px] text-[white] rounded-[3px]">

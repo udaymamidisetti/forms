@@ -1,27 +1,38 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { FaTrashCan } from "react-icons/fa6";
 import { HiOutlineClipboardDocument } from "react-icons/hi2";
 import { useSelector, useDispatch } from "react-redux";
 import {
+  addTextFieldInstance,
   handleInputChange,
   handleAnswerText1,
   handleAnswerText2,
   handleRequiredOption,
   handleHideNumber,
 } from "../redux/slices/TextFieldSlice";
+import { Editor } from "@tinymce/tinymce-react";
 
-const TextField = ({ onDelete }) => {
+const TextField = ({ onDelete, componentId }) => {
   const dispatch = useDispatch();
   const questionInput = useSelector((state) => state.textField.questionInput);
-  const radioValue = useSelector((state) => state.textField.answerText);
+  const question = useSelector((state) => {
+    const instance = state.textField.byId[componentId];
+    if (!instance) {
+      return;
+    }
+    return instance.question;
+  });
+  const radioValue = useSelector((state) => {
+    const instance = state.textField.byId[componentId];
+    if (!instance) {
+      return;
+    }
+    return instance.answerText;
+  });
   const [showFull, setShowFull] = useState(false);
-  const handleChange = useCallback(
-    (e) => {
-      const { value } = e.target;
-      dispatch(handleInputChange(value));
-    },
-    [dispatch]
-  );
+  const handleChange = (componentId) => (content) => {
+    dispatch(handleInputChange({ componentId, value: content }));
+  };
 
   const handleSingleChange = () => {
     dispatch(handleAnswerText1());
@@ -30,6 +41,10 @@ const TextField = ({ onDelete }) => {
   const handleMultipleChange = () => {
     dispatch(handleAnswerText2());
   };
+
+  useEffect(() => {
+    dispatch(addTextFieldInstance({ componentId }));
+  }, []);
 
   return (
     <div>
@@ -71,11 +86,42 @@ const TextField = ({ onDelete }) => {
             </div>
           </div>
           <p className="text-[#7D848C] pt-[7px] text-[12px]">Question</p>
-          <input
-            className="text-[12px] border w-[95%] focus:outline-none p-[10px] pt-[5px] pb-[5px] mt-[7px]"
-            placeholder="What question would you like to ask?"
-            value={questionInput}
-            onChange={handleChange}
+          <Editor
+            // onInit={(evt, editor) => (editorRef.current = editor)}
+            inline={true}
+            value={`${question}`}
+            init={{
+              menubar: false,
+              plugins: [
+                "advlist",
+                "autolink",
+                "lists",
+                "link",
+                "image",
+                "charmap",
+                "preview",
+                "anchor",
+                "searchreplace",
+                "visualblocks",
+                "code",
+                "fullscreen",
+                "insertdatetime",
+                "media",
+                "table",
+                "code",
+                "help",
+                "wordcount",
+              ],
+              toolbar:
+                "bold italic forecolor | alignleft aligncenter " +
+                "alignright alignjustify | bullist numlist outdent indent | " +
+                "removeformat | help",
+              toolbar_mode: "wrap",
+              ui_mode: "split",
+              directionality: "ltr",
+            }}
+            onEditorChange={handleChange(componentId)}
+            // value={question}
           />
           <div className="flex mt-[30px]">
             <p className="text-[#7D848C] text-[13px] w-[180px]">
@@ -86,7 +132,7 @@ const TextField = ({ onDelete }) => {
                 type="radio"
                 id="single"
                 value="single"
-                onChange={handleSingleChange}
+                onChange={() => dispatch(handleAnswerText1({ componentId }))}
                 checked={radioValue === "single"}
               />
               <label htmlFor="single" className="text-[13px]">
@@ -97,7 +143,7 @@ const TextField = ({ onDelete }) => {
                 id="single"
                 value="multiple"
                 className="ml-[10px]"
-                onChange={handleMultipleChange}
+                onChange={() => dispatch(handleAnswerText2({ componentId }))}
                 checked={radioValue === "multiple"}
               />
               <label htmlFor="single" className="text-[13px]">
@@ -112,7 +158,7 @@ const TextField = ({ onDelete }) => {
               <input
                 type="checkbox"
                 id="respondents"
-                onChange={() => dispatch(handleRequiredOption())}
+                onChange={() => dispatch(handleRequiredOption({ componentId }))}
               />
               <label
                 htmlFor="respondents"
@@ -128,7 +174,7 @@ const TextField = ({ onDelete }) => {
               <input
                 type="checkbox"
                 id="required"
-                onChange={() => dispatch(handleHideNumber())}
+                onChange={() => dispatch(handleHideNumber({ componentId }))}
               />
               <label htmlFor="required" className="cursor-pointer text-[13px]">
                 Hide the question number

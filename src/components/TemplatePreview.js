@@ -5,10 +5,13 @@ import { Link } from "react-router-dom";
 
 const TemplatePreview = () => {
   const tokenId = useSelector((state) => state.formData.tokenId);
+  const selectedOptions = useSelector(
+    (state) => state.formData.selectedOptions
+  );
   return (
     <>
-      {tokenId === null ? (
-        <div className="flex justify-center items-center pt-[50px]">
+      {tokenId === 0 ? (
+        <div className="flex justify-center items-center pt-[20px]">
           <h1 className="text-[24px] pt-[20px] pb-[30px] text-white">
             Choose a{" "}
             <span className="text-[#0c9ec7] cursor-pointer hover:drop-shadow-lg hover:underline">

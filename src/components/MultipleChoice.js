@@ -30,18 +30,21 @@ import {
   setOtherTextField,
   setIncludeImage,
   handleSetImage,
+  addMultipleChoiceInstance,
+  deleteMultipleChoiceInstance,
+  setOptionPositionImage,
 } from "../redux/slices/MultipleChoiceSlice";
 import { deleteToken } from "../redux/slices/FormSlice";
 import {
   addPreviewArray,
   setTokenId,
   setOption,
+  setAllStateValues,
 } from "../redux/slices/FormSlice";
 import { Box, Modal } from "@mui/material";
 import Cookies from "js-cookie";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import { Editor } from "@tinymce/tinymce-react";
-import "react-quill/dist/quill.snow.css";
 import { useRef } from "react";
 // import { v4 as uuidv4 } from "uuid";
 
@@ -51,30 +54,77 @@ const MultipleChoice = ({ onDelete, dragHandleProps, componentId }) => {
   // console.log(instanceId);
   const editorRef = useRef(null);
   const dispatch = useDispatch();
-  const question = useSelector((state) => state.MultipleChoice.question);
-  const requiredOption = useSelector(
-    (state) => state.MultipleChoice.requiredOption
+  // dispatch(addMultipleChoiceInstance({ componentId }));
+  // const oneTimeFunction = useRef(() => dispatch(addMultipleChoiceInstance({ componentId })));
+  const applicationState = useSelector(
+    (state) => state.formData.allStateValues
   );
-  const hideNumber = useSelector((state) => state.MultipleChoice.hideNumber);
-  const randomChoice = useSelector(
-    (state) => state.MultipleChoice.randomChoice
-  );
+  const tokenId = useSelector((state) => state.formData.tokenId);
+  console.log(applicationState);
+  const question = useSelector((state) => {
+    const instance = state.MultipleChoice.byId[componentId];
+    if (!instance) {
+      return;
+    }
+    return instance.question;
+  });
+  console.log(question);
+  // const question = useSelector(
+  //   (state) => state.MultipleChoice.byId[componentId]
+  // );
+  // console.log(question.question);
+  const requiredOption = useSelector((state) => {
+    const instance = state.MultipleChoice.byId[componentId];
+    if (!instance) {
+      return false;
+    }
+    return instance.requiredOption;
+  });
+  console.log(requiredOption);
+  const hideNumber = useSelector((state) => {
+    const instance = state.MultipleChoice.byId[componentId];
+    if (!instance) {
+      return false;
+    }
+    return instance.hideNumber;
+  });
+  const randomChoice = useSelector((state) => {
+    const instance = state.MultipleChoice.byId[componentId];
+    if (!instance) {
+      return false;
+    }
+    return instance.randomChoice;
+  });
   const images = useSelector((state) => state.MultipleChoice.images);
   const multipleAnswers = useSelector(
     (state) => state.MultipleChoice.multipleAnswers
   );
-  const optionData = useSelector((state) => state.MultipleChoice.options);
-  const isExpanded = useSelector((state) => state.MultipleChoice.isExpanded);
-  const choiceLayout = useSelector(
-    (state) => state.MultipleChoice.choiceLayout
+  const optionData = useSelector((state) => {
+    const instance = state.MultipleChoice.byId[componentId];
+    if (!instance) {
+      return data;
+    }
+    return instance.options;
+  });
+  const multipleChoiceState = useSelector((state) => state.MultipleChoice.byId);
+  const choiceLayout = useSelector((state) => {
+    const instance = state.MultipleChoice.byId[componentId];
+    if (!instance) {
+      return;
+    }
+    return instance.choiceLayout;
+  });
+  const includeImage = useSelector(
+    (state) => state.MultipleChoice.byId[componentId]
   );
+  console.log(choiceLayout);
   const [jData, setJdata] = useState([...data]);
   const [bulkInputText, setBulkInputText] = useState("");
   const [showFull, setShowFull] = useState(false);
   const [open, setOpen] = useState(false);
   const [otherText, setOtherText] = useState("");
   const [bulkArray, setBulkArray] = useState([]);
-  const [minimize, setMinimize] = useState(false);
+  const [minimize, setMinimize] = useState(true);
   const [quillText, setQuillText] = useState("");
   // const [includeImage, setIncludeImage] = useState(false);
   const handleOpen = () => setOpen(true);
@@ -83,7 +133,7 @@ const MultipleChoice = ({ onDelete, dragHandleProps, componentId }) => {
     setBulkInputText(event.target.value);
   };
   const handleSaveBulkChoices = () => {
-    dispatch(handleBulkAdd(bulkArray));
+    dispatch(handleBulkAdd({ componentId, bulkArray }));
     handleClose();
   };
   const handleKeyDown = (event) => {
@@ -97,7 +147,7 @@ const MultipleChoice = ({ onDelete, dragHandleProps, componentId }) => {
     setQuillText(content);
     dispatch(handleInputChange(quillText));
   };
-  const handleChange = (content) => {
+  const handleChange = (componentId) => (content) => {
     dispatch(handleInputChange({ componentId, value: content }));
   };
   const addOptionsHandler = () => {
@@ -105,11 +155,14 @@ const MultipleChoice = ({ onDelete, dragHandleProps, componentId }) => {
     // setJdata(() => [...jData, ...newOption]);
     dispatch(
       addNewOption({
-        ...newOption,
-        expanded: false,
-        includeImage: false,
-        includeOtherTextField: false,
-        image: "",
+        componentId,
+        value: {
+          ...newOption,
+          expanded: false,
+          includeImage: false,
+          includeOtherTextField: false,
+          image: "",
+        },
       })
     );
   };
@@ -117,8 +170,11 @@ const MultipleChoice = ({ onDelete, dragHandleProps, componentId }) => {
     const newChoice = { title: `Other(Please Specify)` };
     dispatch(
       addOtherChoice({
-        ...newChoice,
-        expanded: false,
+        componentId,
+        value: {
+          ...newChoice,
+          expanded: false,
+        },
       })
     );
   };
@@ -135,7 +191,7 @@ const MultipleChoice = ({ onDelete, dragHandleProps, componentId }) => {
                 <input
                   type="checkbox"
                   id="random"
-                  onChange={() => dispatch(handleRandomChoice())}
+                  onChange={() => dispatch(handleRandomChoice({ componentId }))}
                   checked={randomChoice}
                 />
                 <label htmlFor="random" className="cursor-pointer text-[13px]">
@@ -158,7 +214,11 @@ const MultipleChoice = ({ onDelete, dragHandleProps, componentId }) => {
                 </label> */}
                 <select
                   className="border w-[250px] focus:outline-none h-[30px] text-[12px]"
-                  onChange={(e) => dispatch(handleChoiceLayout(e.target.value))}
+                  onChange={(e) =>
+                    dispatch(
+                      handleChoiceLayout({ componentId, value: e.target.value })
+                    )
+                  }
                 >
                   <option className="text-[12px]" value="Vertical">
                     Vertical
@@ -190,7 +250,11 @@ const MultipleChoice = ({ onDelete, dragHandleProps, componentId }) => {
               <div className="flex items-center gap-[5px]">
                 <input
                   type="file"
-                  onChange={(e) => dispatch(handleImages(e.target.files[0]))}
+                  onChange={(e) =>
+                    dispatch(
+                      handleImages({ componentId, value: e.target.files[0] })
+                    )
+                  }
                 />
               </div>
             </div>
@@ -200,7 +264,7 @@ const MultipleChoice = ({ onDelete, dragHandleProps, componentId }) => {
     );
   };
   const handleToggleExpansion = (index) => {
-    dispatch(toggleExpansion(index));
+    dispatch(toggleExpansion({ componentId, index }));
   };
   const handleTitleInput = (index, event) => {
     const value = event.target.value;
@@ -219,14 +283,15 @@ const MultipleChoice = ({ onDelete, dragHandleProps, componentId }) => {
       images: images,
     };
     const values = {
-      form_data: data,
+      form_data: applicationState,
+      tokenId: tokenId,
     };
 
     await axios
       .post("https://demo.sending.app/react-api", values)
       .then((response) => {
         console.log("Response:", response.data);
-        dispatch(setTokenId(response.data));
+        dispatch(setTokenId(response.data.tokenId));
         Cookies.set("tokenId", response.data);
       })
       .catch((error) => {
@@ -265,8 +330,8 @@ const MultipleChoice = ({ onDelete, dragHandleProps, componentId }) => {
     }
   };
 
-  const handleEditorOptionChange = (index) => (content) => {
-    dispatch(handleOptionChange({ index, value: content }));
+  const handleEditorOptionChange = (componentId, index) => (content) => {
+    dispatch(handleOptionChange({ componentId, index, value: content }));
   };
 
   const style = {
@@ -295,6 +360,24 @@ const MultipleChoice = ({ onDelete, dragHandleProps, componentId }) => {
       })
     );
   };
+  const deleteByid = () => {
+    onDelete();
+    dispatch(deleteMultipleChoiceInstance({ componentId }));
+  };
+
+  const saveOverallState = () => {
+    handleSave();
+    console.log(multipleChoiceState);
+    dispatch(
+      setAllStateValues({
+        overallStates: multipleChoiceState,
+      })
+    );
+  };
+
+  useEffect(() => {
+    dispatch(addMultipleChoiceInstance({ componentId }));
+  }, []);
 
   return (
     <div>
@@ -324,7 +407,7 @@ const MultipleChoice = ({ onDelete, dragHandleProps, componentId }) => {
                         boxShadow: "0 1px 3px 0 rgba(40,60,70,0.2)",
                       }}
                       // onClick={() => handleDeleteContent(uuidv4())}
-                      onClick={onDelete}
+                      onClick={deleteByid}
                       className="h-[36px] leading-[20px] text-[12px] pt-[8px] pb-[8px] pl-[10px] pr-[10px] text-[#3c8dd5]"
                     >
                       Cancel
@@ -334,7 +417,8 @@ const MultipleChoice = ({ onDelete, dragHandleProps, componentId }) => {
                         boxShadow: "0 1px 3px 0 rgba(40,60,70,0.2)",
                       }}
                       className="h-[36px] leading-[20px] text-[12px] pt-[8px] pb-[8px] pl-[10px] pr-[10px] bg-[#5cb85c] text-[white]"
-                      onClick={handleSave}
+                      // onClick={handleSave}
+                      onClick={saveOverallState}
                     >
                       Save
                     </button>
@@ -367,9 +451,9 @@ const MultipleChoice = ({ onDelete, dragHandleProps, componentId }) => {
             ) : ( */}
 
               <Editor
-                onInit={(evt, editor) => (editorRef.current = editor)}
+                // onInit={(evt, editor) => (editorRef.current = editor)}
                 inline={true}
-                // value={`${question}`}
+                value={`${question}`}
                 init={{
                   menubar: false,
                   plugins: [
@@ -400,7 +484,8 @@ const MultipleChoice = ({ onDelete, dragHandleProps, componentId }) => {
                   ui_mode: "split",
                   directionality: "ltr",
                 }}
-                onEditorChange={handleChange}
+                onEditorChange={handleChange(componentId)}
+                // value={question}
               />
               {/* )} */}
               <h1 className="mt-[30px] text-[22px] mb-[10px]">Options</h1>
@@ -410,7 +495,9 @@ const MultipleChoice = ({ onDelete, dragHandleProps, componentId }) => {
                   <input
                     type="checkbox"
                     id="required"
-                    onChange={() => dispatch(handleRequiredOption())}
+                    onChange={() =>
+                      dispatch(handleRequiredOption({ componentId }))
+                    }
                     checked={requiredOption}
                   />
                   <label
@@ -429,7 +516,7 @@ const MultipleChoice = ({ onDelete, dragHandleProps, componentId }) => {
                   <input
                     type="checkbox"
                     id="hide"
-                    onChange={() => dispatch(handleHideNumber())}
+                    onChange={() => dispatch(handleHideNumber({ componentId }))}
                     checked={hideNumber}
                   />
                   <label htmlFor="hide" className="cursor-pointer text-[13px]">
@@ -495,10 +582,11 @@ const MultipleChoice = ({ onDelete, dragHandleProps, componentId }) => {
                                   onInit={(evt, editor) =>
                                     (editorRef.current = editor)
                                   }
-                                  // initialValue={`<p class='tinymce-heading'>${e.title}</p>`}
+                                  // initialValue={`<p>${e.title}</p>`}
                                   value={`${e.title}`}
                                   inline={true}
                                   init={{
+                                    // placeholder: `${e.title}`,
                                     menubar: false,
                                     plugins: "lists help",
                                     toolbar:
@@ -507,7 +595,8 @@ const MultipleChoice = ({ onDelete, dragHandleProps, componentId }) => {
                                     ui_mode: "split",
                                   }}
                                   onEditorChange={handleEditorOptionChange(
-                                    index
+                                    index,
+                                    componentId
                                   )}
                                 />
                                 <button
@@ -521,7 +610,12 @@ const MultipleChoice = ({ onDelete, dragHandleProps, componentId }) => {
                                 <button
                                   className="border p-[8px] text-[#777] flex items-center h-[34px] w-[34px]"
                                   onClick={() =>
-                                    dispatch(deleteOptionContent(index))
+                                    dispatch(
+                                      deleteOptionContent({
+                                        componentId,
+                                        i: index,
+                                      })
+                                    )
                                   }
                                 >
                                   <BsTrashFill />
@@ -552,7 +646,12 @@ const MultipleChoice = ({ onDelete, dragHandleProps, componentId }) => {
                                       <input
                                         type="checkbox"
                                         onChange={() =>
-                                          dispatch(setOtherTextField(index))
+                                          dispatch(
+                                            setOtherTextField({
+                                              componentId,
+                                              index,
+                                            })
+                                          )
                                         }
                                         checked={e.includeOtherTextField}
                                       />
@@ -575,7 +674,12 @@ const MultipleChoice = ({ onDelete, dragHandleProps, componentId }) => {
                                       <input
                                         type="checkbox"
                                         onChange={() =>
-                                          dispatch(setIncludeImage(index))
+                                          dispatch(
+                                            setIncludeImage({
+                                              componentId,
+                                              index,
+                                            })
+                                          )
                                         }
                                       />
                                       Include an image
@@ -589,11 +693,13 @@ const MultipleChoice = ({ onDelete, dragHandleProps, componentId }) => {
                                         </p>
                                         <input
                                           type="file"
+                                          // value={e.includeImage}
                                           onChange={(e) =>
                                             dispatch(
                                               handleSetImage({
                                                 url: e.target.files[0],
                                                 index: index,
+                                                componentId: componentId,
                                               })
                                             )
                                           }
@@ -603,12 +709,31 @@ const MultipleChoice = ({ onDelete, dragHandleProps, componentId }) => {
                                         <p className="text-[13px] text-[#333]">
                                           Position
                                         </p>
-                                        <select className="border focus:outline-none text-[13px] p-[5px]">
+                                        <select
+                                          className="border focus:outline-none text-[13px] p-[5px]"
+                                          onChange={(e) =>
+                                            dispatch(
+                                              setOptionPositionImage({
+                                                index: index,
+                                                componentId: componentId,
+                                                value: e.target.value,
+                                              })
+                                            )
+                                          }
+                                        >
                                           <option></option>
-                                          <option>Above choice text</option>
-                                          <option>Below choice text</option>
-                                          <option>Left of choice text</option>
-                                          <option>Right of choice text</option>
+                                          <option value="Top">
+                                            Above choice text
+                                          </option>
+                                          <option value="Below">
+                                            Below choice text
+                                          </option>
+                                          <option value="Left">
+                                            Left of choice text
+                                          </option>
+                                          <option value="Right">
+                                            Right of choice text
+                                          </option>
                                         </select>
                                       </div>
                                       <div className="flex items-center gap-[39px] ml-[17px] mt-[10px] pb-[15px]">
