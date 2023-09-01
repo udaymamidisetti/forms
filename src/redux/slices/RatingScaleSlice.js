@@ -1,48 +1,81 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  questionInput: "What question would you like to ask?",
-  requiredOption: false,
-  hideNumber: true,
-  agreeOptions: "agree2",
-  naCondition: false,
-  displayMode: "Radio",
+  initialData: {
+    question: "What question would you like to ask?",
+    requiredOption: false,
+    hideNumber: true,
+    image: null,
+    choiceLayout: "",
+    agreeOptions: "agree2",
+    naCondition: false,
+    displayMode: "Radio",
+    scoreDirection: "Ascending",
+  },
+  byId: {},
 };
 
 export const RatingScaleSlice = createSlice({
   name: "ratingScale",
   initialState,
   reducers: {
+    addRatingScaleInstance: (state, action) => {
+      const { componentId } = action.payload;
+      state.byId[componentId] = {
+        ...state.initialData,
+      };
+    },
     handleInputChange: (state, action) => {
-      state.questionInput = action.payload;
-      console.log(state.questionInput);
+      const { componentId, value } = action.payload;
+      state.byId[componentId].question = value;
     },
-    handleRequiredOption: (state) => {
-      state.requiredOption = !state.requiredOption;
-      console.log(state.requiredOption);
+    handleRequiredOption: (state, action) => {
+      const { componentId } = action.payload;
+      state.byId[componentId].requiredOption =
+        !state.byId[componentId].requiredOption;
     },
-    handleHideNumber: (state) => {
-      state.hideNumber = !state.hideNumber;
+    handleHideNumber: (state, action) => {
+      const { componentId } = action.payload;
+      state.byId[componentId].hideNumber = !state.byId[componentId].hideNumber;
+    },
+    handleImages: (state, action) => {
+      const { componentId, value } = action.payload;
+      state.byId[componentId].image = URL.createObjectURL(value);
+    },
+    handleChoiceLayout: (state, action) => {
+      const { componentId, value } = action.payload;
+      state.byId[componentId].choiceLayout = value;
     },
     handleAgreeOptions: (state, action) => {
-      state.agreeOptions = action.payload;
-      console.log(state.agreeOptions);
+      const { componentId, value } = action.payload;
+      state.byId[componentId].agreeOptions = value;
     },
     handleNaCondition: (state, action) => {
-      state.naCondition = !state.naCondition;
+      const { componentId } = action.payload;
+      state.byId[componentId].naCondition =
+        !state.byId[componentId].naCondition;
     },
     handleDisplayMode: (state, action) => {
-      state.displayMode = action.payload;
+      const { componentId, value } = action.payload;
+      state.byId[componentId].displayMode = value;
+    },
+    handleScoreDirection: (state, action) => {
+      const { componentId, value } = action.payload;
+      state.byId[componentId].scoreDirection = value;
     },
   },
 });
 
 export const {
+  addRatingScaleInstance,
   handleInputChange,
   handleRequiredOption,
   handleHideNumber,
   handleAgreeOptions,
   handleNaCondition,
   handleDisplayMode,
+  handleImages,
+  handleChoiceLayout,
+  handleScoreDirection,
 } = RatingScaleSlice.actions;
 export default RatingScaleSlice.reducer;

@@ -6,17 +6,20 @@ const initialState = {
     question: "<p>What question would you like to ask?</p>",
     requiredOption: false,
     hideNumber: true,
-    randomChoice: false,
-    image: null,
     fields: [...fieldData],
+    isExpanded: false,
+    randomChoice: false,
+    choiceLayout: "Vertical",
+    image: null,
   },
   byId: {},
 };
-const PercentageSumSlice = createSlice({
-  name: "PercentageSum",
+
+const RankingSlice = createSlice({
+  name: "RankingSlice",
   initialState,
   reducers: {
-    addPercentageInstance: (state, action) => {
+    addRankingInstance: (state, action) => {
       const { componentId } = action.payload;
       state.byId[componentId] = {
         ...state.initialData,
@@ -36,12 +39,20 @@ const PercentageSumSlice = createSlice({
       state.byId[componentId].hideNumber = !state.byId[componentId].hideNumber;
     },
     handleRandomChoice: (state, action) => {
-      const { componentId, value } = action.payload;
-      state.byId[componentId].randomChoice = value;
+      const { componentId } = action.payload;
+      state.byId[componentId].randomChoice =
+        !state.byId[componentId].randomChoice;
     },
     handleImages: (state, action) => {
       const { componentId, value } = action.payload;
       state.byId[componentId].image = URL.createObjectURL(value);
+    },
+    handleFieldChange: (state, action) => {
+      const { index, componentId, value } = action.payload;
+      state.byId[index].fields[componentId] = {
+        ...state.byId[index].fields[componentId],
+        title: value,
+      };
     },
     handleDeleteField: (state, action) => {
       const { componentId, i } = action.payload;
@@ -57,25 +68,18 @@ const PercentageSumSlice = createSlice({
       // return [...state.options, action.payload];
       state.byId[componentId].fields.push(value);
     },
-    handleFieldChange: (state, action) => {
-      const { index, componentId, value } = action.payload;
-      state.byId[index].fields[componentId] = {
-        ...state.byId[index].fields[componentId],
-        title: value,
-      };
-    },
   },
 });
 
 export const {
-  addPercentageInstance,
+  addRankingInstance,
   handleInputChange,
-  handleRequiredOption,
   handleHideNumber,
-  handleRandomChoice,
   handleImages,
+  handleRandomChoice,
+  handleRequiredOption,
+  handleFieldChange,
   handleDeleteField,
   handleAddField,
-  handleFieldChange,
-} = PercentageSumSlice.actions;
-export default PercentageSumSlice.reducer;
+} = RankingSlice.actions;
+export default RankingSlice.reducer;

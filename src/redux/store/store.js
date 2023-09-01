@@ -14,6 +14,7 @@ import NetPromoterSlice from "../slices/NetPromoterSlice";
 import TextFieldGridReducer from "../slices/TextFieldGridSlice";
 import RatingMatrixReducer from "../slices/RatingMatrixSlice";
 import PercentageSumReducer from "../slices/PercentageSumSlice";
+import RankingReducer from "../slices/RankingSlice";
 
 export const store = configureStore({
   reducer: {
@@ -32,5 +33,6 @@ export const store = configureStore({
     TextFieldGrid: TextFieldGridReducer,
     RatingMatrix: RatingMatrixReducer,
     PercentageSum: PercentageSumReducer,
+    Ranking: RankingReducer,
   },
 });

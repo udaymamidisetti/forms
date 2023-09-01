@@ -50,12 +50,8 @@ import { useRef } from "react";
 
 const MultipleChoice = ({ onDelete, dragHandleProps, componentId }) => {
   console.log(componentId);
-  // const instanceId = uuidv4();
-  // console.log(instanceId);
   const editorRef = useRef(null);
   const dispatch = useDispatch();
-  // dispatch(addMultipleChoiceInstance({ componentId }));
-  // const oneTimeFunction = useRef(() => dispatch(addMultipleChoiceInstance({ componentId })));
   const applicationState = useSelector(
     (state) => state.formData.allStateValues
   );
@@ -69,10 +65,6 @@ const MultipleChoice = ({ onDelete, dragHandleProps, componentId }) => {
     return instance.question;
   });
   console.log(question);
-  // const question = useSelector(
-  //   (state) => state.MultipleChoice.byId[componentId]
-  // );
-  // console.log(question.question);
   const requiredOption = useSelector((state) => {
     const instance = state.MultipleChoice.byId[componentId];
     if (!instance) {
@@ -439,17 +431,6 @@ const MultipleChoice = ({ onDelete, dragHandleProps, componentId }) => {
                 </div>
               </div>
               <p className="text-[#7D848C] pt-[7px] text-[14px]">Question</p>
-              {/* {focus ? (
-              <input
-                className="border w-[95%] focus:outline-none p-[10px] pt-[5px] pb-[5px] mt-[7px] text-[12px]"
-                placeholder="What question would you like to ask?"
-                onChange={handleChange}
-                value={question}
-                onFocus={() => setFocus(false)}
-                onBlur={() => setFocus(true)}
-              />
-            ) : ( */}
-
               <Editor
                 // onInit={(evt, editor) => (editorRef.current = editor)}
                 inline={true}
@@ -487,7 +468,6 @@ const MultipleChoice = ({ onDelete, dragHandleProps, componentId }) => {
                 onEditorChange={handleChange(componentId)}
                 // value={question}
               />
-              {/* )} */}
               <h1 className="mt-[30px] text-[22px] mb-[10px]">Options</h1>
               <div className="flex">
                 <p className="text-[#7D848C] text-[13px] w-[180px]">Required</p>

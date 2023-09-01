@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { FaTrashCan } from "react-icons/fa6";
 import { HiOutlineClipboardDocument } from "react-icons/hi2";
 import { useDispatch, useSelector } from "react-redux";
@@ -9,24 +9,32 @@ import {
   handleAgreeOptions,
   handleNaCondition,
   handleDisplayMode,
+  addRatingScaleInstance,
+  handleImages,
+  handleChoiceLayout,
+  handleScoreDirection,
 } from "../redux/slices/RatingScaleSlice";
 import { Box, Modal } from "@mui/material";
+import { Editor } from "@tinymce/tinymce-react";
 
-const RatingScale = ({ onDelete }) => {
+const RatingScale = ({ onDelete, componentId }) => {
   const dispatch = useDispatch();
-  const question = useSelector((state) => state.RatingScale.questionInput);
+  const question = useSelector((state) => {
+    const instance = state.RatingScale.byId[componentId];
+    if (!instance) {
+      return;
+    }
+    return instance.question;
+  });
   const agreedOption = useSelector((state) => state.RatingScale.agreeOptions);
   const naCondition = useSelector((state) => state.RatingScale.naCondition);
   const displayMode = useSelector((state) => state.RatingScale.displayMode);
   const [showFull, setShowFull] = useState(false);
   const [modalShow, setModalShow] = useState(false);
-  const handleChange = useCallback(
-    (e) => {
-      const { value } = e.target;
-      dispatch(handleInputChange(value));
-    },
-    [dispatch]
-  );
+
+  const handleChange = (componentId) => (content) => {
+    dispatch(handleInputChange({ componentId, value: content }));
+  };
 
   const style = {
     position: "absolute",
@@ -38,6 +46,10 @@ const RatingScale = ({ onDelete }) => {
     boxShadow: 24,
     p: 4,
   };
+  useEffect(() => {
+    dispatch(addRatingScaleInstance({ componentId }));
+  }, []);
+
   return (
     <div>
       <div className="w-[750px] flex transition-opacity duration-200 ease-in-expo mt-[15px] bg-white">
@@ -78,22 +90,53 @@ const RatingScale = ({ onDelete }) => {
             </div>
           </div>
           <p className="text-[#7D848C] pt-[7px] text-[14px]">Question</p>
-          <input
-            className="border w-[95%] focus:outline-none p-[10px] pt-[5px] pb-[5px] mt-[7px] text-[12px]"
-            placeholder="What question would you like to ask?"
-            onChange={handleChange}
-            value={question}
+          <Editor
+            // onInit={(evt, editor) => (editorRef.current = editor)}
+            inline={true}
+            value={`${question}`}
+            init={{
+              menubar: false,
+              plugins: [
+                "advlist",
+                "autolink",
+                "lists",
+                "link",
+                "image",
+                "charmap",
+                "preview",
+                "anchor",
+                "searchreplace",
+                "visualblocks",
+                "code",
+                "fullscreen",
+                "insertdatetime",
+                "media",
+                "table",
+                "code",
+                "help",
+                "wordcount",
+              ],
+              toolbar:
+                "bold italic forecolor | alignleft aligncenter " +
+                "alignright alignjustify | bullist numlist outdent indent | " +
+                "removeformat | help",
+              toolbar_mode: "wrap",
+              ui_mode: "split",
+              directionality: "ltr",
+            }}
+            onEditorChange={handleChange(componentId)}
           />
           <h1 className="mt-[30px] text-[22px] mb-[10px]">Options</h1>
           <div className="flex">
             <p className="text-[#7D848C] text-[13px] w-[180px]">Required</p>
             <div className="flex items-center gap-[5px]">
-              <input
-                type="checkbox"
-                id="required"
-                onChange={() => dispatch(handleRequiredOption())}
-              />
-              <label htmlFor="required" className="cursor-pointer text-[13px]">
+              <label className="cursor-pointer text-[13px] flex items-center gap-[5px]">
+                <input
+                  type="checkbox"
+                  onChange={() =>
+                    dispatch(handleRequiredOption({ componentId }))
+                  }
+                />
                 Respondents must answer this question
               </label>
             </div>
@@ -101,22 +144,30 @@ const RatingScale = ({ onDelete }) => {
           <div className="flex mt-[30px]">
             <p className="text-[#7D848C] text-[13px] w-[180px]">Hide number</p>
             <div className="flex items-center gap-[5px]">
-              <input
-                type="checkbox"
-                id="required"
-                onChange={() => dispatch(handleHideNumber())}
-              />
-              <label htmlFor="required" className="cursor-pointer text-[13px]">
+              <label className="cursor-pointer text-[13px] flex items-center gap-[5px]">
+                <input
+                  type="checkbox"
+                  onChange={() => dispatch(handleHideNumber({ componentId }))}
+                />
                 Hide the question number
               </label>
             </div>
           </div>
-          <p
-            className="text-[#2366a2] text-[12px] mt-[20px] cursor-pointer"
-            onClick={() => setShowFull(!showFull)}
-          >
-            Show all Options
-          </p>
+          {showFull ? (
+            <p
+              className="text-[#2366a2] text-[12px] mt-[20px] cursor-pointer"
+              onClick={() => setShowFull(!showFull)}
+            >
+              Hide all Options
+            </p>
+          ) : (
+            <p
+              className="text-[#2366a2] text-[12px] mt-[20px] cursor-pointer"
+              onClick={() => setShowFull(!showFull)}
+            >
+              Show all Options
+            </p>
+          )}
           {showFull ? (
             <div className="transition-opacity duration-200 ease-in-expo">
               <div className="flex mt-[15px] items-center">
@@ -132,8 +183,20 @@ const RatingScale = ({ onDelete }) => {
                 <label htmlFor="random" className="cursor-pointer text-[13px]">
                   Randomize choices
                 </label> */}
-                  <select className="border w-[250px] focus:outline-none h-[30px] text-[12px]">
-                    <option className="text-[12px]">Vertical</option>
+                  <select
+                    className="border w-[250px] focus:outline-none h-[30px] text-[12px]"
+                    onChange={(e) =>
+                      dispatch(
+                        handleChoiceLayout({
+                          componentId,
+                          value: e.target.value,
+                        })
+                      )
+                    }
+                  >
+                    <option className="text-[12px]" value="vertical">
+                      Vertical
+                    </option>
                     <option
                       value="horizontal"
                       selected=""
@@ -161,7 +224,17 @@ const RatingScale = ({ onDelete }) => {
               <div className="flex mt-[15px]">
                 <p className="text-[#7D848C] text-[13px] w-[180px]">Media</p>
                 <div className="flex items-center gap-[5px]">
-                  <input type="file" />
+                  <input
+                    type="file"
+                    onChange={(e) =>
+                      dispatch(
+                        handleImages({
+                          componentId,
+                          value: e.target.files[0],
+                        })
+                      )
+                    }
+                  />
                 </div>
               </div>
             </div>
@@ -176,7 +249,11 @@ const RatingScale = ({ onDelete }) => {
               <div>
                 <select
                   className="h-[34px] border w-[190px] text-[13px] pl-[6px] focus:outline-none"
-                  onChange={(e) => dispatch(handleAgreeOptions(e.target.value))}
+                  onChange={(e) =>
+                    dispatch(
+                      handleAgreeOptions({ componentId, value: e.target.value })
+                    )
+                  }
                   value={agreedOption}
                 >
                   <option value="agree2">Agree-Disagree(2 levels)</option>
@@ -224,7 +301,11 @@ const RatingScale = ({ onDelete }) => {
             <p className="w-[180px] text-[#7D848C] text-[13px]">Display mode</p>
             <select
               className="border text-[13px] h-[34px] w-[100px] focus:outline-none"
-              onChange={(e) => dispatch(handleDisplayMode(e.target.value))}
+              onChange={(e) =>
+                dispatch(
+                  handleDisplayMode({ componentId, value: e.target.value })
+                )
+              }
               value={displayMode}
             >
               <option value="Radio">Radio list</option>
@@ -238,7 +319,11 @@ const RatingScale = ({ onDelete }) => {
             </p>
             <select
               className="border text-[13px] h-[34px] w-[100px] focus:outline-none"
-              onChange={(e) => dispatch(handleNaCondition(e.target.value))}
+              onChange={(e) =>
+                dispatch(
+                  handleNaCondition({ componentId, value: e.target.value })
+                )
+              }
               value={naCondition}
             >
               <option value={true}>Yes</option>
@@ -249,9 +334,16 @@ const RatingScale = ({ onDelete }) => {
             <p className="w-[180px] text-[#7D848C] text-[13px]">
               Scoring direction
             </p>
-            <select className="border text-[13px] h-[34px] w-[100px] focus:outline-none">
-              <option>Ascending</option>
-              <option>Descending</option>
+            <select
+              className="border text-[13px] h-[34px] w-[100px] focus:outline-none"
+              onChange={(e) =>
+                dispatch(
+                  handleScoreDirection({ componentId, value: e.target.value })
+                )
+              }
+            >
+              <option value="Ascending">Ascending</option>
+              <option value="Descending">Descending</option>
             </select>
           </div>
 

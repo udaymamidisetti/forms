@@ -60,7 +60,7 @@ export const {
   handleRequiredOption,
   handleHideNumber,
   handleInitialValue,
-  handleImages
+  handleImages,
 } = TextFieldSlice.actions;
 
 export default TextFieldSlice.reducer;

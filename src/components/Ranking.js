@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { BiSolidChevronDown } from "react-icons/bi";
 import { BsTrashFill } from "react-icons/bs";
 import { FaTrashCan } from "react-icons/fa6";
@@ -6,15 +6,54 @@ import { HiOutlineClipboardDocument } from "react-icons/hi2";
 import { LuPlus } from "react-icons/lu";
 import { RiDragMove2Fill } from "react-icons/ri";
 import fieldData from "../fieldData";
+import { Editor } from "@tinymce/tinymce-react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  addRankingInstance,
+  handleAddField,
+  handleDeleteField,
+  handleFieldChange,
+  handleHideNumber,
+  handleImages,
+  handleInputChange,
+  handleRandomChoice,
+  handleRequiredOption,
+} from "../redux/slices/RankingSlice";
 
-const Ranking = ({ onDelete }) => {
+const Ranking = ({ onDelete, componentId }) => {
+  const dispatch = useDispatch();
   const [showFull, setShowFull] = useState(false);
-  const [fData, setfData] = useState([...fieldData]);
+  // const [fData, setfData] = useState([...fieldData]);
+  const question = useSelector((state) => {
+    const instance = state.Ranking.byId[componentId];
+    if (!instance) {
+      return;
+    }
+    return instance.question;
+  });
+  console.log(question);
+  const fData = useSelector((state) => {
+    const instance = state.Ranking.byId[componentId];
+    if (!instance) {
+      return fieldData;
+    }
+    return instance.fields;
+  });
   const addFieldsHandler = () => {
-    console.log("Clicked");
-    const newOption = [{ title: `Field ${fData.length + 1}` }];
+    const newOption = { title: `Field ${fData.length + 1}` };
     console.log(newOption);
-    setfData(() => [...fData, ...newOption]);
+    dispatch(
+      handleAddField({
+        componentId,
+        value: {
+          ...newOption,
+          expanded: false,
+          includeImage: false,
+          includeOtherTextField: false,
+          image: "",
+        },
+      })
+    );
   };
   const deleteFieldOption = (index) => {
     setfData((prevData) => {
@@ -23,6 +62,18 @@ const Ranking = ({ onDelete }) => {
       return updatedData;
     });
   };
+
+  const handleChange = (componentId) => (content) => {
+    dispatch(handleInputChange({ componentId, value: content }));
+  };
+  const handleEditorFieldChange = (componentId, index) => (content) => {
+    dispatch(handleFieldChange({ componentId, index, value: content }));
+  };
+
+  useEffect(() => {
+    dispatch(addRankingInstance({ componentId }));
+  }, []);
+
   return (
     <div>
       <div>
@@ -64,19 +115,53 @@ const Ranking = ({ onDelete }) => {
               </div>
             </div>
             <p className="text-[#7D848C] pt-[7px] text-[13px]">Question</p>
-            <input
-              className="border w-[95%] focus:outline-none p-[10px] pt-[5px] pb-[5px] mt-[7px] placeholder:text-[13px]"
-              placeholder="What question would you like to ask?"
+            <Editor
+              // onInit={(evt, editor) => (editorRef.current = editor)}
+              inline={true}
+              value={`${question}`}
+              init={{
+                menubar: false,
+                plugins: [
+                  "advlist",
+                  "autolink",
+                  "lists",
+                  "link",
+                  "image",
+                  "charmap",
+                  "preview",
+                  "anchor",
+                  "searchreplace",
+                  "visualblocks",
+                  "code",
+                  "fullscreen",
+                  "insertdatetime",
+                  "media",
+                  "table",
+                  "code",
+                  "help",
+                  "wordcount",
+                ],
+                toolbar:
+                  "bold italic forecolor | alignleft aligncenter " +
+                  "alignright alignjustify | bullist numlist outdent indent | " +
+                  "removeformat | help",
+                toolbar_mode: "wrap",
+                ui_mode: "split",
+                directionality: "ltr",
+              }}
+              onEditorChange={handleChange(componentId)}
             />
             <h1 className="mt-[30px] text-[22px] mb-[10px]">Options</h1>
             <div className="flex">
               <p className="text-[#7D848C] text-[13px] w-[180px]">Required</p>
               <div className="flex items-center gap-[5px]">
-                <input type="checkbox" id="required" />
-                <label
-                  htmlFor="required"
-                  className="cursor-pointer text-[13px]"
-                >
+                <label className="cursor-pointer text-[13px] flex items-center gap-[5px]">
+                  <input
+                    type="checkbox"
+                    onChange={() =>
+                      dispatch(handleRequiredOption({ componentId }))
+                    }
+                  />
                   Respondents must answer this question
                 </label>
               </div>
@@ -86,21 +171,30 @@ const Ranking = ({ onDelete }) => {
                 Hide number
               </p>
               <div className="flex items-center gap-[5px]">
-                <input type="checkbox" id="required" />
-                <label
-                  htmlFor="required"
-                  className="cursor-pointer text-[13px]"
-                >
+                <label className="cursor-pointer text-[13px] flex items-center gap-[5px]">
+                  <input
+                    type="checkbox"
+                    onChange={() => dispatch(handleHideNumber({ componentId }))}
+                  />
                   Hide the question number
                 </label>
               </div>
             </div>
-            <p
-              className="text-[#2366a2] text-[12px] mt-[20px] cursor-pointer"
-              onClick={() => setShowFull(!showFull)}
-            >
-              Show all Options
-            </p>
+            {showFull ? (
+              <p
+                className="text-[#2366a2] text-[12px] mt-[20px] cursor-pointer"
+                onClick={() => setShowFull(!showFull)}
+              >
+                Hide all Options
+              </p>
+            ) : (
+              <p
+                className="text-[#2366a2] text-[12px] mt-[20px] cursor-pointer"
+                onClick={() => setShowFull(!showFull)}
+              >
+                Show all Options
+              </p>
+            )}
             {showFull ? (
               <>
                 <div className="flex mt-[20px]">
@@ -109,11 +203,13 @@ const Ranking = ({ onDelete }) => {
                   </p>
                   <div>
                     <div className="flex items-center gap-[5px]">
-                      <input type="checkbox" id="required" />
-                      <label
-                        htmlFor="required"
-                        className="cursor-pointer text-[13px]"
-                      >
+                      <label className="cursor-pointer text-[13px] flex items-center gap-[5px]">
+                        <input
+                          type="checkbox"
+                          onChange={() =>
+                            dispatch(handleRandomChoice({ componentId }))
+                          }
+                        />
                         Randomize Fields
                       </label>
                     </div>
@@ -135,7 +231,18 @@ const Ranking = ({ onDelete }) => {
                 <div className="flex mt-[20px] items-center">
                   <p className="text-[#7D848C] text-[13px] w-[180px]">Media</p>
                   <div>
-                    <input type="file" className="" />
+                    <input
+                      type="file"
+                      className=""
+                      onChange={(e) =>
+                        dispatch(
+                          handleImages({
+                            componentId,
+                            value: e.target.files[0],
+                          })
+                        )
+                      }
+                    />
                   </div>
                 </div>
               </>
@@ -148,26 +255,33 @@ const Ranking = ({ onDelete }) => {
             {fData.map((e, index) => (
               <>
                 <div
-                  className="flex items-center gap-[5px] mt-[5px]"
+                  className="flex items-center gap-[5px] mt-[5px] w-[670px]"
                   key={index}
                 >
                   <RiDragMove2Fill color="#777" size={19} />
-                  <input
-                    className="text-[12px] h-[34px] border focus:outline-none pt-[6px] pr-[12px] pl-[12px] pb-[6px] flex-1"
-                    placeholder={e.title}
-                    // onChange={(e) => optionsChange(index, e.target.value)}
-                    value={e.title}
+                  <Editor
+                    inline={true}
+                    value={`${e.title}`}
+                    init={{
+                      menubar: false,
+                      plugins: "lists help",
+                      toolbar:
+                        "bold italic forecolor underline link removeformat",
+                      toolbar_mode: "wrap",
+                      ui_mode: "split",
+                    }}
+                    onEditorChange={handleEditorFieldChange(index, componentId)}
                   />
                   <button
-                    className="border p-[8px] text-[#777] h-[34px] w-[34px]"
-                    // onClick={handleToggleExpansion(index)}
-                    // onClick={() => dispatch(toggleExpansion(index))}
-                  >
-                    <BiSolidChevronDown />
-                  </button>
-                  <button
                     className="border p-[8px] text-[#777] flex items-center h-[34px] w-[34px]"
-                    onClick={() => deleteFieldOption(index)}
+                    onClick={() =>
+                      dispatch(
+                        handleDeleteField({
+                          componentId,
+                          i: index,
+                        })
+                      )
+                    }
                   >
                     <BsTrashFill />
                   </button>

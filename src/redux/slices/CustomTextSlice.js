@@ -9,7 +9,7 @@ const CustomTextSlice = createSlice({
   name: "CustomTextSlice",
   initialState,
   reducers: {
-    addustomTextInstance: (state, action) => {
+    addcustomTextInstance: (state, action) => {
       const { componentId } = action.payload;
       state.byId[componentId] = {
         ...state.initialData,
@@ -22,6 +22,7 @@ const CustomTextSlice = createSlice({
   },
 });
 
-export const { handleCustomText } = CustomTextSlice.actions;
+export const { addcustomTextInstance, handleCustomText } =
+  CustomTextSlice.actions;
 
 export default CustomTextSlice.reducer;

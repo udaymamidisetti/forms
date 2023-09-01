@@ -37,23 +37,6 @@ export const MultipleChoiceSlice = createSlice({
     },
     handleInputChange: (state, action) => {
       const { componentId, value } = action.payload;
-      console.log(componentId, value);
-
-      // // Initialize the string value if not present
-      // if (!state.question.hasOwnProperty(componentId)) {
-      //   state.question[componentId] = "What question would you like to ask?";
-      // }
-      // if (!state.byId[componentId]) {
-      //   state.byId[componentId] = {
-      //     question: "What question would you like to ask?",
-      //   };
-      // }
-      // state.byId[componentId].question = {
-      //   ...state.byId[componentId].question,
-      //   question: value,
-      // };
-
-      // state.question[componentId] = { value };
       state.byId[componentId].question = value;
     },
     handleOptionChange: (state, action) => {
@@ -77,30 +60,11 @@ export const MultipleChoiceSlice = createSlice({
     },
     handleRequiredOption: (state, action) => {
       const { componentId } = action.payload;
-      // console.log(componentId);
-      // if (!state.byId[componentId]) {
-      //   state.byId[componentId] = {
-      //     required: false,
-      //   };
-      // }
-      // state.byId[componentId] = {
-      //   ...state.byId[componentId],
-      //   required: !state.byId[componentId].required,
-      // };
       state.byId[componentId].requiredOption =
         !state.byId[componentId].requiredOption;
     },
     handleHideNumber: (state, action) => {
       const { componentId } = action.payload;
-      // if (!state.byId[componentId]) {
-      //   state.byId[componentId] = {
-      //     hideNumber: false,
-      //   };
-      // }
-      // state.byId[componentId] = {
-      //   ...state.byId[componentId],
-      //   hideNumber: !state.byId[componentId].hideNumber,
-      // };
       state.byId[componentId].hideNumber = !state.byId[componentId].hideNumber;
     },
     toggleExpansion: (state, action) => {
