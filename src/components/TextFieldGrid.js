@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { BiSolidChevronDown } from "react-icons/bi";
 import { BsTrashFill } from "react-icons/bs";
 import { FaTrashCan } from "react-icons/fa6";
@@ -6,10 +6,31 @@ import { HiOutlineClipboardDocument } from "react-icons/hi2";
 import { LuPlus } from "react-icons/lu";
 import { RiDragMove2Fill } from "react-icons/ri";
 import fieldData from "../fieldData";
+import { Editor } from "@tinymce/tinymce-react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  addTextfieldGridInstance,
+  handleColumnWidth,
+  handleHideNumber,
+  handleImages,
+  handleInputChange,
+  handleRequiredOption,
+} from "../redux/slices/TextFieldGridSlice";
 
-const TextFieldGrid = ({ onDelete }) => {
+const TextFieldGrid = ({ onDelete, componentId }) => {
+  const dispatch = useDispatch();
   const [showFull, setShowFull] = useState(false);
   const [fData, setfData] = useState([...fieldData]);
+  const question = useSelector((state) => {
+    const instance = state.TextFieldGrid.byId[componentId];
+    if (!instance) {
+      return;
+    }
+    return instance.question;
+  });
+  const handleChange = (componentId) => (content) => {
+    dispatch(handleInputChange({ componentId, value: content }));
+  };
   const deleteFieldOption = (index) => {
     setfData((prevData) => {
       const updatedData = [...prevData];
@@ -23,6 +44,10 @@ const TextFieldGrid = ({ onDelete }) => {
     console.log(newOption);
     setfData(() => [...fData, ...newOption]);
   };
+
+  useEffect(() => {
+    dispatch(addTextfieldGridInstance({ componentId }));
+  }, []);
 
   return (
     <div>
@@ -64,9 +89,40 @@ const TextFieldGrid = ({ onDelete }) => {
             </div>
           </div>
           <p className="text-[#7D848C] pt-[7px] text-[14px]">Question</p>
-          <input
-            className="border w-[95%] focus:outline-none p-[10px] pt-[5px] pb-[5px] mt-[7px] text-[12px]"
-            placeholder="What question would you like to ask?"
+          <Editor
+            inline={true}
+            value={question}
+            init={{
+              menubar: false,
+              plugins: [
+                "advlist",
+                "autolink",
+                "lists",
+                "link",
+                "image",
+                "charmap",
+                "preview",
+                "anchor",
+                "searchreplace",
+                "visualblocks",
+                "code",
+                "fullscreen",
+                "insertdatetime",
+                "media",
+                "table",
+                "code",
+                "help",
+                "wordcount",
+              ],
+              toolbar:
+                "bold italic forecolor | alignleft aligncenter " +
+                "alignright alignjustify | bullist numlist outdent indent | " +
+                "removeformat | help",
+              toolbar_mode: "wrap",
+              ui_mode: "split",
+              directionality: "ltr",
+            }}
+            onEditorChange={handleChange(componentId)}
           />
           <h1 className="mt-[30px] text-[22px] mb-[10px]">Options</h1>
           <div className="flex items-center">
@@ -74,26 +130,46 @@ const TextFieldGrid = ({ onDelete }) => {
               Answer Required
             </p>
             <div className="flex items-center gap-[5px]">
-              <select className="border text-[13px] h-[34px] w-[180px]">
-                <option>No</option>
+              <select
+                className="border text-[13px] h-[34px] w-[180px]"
+                onChange={(e) =>
+                  dispatch(
+                    handleRequiredOption({ componentId, value: e.target.value })
+                  )
+                }
+              >
+                <option value={true}>Yes</option>
+                <option value={false}>No</option>
               </select>
             </div>
           </div>
           <div className="flex mt-[30px]">
             <p className="text-[#7D848C] text-[13px] w-[180px]">Hide number</p>
             <div className="flex items-center gap-[5px]">
-              <input type="checkbox" id="required" />
-              <label htmlFor="required" className="cursor-pointer text-[13px]">
+              <input
+                type="checkbox"
+                onChange={() => dispatch(handleHideNumber({ componentId }))}
+              />
+              <label className="cursor-pointer text-[13px]">
                 Hide the question number
               </label>
             </div>
           </div>
-          <p
-            className="text-[#2366a2] text-[12px] mt-[20px] cursor-pointer"
-            onClick={() => setShowFull(!showFull)}
-          >
-            Show all Options
-          </p>
+          {showFull ? (
+            <p
+              className="text-[#2366a2] text-[12px] mt-[20px] cursor-pointer"
+              onClick={() => setShowFull(!showFull)}
+            >
+              Hide all Options
+            </p>
+          ) : (
+            <p
+              className="text-[#2366a2] text-[12px] mt-[20px] cursor-pointer"
+              onClick={() => setShowFull(!showFull)}
+            >
+              Show all Options
+            </p>
+          )}
           {showFull ? (
             <>
               <div className="flex mt-[30px]">
@@ -116,16 +192,26 @@ const TextFieldGrid = ({ onDelete }) => {
                 </p>
                 <div>
                   <div className="flex items-center gap-[5px]">
-                    <select className="border focus:outline-none text-[12px] p-[5px]">
-                      <option>10%</option>
-                      <option>20%</option>
-                      <option>30%</option>
-                      <option>40%</option>
-                      <option>50%</option>
-                      <option>60%</option>
-                      <option>70%</option>
-                      <option>80%</option>
-                      <option>90%</option>
+                    <select
+                      className="border focus:outline-none text-[12px] p-[5px]"
+                      onChange={(e) =>
+                        dispatch(
+                          handleColumnWidth({
+                            componentId,
+                            value: e.target.value,
+                          })
+                        )
+                      }
+                    >
+                      <option value={10}>10%</option>
+                      <option value={20}>20%</option>
+                      <option value={30}>30%</option>
+                      <option value={40}>40%</option>
+                      <option value={50}>50%</option>
+                      <option value={60}>60%</option>
+                      <option value={70}>70%</option>
+                      <option value={80}>80%</option>
+                      <option value={90}>90%</option>
                     </select>
                   </div>
                 </div>
@@ -146,7 +232,18 @@ const TextFieldGrid = ({ onDelete }) => {
               <div className="flex mt-[20px] items-center">
                 <p className="text-[#7D848C] text-[13px] w-[180px]">Media</p>
                 <div>
-                  <input type="file" className="" />
+                  <input
+                    type="file"
+                    className=""
+                    onChange={(e) =>
+                      dispatch(
+                        handleImages({
+                          componentId,
+                          value: e.target.files[0],
+                        })
+                      )
+                    }
+                  />
                 </div>
               </div>
             </>
@@ -159,15 +256,27 @@ const TextFieldGrid = ({ onDelete }) => {
             {fData.map((e, index) => (
               <>
                 <div
-                  className="flex items-center gap-[5px] mt-[5px]"
+                  className="flex items-center gap-[5px] mt-[5px] w-[670px]"
                   key={index}
                 >
                   <RiDragMove2Fill color="#777" size={19} />
-                  <input
-                    className="text-[12px] h-[34px] border focus:outline-none pt-[6px] pr-[12px] pl-[12px] pb-[6px] flex-1"
-                    placeholder={e.title}
-                    // onChange={(e) => optionsChange(index, e.target.value)}
-                    value={e.title}
+                  <Editor
+                    // onInit={(evt, editor) => (editorRef.current = editor)}
+                    // initialValue={`<p class='tinymce-heading'>${e.title}</p>`}
+                    value={`${e.title}`}
+                    inline={true}
+                    init={{
+                      menubar: false,
+                      plugins: "lists help",
+                      toolbar:
+                        "bold italic forecolor underline link removeformat",
+                      toolbar_mode: "wrap",
+                      ui_mode: "split",
+                    }}
+                    // onEditorChange={handleEditorFieldChange(
+                    //   index,
+                    //   componentId
+                    // )}
                   />
                   <button
                     className="border p-[8px] text-[#777] h-[34px] w-[34px]"

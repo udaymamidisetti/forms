@@ -91,7 +91,6 @@ const RatingScale = ({ onDelete, componentId }) => {
           </div>
           <p className="text-[#7D848C] pt-[7px] text-[14px]">Question</p>
           <Editor
-            // onInit={(evt, editor) => (editorRef.current = editor)}
             inline={true}
             value={`${question}`}
             init={{
