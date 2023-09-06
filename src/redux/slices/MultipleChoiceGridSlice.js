@@ -142,6 +142,18 @@ const MultipleChoiceGridSlice = createSlice({
       state.byId[componentId].options.splice(0);
       state.byId[componentId].options = bulkArray;
     },
+    setOrder: (state, action) => {
+      const { sourceIndex, destinationIndex, componentId } = action.payload;
+      const [removedOption] = state.byId[componentId].options.splice(
+        sourceIndex,
+        1
+      );
+      state.byId[componentId].options.splice(
+        destinationIndex,
+        0,
+        removedOption
+      );
+    },
   },
 });
 export const {
@@ -164,5 +176,6 @@ export const {
   handleMultipleAnswers,
   setIncludeImage,
   handleBulkAdd,
+  setOrder,
 } = MultipleChoiceGridSlice.actions;
 export default MultipleChoiceGridSlice.reducer;

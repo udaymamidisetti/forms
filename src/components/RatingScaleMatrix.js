@@ -28,6 +28,8 @@ import {
   handleScoreDirection,
 } from "../redux/slices/RatingMatrixSlice";
 import { Editor } from "@tinymce/tinymce-react";
+import { setAllStateValues, setTokenId } from "../redux/slices/FormSlice";
+import axios from "axios";
 
 const RatingScaleMatrix = ({ onDelete, componentId }) => {
   const dispatch = useDispatch();
@@ -35,6 +37,10 @@ const RatingScaleMatrix = ({ onDelete, componentId }) => {
   const [fData, setfData] = useState([...fieldData]);
   const [modalShow, setModalShow] = useState(false);
   const [newmodel, setNewmodel] = useState(false);
+  const tokenId = useSelector((state) => state.formData.tokenId);
+  const ratingScaleMatrixStates = useSelector(
+    (state) => state.RatingMatrix.byId
+  );
   const question = useSelector((state) => {
     const instance = state.RatingMatrix.byId[componentId];
     if (!instance) {
@@ -88,6 +94,32 @@ const RatingScaleMatrix = ({ onDelete, componentId }) => {
     boxShadow: 24,
     p: 4,
   };
+
+  const handleSave = async () => {
+    const values = {
+      form_data: ratingScaleMatrixStates,
+      tokenId: tokenId,
+    };
+
+    await axios
+      .post("https://demo.sending.app/react-api", values)
+      .then((response) => {
+        console.log("Response:", response.data);
+        dispatch(setTokenId(response.data.tokenId));
+      })
+      .catch((error) => {
+        console.error("Error submitting form:", error);
+      });
+  };
+
+  const saveOverallState = () => {
+    // handleSave();
+    dispatch(
+      setAllStateValues({
+        overallStates: ratingScaleMatrixStates,
+      })
+    );
+  };
   useEffect(() => {
     dispatch(addRatingMatrixInstance({ componentId }));
   }, []);
@@ -116,6 +148,7 @@ const RatingScaleMatrix = ({ onDelete, componentId }) => {
                       boxShadow: "0 1px 3px 0 rgba(40,60,70,0.2)",
                     }}
                     className="h-[36px] leading-[20px] text-[12px] pt-[8px] pb-[8px] pl-[10px] pr-[10px] bg-[#5cb85c] text-[white]"
+                    onClick={saveOverallState}
                   >
                     Save
                   </button>

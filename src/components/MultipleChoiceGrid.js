@@ -30,6 +30,7 @@ import {
   handleMultipleAnswers,
   setIncludeImage,
   handleBulkAdd,
+  setOrder,
 } from "../redux/slices/MultipleChoiceGridSlice";
 import { useDispatch } from "react-redux";
 import { Editor } from "@tinymce/tinymce-react";
@@ -137,6 +138,7 @@ const MultipleChoiceGrid = ({ onDelete, componentId }) => {
       setOrder({
         sourceIndex: source.index,
         destinationIndex: destination.index,
+        componentId: componentId,
       })
     );
   };
@@ -183,16 +185,6 @@ const MultipleChoiceGrid = ({ onDelete, componentId }) => {
     dispatch(toggleExpansion({ componentId, index }));
   };
   const handleSave = async () => {
-    // const data = {
-    //   question: question,
-    //   optionData: optionData,
-    //   requiredOption: requiredOption,
-    //   choiceLayout: choiceLayout,
-    //   multipleAnswers: multipleAnswers,
-    //   hideNumber: hideNumber,
-    //   randomChoice: randomChoice,
-    //   images: images,
-    // };
     const values = {
       form_data: applicationState,
       tokenId: tokenId,
@@ -203,7 +195,6 @@ const MultipleChoiceGrid = ({ onDelete, componentId }) => {
       .then((response) => {
         console.log("Response:", response.data);
         dispatch(setTokenId(response.data.tokenId));
-        Cookies.set("tokenId", response.data);
       })
       .catch((error) => {
         console.error("Error submitting form:", error);
@@ -211,8 +202,7 @@ const MultipleChoiceGrid = ({ onDelete, componentId }) => {
   };
 
   const saveOverallState = () => {
-    handleSave();
-    // console.log(multipleChoiceState);
+    // handleSave();
     dispatch(
       setAllStateValues({
         overallStates: multipleChoiceGridState,

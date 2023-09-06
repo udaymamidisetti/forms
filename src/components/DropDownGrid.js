@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { BiSolidChevronDown } from "react-icons/bi";
 import { BsTrashFill } from "react-icons/bs";
 import { CgMenu } from "react-icons/cg";
@@ -8,16 +8,81 @@ import { LuPlus } from "react-icons/lu";
 import { RiDragMove2Fill } from "react-icons/ri";
 import data from "../data";
 import { Box, Modal } from "@mui/material";
+import { Editor } from "@tinymce/tinymce-react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  addDropdownGridInstance,
+  handleAddOption,
+  handleBulkAdd,
+  handleColumnWidth,
+  handleDeleteOption,
+  handleHideNumber,
+  handleImages,
+  handleInputChange,
+  handleOptionChange,
+  handleRandomChoices,
+  handleRandomFields,
+  handleRequiredOption,
+} from "../redux/slices/DropdownGridSlice";
 
-const DropDownGrid = ({ onDelete }) => {
+const DropDownGrid = ({ onDelete, componentId }) => {
+  const dispatch = useDispatch();
   const [showFull, setShowFull] = useState(false);
+  const [bulkInputText, setBulkInputText] = useState("");
+  const [bulkArray, setBulkArray] = useState([]);
   const [jData, setjData] = useState([...data]);
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+  const question = useSelector((state) => {
+    const instance = state.DropDownGrid.byId[componentId];
+    if (!instance) {
+      return;
+    }
+    return instance.question;
+  });
+  const optionsData = useSelector((state) => {
+    const instance = state.DropDownGrid.byId[componentId];
+    if (!instance) {
+      return data;
+    }
+    return instance.optionsData;
+  });
+  const handleChange = (componentId) => (content) => {
+    dispatch(handleInputChange({ componentId, value: content }));
+  };
   const addOptionsHandler = () => {
-    const newOption = [{ title: `Option ${jData.length + 1}` }];
-    setjData(() => [...jData, ...newOption]);
+    const newOption = { title: `Option ${optionsData.length + 1}` };
+    // setJdata(() => [...jData, ...newOption]);
+    dispatch(
+      handleAddOption({
+        componentId,
+        value: {
+          ...newOption,
+          expanded: false,
+          includeImage: false,
+          includeOtherTextField: false,
+          image: "",
+        },
+      })
+    );
+  };
+  const handleSaveBulkChoices = () => {
+    dispatch(handleBulkAdd({ componentId, bulkArray }));
+    handleClose();
+  };
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      const words = bulkInputText.trim(" ");
+      setBulkArray((p) => [...p, { title: bulkInputText }]);
+    }
+  };
+  const handleBulkInputChange = (event) => {
+    setBulkInputText(event.target.value);
+  };
+  const handleEditorOptionChange = (componentId, index) => (content) => {
+    dispatch(handleOptionChange({ componentId, index, value: content }));
   };
   const deleteOption = (index) => {
     setjData((prevData) => {
@@ -36,6 +101,11 @@ const DropDownGrid = ({ onDelete }) => {
     boxShadow: 24,
     p: 4,
   };
+
+  useEffect(() => {
+    dispatch(addDropdownGridInstance({ componentId }));
+  }, []);
+
   return (
     <div>
       <div>
@@ -77,9 +147,40 @@ const DropDownGrid = ({ onDelete }) => {
               </div>
             </div>
             <p className="text-[#7D848C] pt-[7px] text-[14px]">Question</p>
-            <input
-              className="border w-[95%] focus:outline-none p-[10px] pt-[5px] pb-[5px] mt-[7px] text-[12px]"
-              placeholder="What question would you like to ask?"
+            <Editor
+              inline={true}
+              value={question}
+              init={{
+                menubar: false,
+                plugins: [
+                  "advlist",
+                  "autolink",
+                  "lists",
+                  "link",
+                  "image",
+                  "charmap",
+                  "preview",
+                  "anchor",
+                  "searchreplace",
+                  "visualblocks",
+                  "code",
+                  "fullscreen",
+                  "insertdatetime",
+                  "media",
+                  "table",
+                  "code",
+                  "help",
+                  "wordcount",
+                ],
+                toolbar:
+                  "bold italic forecolor | alignleft aligncenter " +
+                  "alignright alignjustify | bullist numlist outdent indent | " +
+                  "removeformat | help",
+                toolbar_mode: "wrap",
+                ui_mode: "split",
+                directionality: "ltr",
+              }}
+              onEditorChange={handleChange(componentId)}
             />
             <h1 className="mt-[30px] text-[22px] mb-[10px]">Options</h1>
             <div className="flex">
@@ -87,7 +188,18 @@ const DropDownGrid = ({ onDelete }) => {
                 Answer Required
               </p>
               <div className="flex items-center gap-[5px]">
-                <select className="w-[140px] border h-[30px] text-[13px]">
+                <select
+                  className="w-[140px] border h-[30px] text-[13px] focus:outline-none"
+                  onChange={(e) =>
+                    dispatch(
+                      handleRequiredOption({
+                        componentId,
+                        value: e.target.value,
+                      })
+                    )
+                  }
+                >
+                  <option>Yes</option>
                   <option>No</option>
                 </select>
               </div>
@@ -97,21 +209,30 @@ const DropDownGrid = ({ onDelete }) => {
                 Hide number
               </p>
               <div className="flex items-center gap-[5px]">
-                <input type="checkbox" id="required" />
-                <label
-                  htmlFor="required"
-                  className="cursor-pointer text-[13px]"
-                >
+                <label className="cursor-pointer text-[13px] flex items-center gap-[5px]">
+                  <input
+                    type="checkbox"
+                    onChange={() => dispatch(handleHideNumber({ componentId }))}
+                  />
                   Hide the question number
                 </label>
               </div>
             </div>
-            <p
-              className="text-[#2366a2] text-[12px] mt-[20px] cursor-pointer"
-              onClick={() => setShowFull(!showFull)}
-            >
-              Show all Options
-            </p>
+            {showFull ? (
+              <p
+                className="text-[#2366a2] text-[12px] mt-[20px] cursor-pointer"
+                onClick={() => setShowFull(!showFull)}
+              >
+                Hide all Options
+              </p>
+            ) : (
+              <p
+                className="text-[#2366a2] text-[12px] mt-[20px] cursor-pointer"
+                onClick={() => setShowFull(!showFull)}
+              >
+                Show all Options
+              </p>
+            )}
             {showFull ? (
               <>
                 <div className="flex mt-[20px]">
@@ -120,20 +241,24 @@ const DropDownGrid = ({ onDelete }) => {
                   </p>
                   <div>
                     <div className="flex items-center gap-[5px]">
-                      <input type="checkbox" id="required" />
-                      <label
-                        htmlFor="required"
-                        className="cursor-pointer text-[13px]"
-                      >
+                      <label className="cursor-pointer text-[13px] flex items-center gap-[5px]">
+                        <input
+                          type="checkbox"
+                          onChange={() =>
+                            dispatch(handleRandomFields({ componentId }))
+                          }
+                        />
                         Randomize Fields
                       </label>
                     </div>
                     <div className="flex items-center gap-[5px] mt-[10px]">
-                      <input type="checkbox" id="required" />
-                      <label
-                        htmlFor="required"
-                        className="cursor-pointer text-[13px]"
-                      >
+                      <label className="cursor-pointer text-[13px] flex items-center gap-[5px]">
+                        <input
+                          type="checkbox"
+                          onChange={() =>
+                            dispatch(handleRandomChoices({ componentId }))
+                          }
+                        />
                         Randomize Choices
                       </label>
                     </div>
@@ -145,16 +270,26 @@ const DropDownGrid = ({ onDelete }) => {
                   </p>
                   <div>
                     <div className="flex items-center gap-[5px]">
-                      <select className="border focus:outline-none text-[12px] p-[5px]">
-                        <option>10%</option>
-                        <option>20%</option>
-                        <option>30%</option>
-                        <option>40%</option>
-                        <option>50%</option>
-                        <option>60%</option>
-                        <option>70%</option>
-                        <option>80%</option>
-                        <option>90%</option>
+                      <select
+                        className="border focus:outline-none text-[12px] p-[5px]"
+                        onChange={(e) =>
+                          dispatch(
+                            handleColumnWidth({
+                              componentId,
+                              value: e.target.value,
+                            })
+                          )
+                        }
+                      >
+                        <option value={10}>10%</option>
+                        <option value={20}>20%</option>
+                        <option value={30}>30%</option>
+                        <option value={40}>40%</option>
+                        <option value={50}>50%</option>
+                        <option value={60}>60%</option>
+                        <option value={70}>70%</option>
+                        <option value={80}>80%</option>
+                        <option value={90}>90%</option>
                       </select>
                     </div>
                   </div>
@@ -175,7 +310,18 @@ const DropDownGrid = ({ onDelete }) => {
                 <div className="flex mt-[20px] items-center">
                   <p className="text-[#7D848C] text-[13px] w-[180px]">Media</p>
                   <div>
-                    <input type="file" className="" />
+                    <input
+                      type="file"
+                      className=""
+                      onChange={(e) =>
+                        dispatch(
+                          handleImages({
+                            componentId,
+                            value: e.target.files[0],
+                          })
+                        )
+                      }
+                    />
                   </div>
                 </div>
               </>
@@ -186,7 +332,7 @@ const DropDownGrid = ({ onDelete }) => {
             <div className="flex">
               <p className="text-[13px] w-[180px] text-[#737373]">Row labels</p>
               <div className="w-[100%]">
-                <textarea className="h-[150px] border w-[100%]"></textarea>
+                <textarea className="h-[150px] border w-[100%] focus:outline-none"></textarea>
                 <p className="mt-[5px] text-[13px] text-[#737373]">
                   Each line represents a row, HTML is OK.
                 </p>
@@ -197,7 +343,7 @@ const DropDownGrid = ({ onDelete }) => {
                 Column labels
               </p>
               <div className="w-[100%]">
-                <textarea className="h-[150px] border w-[100%]"></textarea>
+                <textarea className="h-[150px] border w-[100%] focus:outline-none"></textarea>
                 <p className="mt-[5px] text-[13px] text-[#737373]">
                   Each line represents a column, HTML is OK.
                 </p>
@@ -207,35 +353,43 @@ const DropDownGrid = ({ onDelete }) => {
             <h1 className="mt-[30px] text-[22px] mb-[10px]">Choices</h1>
             <p className="pl-[30px] text-[#777] text-[13px]">Label</p>
             <div>
-              {jData.map((e, index) => (
-                <>
-                  <div
-                    className="flex items-center gap-[5px] mt-[5px]"
-                    key={index}
-                  >
+              {optionsData.map((e, index) => (
+                <div key={index}>
+                  <div className="flex items-center gap-[5px] mt-[5px] w-[670px]">
                     <RiDragMove2Fill color="#777" size={19} />
-                    <input
-                      className="text-[12px] h-[34px] border focus:outline-none pt-[6px] pr-[12px] pl-[12px] pb-[6px] flex-1"
-                      placeholder={e.title}
-                      // onChange={(e) => optionsChange(index, e.target.value)}
-                      value={e.title}
+                    <Editor
+                      // initialValue={`<p class='tinymce-heading'>${e.title}</p>`}
+                      value={`${e.title}`}
+                      inline={true}
+                      init={{
+                        menubar: false,
+                        plugins: "lists help",
+                        toolbar:
+                          "bold italic forecolor underline link removeformat",
+                        toolbar_mode: "wrap",
+                        ui_mode: "split",
+                      }}
+                      onEditorChange={handleEditorOptionChange(
+                        index,
+                        componentId
+                      )}
                     />
                     <button
-                      className="border p-[8px] text-[#777] h-[34px] w-[34px]"
-                      // onClick={handleToggleExpansion(index)}
-                      // onClick={() => dispatch(toggleExpansion(index))}
-                    >
-                      <BiSolidChevronDown />
-                    </button>
-                    <button
                       className="border p-[8px] text-[#777] flex items-center h-[34px] w-[34px]"
-                      onClick={() => deleteOption(index)}
+                      onClick={() =>
+                        dispatch(
+                          handleDeleteOption({
+                            componentId,
+                            i: index,
+                          })
+                        )
+                      }
                     >
                       <BsTrashFill />
                     </button>
                   </div>
                   {/* {isExpanded ? <div>Set</div> : null} */}
-                </>
+                </div>
               ))}
               <div className="pl-[24px] flex gap-[3px] mt-[5px]">
                 <button
@@ -258,7 +412,7 @@ const DropDownGrid = ({ onDelete }) => {
                   aria-labelledby="modal-modal-title"
                   aria-describedby="modal-modal-description"
                   style={{
-                    animation: "slideInFromTop 0.3s ease-in-out",
+                    animation: "slideInFromTop 0.05s ease-in-out",
                   }}
                 >
                   <Box sx={style}>
@@ -266,16 +420,26 @@ const DropDownGrid = ({ onDelete }) => {
                     <p className="text-[12px] mt-[10px]">
                       Enter one choice per line
                     </p>
-                    <textarea className=" focus:outline-none w-full border h-[200px] mt-[5px] p-[10px] placeholder:text-[12px]"></textarea>
+                    <textarea
+                      className=" focus:outline-none w-full border h-[200px] mt-[5px] p-[10px] placeholder:text-[12px]"
+                      onChange={handleBulkInputChange}
+                      onKeyDown={handleKeyDown}
+                    ></textarea>
                     <p className="text-[#737373] text-[12px]">
                       Adding in bulk will replace your existing choices with
                       those entered.
                     </p>
                     <div>
-                      <button className="bg-transparent text-[#2366a2] text-[12px] pt-[6px] pb-[6px] pr-[12px] pl-[12px]">
+                      <button
+                        className="bg-transparent text-[#2366a2] text-[12px] pt-[6px] pb-[6px] pr-[12px] pl-[12px]"
+                        onClick={handleClose}
+                      >
                         Close
                       </button>
-                      <button className="bg-[#2773b7] text-white text-[12px] pt-[6px] pb-[6px] pr-[12px] pl-[12px]">
+                      <button
+                        className="bg-[#2773b7] text-white text-[12px] pt-[6px] pb-[6px] pr-[12px] pl-[12px]"
+                        onClick={handleSaveBulkChoices}
+                      >
                         Save choices
                       </button>
                     </div>

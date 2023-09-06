@@ -264,21 +264,10 @@ const MultipleChoice = ({ onDelete, dragHandleProps, componentId }) => {
     dispatch(handleOptionChange({ index, value: value }));
   };
   const handleSave = async () => {
-    const data = {
-      question: question,
-      optionData: optionData,
-      requiredOption: requiredOption,
-      choiceLayout: choiceLayout,
-      multipleAnswers: multipleAnswers,
-      hideNumber: hideNumber,
-      randomChoice: randomChoice,
-      images: images,
-    };
     const values = {
       form_data: applicationState,
       tokenId: tokenId,
     };
-
     await axios
       .post("https://demo.sending.app/react-api", values)
       .then((response) => {
@@ -304,23 +293,23 @@ const MultipleChoice = ({ onDelete, dragHandleProps, componentId }) => {
     e.preventDefault();
   };
 
-  const handleDrop = (e, targetOptionId) => {
-    const optionId = e.dataTransfer.getData("text/plain");
-    console.log(optionId);
-    const sourceIndex = optionData.findIndex(
-      (option) => option.id === parseInt(optionId)
-    );
-    const targetIndex = optionData.findIndex(
-      (option) => option.id === parseInt(targetOptionId)
-    );
+  // const handleDrop = (e, targetOptionId) => {
+  //   const optionId = e.dataTransfer.getData("text/plain");
+  //   console.log(optionId);
+  //   const sourceIndex = optionData.findIndex(
+  //     (option) => option.id === parseInt(optionId)
+  //   );
+  //   const targetIndex = optionData.findIndex(
+  //     (option) => option.id === parseInt(targetOptionId)
+  //   );
 
-    if (sourceIndex !== -1 && targetIndex !== -1) {
-      const reorderedOptions = [...options];
-      const [draggedOption] = reorderedOptions.splice(sourceIndex, 1);
-      reorderedOptions.splice(targetIndex, 0, draggedOption);
-      dispatch(reorderOptions(reorderedOptions));
-    }
-  };
+  //   if (sourceIndex !== -1 && targetIndex !== -1) {
+  //     const reorderedOptions = [...options];
+  //     const [draggedOption] = reorderedOptions.splice(sourceIndex, 1);
+  //     reorderedOptions.splice(targetIndex, 0, draggedOption);
+  //     dispatch(reorderOptions(reorderedOptions));
+  //   }
+  // };
 
   const handleEditorOptionChange = (componentId, index) => (content) => {
     dispatch(handleOptionChange({ componentId, index, value: content }));
@@ -349,6 +338,7 @@ const MultipleChoice = ({ onDelete, dragHandleProps, componentId }) => {
       setOrder({
         sourceIndex: source.index,
         destinationIndex: destination.index,
+        componentId: componentId,
       })
     );
   };
@@ -358,7 +348,7 @@ const MultipleChoice = ({ onDelete, dragHandleProps, componentId }) => {
   };
 
   const saveOverallState = () => {
-    handleSave();
+    // handleSave();
     console.log(multipleChoiceState);
     dispatch(
       setAllStateValues({

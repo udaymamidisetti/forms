@@ -6,9 +6,16 @@ import {
   addHeadingInstance,
   handleHeading,
 } from "../redux/slices/HeadingSlice";
+import axios from "axios";
+import { setAllStateValues, setTokenId } from "../redux/slices/FormSlice";
 
 const Heading = ({ onDelete, componentId }) => {
   const dispatch = useDispatch();
+  const headingState = useSelector((state) => state.Heading.byId);
+  const tokenId = useSelector((state) => state.formData.tokenId);
+  const applicationState = useSelector(
+    (state) => state.formData.allStateValues
+  );
   // const heading = useSelector((state) => state.Heading.heading.componentId);
   const heading = useSelector((state) => {
     const instance = state.Heading.byId[componentId];
@@ -21,6 +28,32 @@ const Heading = ({ onDelete, componentId }) => {
 
   const onChangeHeading = (event) => {
     dispatch(handleHeading({ componentId, value: event.target.value }));
+  };
+  const handleSave = async () => {
+    const values = {
+      form_data: applicationState,
+      tokenId: tokenId,
+    };
+
+    await axios
+      .post("https://demo.sending.app/react-api", values)
+      .then((response) => {
+        console.log("Response:", response.data);
+        dispatch(setTokenId(response.data.tokenId));
+        // Cookies.set("tokenId", response.data);
+      })
+      .catch((error) => {
+        console.error("Error submitting form:", error);
+      });
+  };
+
+  const saveOverallState = () => {
+    // handleSave();
+    dispatch(
+      setAllStateValues({
+        overallStates: headingState,
+      })
+    );
   };
 
   useEffect(() => {
@@ -52,6 +85,7 @@ const Heading = ({ onDelete, componentId }) => {
                   }}
                   className="h-[36px] leading-[20px] text-[12px] pt-[8px] pb-[8px] pl-[10px] pr-[10px] bg-[#5cb85c] text-[white]"
                   //   onClick={saveFields}
+                  onClick={saveOverallState}
                 >
                   Save
                 </button>

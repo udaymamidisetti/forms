@@ -113,9 +113,16 @@ export const MultipleChoiceSlice = createSlice({
       state.byId[componentId].options = bulkArray;
     },
     setOrder: (state, action) => {
-      const { sourceIndex, destinationIndex } = action.payload;
-      const [removedOption] = state.options.splice(sourceIndex, 1);
-      state.options.splice(destinationIndex, 0, removedOption);
+      const { sourceIndex, destinationIndex, componentId } = action.payload;
+      const [removedOption] = state.byId[componentId].options.splice(
+        sourceIndex,
+        1
+      );
+      state.byId[componentId].options.splice(
+        destinationIndex,
+        0,
+        removedOption
+      );
     },
     setOtherTextField: (state, action) => {
       const { componentId, index } = action.payload;

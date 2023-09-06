@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import TextFieldForm from "../components/previewPageComponents/TextFieldForm";
@@ -11,13 +11,13 @@ import HeadingForm from "../components/previewPageComponents/HeadingForm";
 import ScoreDisplayForm from "../components/previewPageComponents/ScoreDisplayForm";
 import MultipleChoiceGridForm from "../components/previewPageComponents/MultipleChoiceGridForm";
 import CustomTextForm from "../components/previewPageComponents/CustomTextForm";
-import Cookies from "js-cookie";
 
 const Preview = () => {
-  const navigate = useNavigate();
   const { id } = useParams();
   console.log(id);
+  const [data, setData] = useState([]);
   const tokenId = useSelector((state) => state.formData.tokenId);
+  console.log(tokenId);
   const selectedOptions = useSelector(
     (state) => state.formData.selectedOptions
   );
@@ -25,13 +25,8 @@ const Preview = () => {
   const sortedOptions = [...new Set(selectedOptions)];
   console.log(sortedOptions);
   const options = useSelector((state) => state.formData.options);
-  const ref_id = Cookies.get("tokenId");
-  console.log(ref_id);
-  console.log(selectedOptions);
-  console.log(...options);
 
   useEffect(() => {
-    console.log("Running");
     getAllOptionValues();
   }, []);
 
@@ -42,11 +37,15 @@ const Preview = () => {
     axios
       .post("https://demo.sending.app/react-api", values)
       .then((response) => {
-        console.log(response.data);
+        console.log(response.data.form_data);
+        setData(JSON.parse(response.data.form_data));
+        console.log(data);
       })
       .catch((e) => console.log(e));
   };
-
+  // console.log(Object.keys(data));
+  const keys = [...data].map((item) => Object.keys(item)[0]);
+  console.log(keys);
   const getOptionContent = (optionId) => {
     const option = options.find((opt) => opt.id === optionId);
     if (option) {
@@ -57,15 +56,20 @@ const Preview = () => {
     return "";
   };
 
-  // console.log(getOptionContent())
-  // const containerRef = React.useRef(null);
-
   const htmlStructure = (
     <div>
-      {sortedOptions.map((optionId, index) => {
-        switch (optionId.droppedOption) {
-          case "TextField":
-            return <TextFieldForm key={`${optionId}-${index}`} index={index} />;
+      {/* {data.map((optionId, index) => {
+        const keys = data.map((item) => Object.keys(item)[0]);
+        const dataType = data[keys];
+        switch (keys) {
+          case "TextField1":
+            return (
+              <TextFieldForm
+                key={`${optionId}-${index}`}
+                index={index}
+                questionData={dataType}
+              />
+            );
           case "YesNo":
             return <YesorNoForm key={`${optionId}-${index}`} index={index} />;
           case "MultipleChoice":
@@ -98,6 +102,23 @@ const Preview = () => {
           default:
             return null;
         }
+      })} */}
+      {/* {data.map((e,i) => (
+        
+      ))} */}
+      {/* {console.log(Object.values(data))} */}
+      {keys.map((e, i) => {
+        console.log(data);
+        return (
+          <div key={i}>
+            <div>
+              {e.slice(0, -1) === "TextField" && <div>Textfield</div>}
+              {e.slice(0, -1) === "Multiplechoice" && (
+                <MultipleChoiceForm questionData={data[i][e]} />
+              )}
+            </div>
+          </div>
+        );
       })}
     </div>
   );
@@ -124,24 +145,6 @@ const Preview = () => {
   // useEffect(() => {
   //   getAllConditions();
   // }, []);
-
-  const getAllConditions = async () => {
-    const data = {
-      token_id: ref_id,
-    };
-    const values = {
-      ref_id: data,
-    };
-    await axios
-      .get(`https://demo.sending.app/react-api?ref_id=${ref_id}`)
-      .then((response) => {
-        console.log("Response:", response);
-        // Cookies.set("tokenId", response.data);
-      })
-      .catch((error) => {
-        console.error("Error submitting form:", error);
-      });
-  };
 
   return (
     <div

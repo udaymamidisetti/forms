@@ -16,6 +16,8 @@ const initialState = {
     columnWidth: null,
     fieldsData: [...fieldData],
     scaleType: null,
+    validation: "",
+    answerTextarea: "",
   },
   byId: {},
 };
@@ -54,7 +56,40 @@ const TextFieldGridSlice = createSlice({
       const { componentId, value } = action.payload;
       state.byId[componentId].columnWidth = value;
     },
-    
+    handleAddField: (state, action) => {
+      const { componentId, value } = action.payload;
+      console.log(componentId, value);
+      // return [...state.options, action.payload];
+      state.byId[componentId].fieldsData.push(value);
+    },
+    handleDeleteField: (state, action) => {
+      const { componentId, i } = action.payload;
+      console.log(componentId, i);
+      const updated = [...state.byId[componentId].fieldsData];
+      state.byId[componentId].fieldsData = updated.filter(
+        (_, index) => index !== i
+      );
+    },
+    toggleExpansion: (state, action) => {
+      const { componentId, index } = action.payload;
+      state.byId[componentId].fieldsData[index].expanded =
+        !state.byId[componentId].fieldsData[index].expanded;
+    },
+    handleValidation: (state, action) => {
+      const { index, componentId, value } = action.payload;
+      state.byId[componentId].fieldsData[index].validation = value;
+    },
+    handleFieldChange: (state, action) => {
+      const { index, componentId, value } = action.payload;
+      state.byId[index].fieldsData[componentId] = {
+        ...state.byId[index].fieldsData[componentId],
+        title: value,
+      };
+    },
+    handleAnswerTextarea: (state, action) => {
+      const { componentId, value } = action.payload;
+      state.byId[componentId].answerTextarea = value;
+    },
   },
 });
 
@@ -66,5 +101,11 @@ export const {
   handleRequiredOption,
   handleRandomFields,
   handleColumnWidth,
+  handleAddField,
+  handleDeleteField,
+  toggleExpansion,
+  handleValidation,
+  handleFieldChange,
+  handleAnswerTextarea,
 } = TextFieldGridSlice.actions;
 export default TextFieldGridSlice.reducer;

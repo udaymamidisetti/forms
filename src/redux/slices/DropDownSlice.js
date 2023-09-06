@@ -80,6 +80,18 @@ export const DropDownSlice = createSlice({
       state.byId[componentId].options.splice(0);
       state.byId[componentId].options = bulkArray;
     },
+    setOrder: (state, action) => {
+      const { sourceIndex, destinationIndex, componentId } = action.payload;
+      const [removedOption] = state.byId[componentId].options.splice(
+        sourceIndex,
+        1
+      );
+      state.byId[componentId].options.splice(
+        destinationIndex,
+        0,
+        removedOption
+      );
+    },
   },
 });
 export const {
@@ -95,6 +107,7 @@ export const {
   handleRandomChoices,
   handleImages,
   handleBulkAdd,
+  setOrder,
 } = DropDownSlice.actions;
 
 export default DropDownSlice.reducer;

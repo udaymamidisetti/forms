@@ -15,18 +15,50 @@ import {
   handleImages,
   handleInputChange,
   handleRequiredOption,
+  handleRandomFields,
+  handleAddField,
+  handleDeleteField,
+  toggleExpansion,
+  handleValidation,
+  handleFieldChange,
+  handleAnswerTextarea,
 } from "../redux/slices/TextFieldGridSlice";
+import { setAllStateValues, setTokenId } from "../redux/slices/FormSlice";
+import axios from "axios";
 
 const TextFieldGrid = ({ onDelete, componentId }) => {
   const dispatch = useDispatch();
   const [showFull, setShowFull] = useState(false);
   const [fData, setfData] = useState([...fieldData]);
+  const tokenId = useSelector((state) => state.formData.tokenId);
+  const textFieldGridStates = useSelector((state) => state.TextFieldGrid.byId);
   const question = useSelector((state) => {
     const instance = state.TextFieldGrid.byId[componentId];
     if (!instance) {
       return;
     }
     return instance.question;
+  });
+  const fieldsData = useSelector((state) => {
+    const instance = state.TextFieldGrid.byId[componentId];
+    if (!instance) {
+      return fieldData;
+    }
+    return instance.fieldsData;
+  });
+  const validation = useSelector((state) => {
+    const instance = state.TextFieldGrid.byId[componentId];
+    if (!instance) {
+      return;
+    }
+    return instance.validation;
+  });
+  const answerTextarea = useSelector((state) => {
+    const instance = state.TextFieldGrid.byId[componentId];
+    if (!instance) {
+      return;
+    }
+    return instance.answerTextarea;
   });
   const handleChange = (componentId) => (content) => {
     dispatch(handleInputChange({ componentId, value: content }));
@@ -39,12 +71,52 @@ const TextFieldGrid = ({ onDelete, componentId }) => {
     });
   };
   const addFieldsHandler = () => {
-    console.log("Clicked");
-    const newOption = [{ title: `Field ${fData.length + 1}` }];
+    const newOption = { title: `Field ${fieldsData.length + 1}` };
     console.log(newOption);
-    setfData(() => [...fData, ...newOption]);
+    dispatch(
+      handleAddField({
+        componentId,
+        value: {
+          ...newOption,
+          expanded: false,
+          includeImage: false,
+          includeOtherTextField: false,
+          image: "",
+        },
+      })
+    );
+  };
+  const handleToggleExpansion = (index) => {
+    dispatch(toggleExpansion({ componentId, index }));
+  };
+  const handleEditorFieldChange = (componentId, index) => (content) => {
+    dispatch(handleFieldChange({ componentId, index, value: content }));
+  };
+  const handleSave = async () => {
+    const values = {
+      form_data: textFieldGridStates,
+      tokenId: tokenId,
+    };
+
+    await axios
+      .post("https://demo.sending.app/react-api", values)
+      .then((response) => {
+        console.log("Response:", response.data);
+        dispatch(setTokenId(response.data.tokenId));
+      })
+      .catch((error) => {
+        console.error("Error submitting form:", error);
+      });
   };
 
+  const saveOverallState = () => {
+    // handleSave();
+    dispatch(
+      setAllStateValues({
+        overallStates: textFieldGridStates,
+      })
+    );
+  };
   useEffect(() => {
     dispatch(addTextfieldGridInstance({ componentId }));
   }, []);
@@ -73,6 +145,7 @@ const TextFieldGrid = ({ onDelete, componentId }) => {
                     boxShadow: "0 1px 3px 0 rgba(40,60,70,0.2)",
                   }}
                   className="h-[36px] leading-[20px] text-[12px] pt-[8px] pb-[8px] pl-[10px] pr-[10px] bg-[#5cb85c] text-[white]"
+                  onClick={saveOverallState}
                 >
                   Save
                 </button>
@@ -131,7 +204,7 @@ const TextFieldGrid = ({ onDelete, componentId }) => {
             </p>
             <div className="flex items-center gap-[5px]">
               <select
-                className="border text-[13px] h-[34px] w-[180px]"
+                className="border text-[13px] h-[34px] w-[180px] focus:outline-none"
                 onChange={(e) =>
                   dispatch(
                     handleRequiredOption({ componentId, value: e.target.value })
@@ -177,11 +250,13 @@ const TextFieldGrid = ({ onDelete, componentId }) => {
                   Display Order
                 </p>
                 <div className="flex items-center gap-[5px]">
-                  <input type="checkbox" id="required" />
-                  <label
-                    htmlFor="required"
-                    className="cursor-pointer text-[13px]"
-                  >
+                  <label className="cursor-pointer text-[13px] flex items-center gap-[5px]">
+                    <input
+                      type="checkbox"
+                      onChange={() =>
+                        dispatch(handleRandomFields({ componentId }))
+                      }
+                    />
                     Randomize Fields
                   </label>
                 </div>
@@ -253,12 +328,9 @@ const TextFieldGrid = ({ onDelete, componentId }) => {
           <h1 className="mt-[30px] text-[22px] mb-[10px]">Fields</h1>
           <p className="pl-[30px] text-[#777] text-[13px]">Label</p>
           <div>
-            {fData.map((e, index) => (
-              <>
-                <div
-                  className="flex items-center gap-[5px] mt-[5px] w-[670px]"
-                  key={index}
-                >
+            {fieldsData.map((e, index) => (
+              <div key={index}>
+                <div className="flex items-center gap-[5px] mt-[5px] w-[670px]">
                   <RiDragMove2Fill color="#777" size={19} />
                   <Editor
                     // onInit={(evt, editor) => (editorRef.current = editor)}
@@ -273,27 +345,424 @@ const TextFieldGrid = ({ onDelete, componentId }) => {
                       toolbar_mode: "wrap",
                       ui_mode: "split",
                     }}
-                    // onEditorChange={handleEditorFieldChange(
-                    //   index,
-                    //   componentId
-                    // )}
+                    onEditorChange={handleEditorFieldChange(index, componentId)}
                   />
                   <button
                     className="border p-[8px] text-[#777] h-[34px] w-[34px]"
                     // onClick={handleToggleExpansion(index)}
                     // onClick={() => dispatch(toggleExpansion(index))}
+                    onClick={() => handleToggleExpansion(index)}
                   >
                     <BiSolidChevronDown />
                   </button>
                   <button
                     className="border p-[8px] text-[#777] flex items-center h-[34px] w-[34px]"
-                    onClick={() => deleteFieldOption(index)}
+                    onClick={() =>
+                      dispatch(
+                        handleDeleteField({
+                          componentId,
+                          i: index,
+                        })
+                      )
+                    }
                   >
                     <BsTrashFill />
                   </button>
                 </div>
-                {/* {isExpanded ? <div>Set</div> : null} */}
-              </>
+                {e.expanded && (
+                  <div className="bg-[#F3F3F3] w-[568px] ml-[24px] mt-[5px] pb-[15px]">
+                    <div className="flex gap-[30px] items-center pt-[7px] ml-[10px]">
+                      <p className="text-[#7D848C] text-[13px] w-[100px]">
+                        Initial answer
+                      </p>
+                      <input
+                        className="border w-[440px] p-[3px] text-[13px] focus:outline-none"
+                        placeholder="Optional-a pre-filled text value"
+                      />
+                    </div>
+                    <div className="flex gap-[30px] items-center pt-[7px] ml-[10px]">
+                      <p className="text-[#7D848C] text-[13px] w-[100px]">
+                        Validation
+                      </p>
+                      <select
+                        className="text-[13px] w-[150px] h-[30px] focus:outline-none"
+                        onChange={(e) =>
+                          dispatch(
+                            handleValidation({
+                              index,
+                              componentId,
+                              value: e.target.value,
+                            })
+                          )
+                        }
+                      >
+                        <option value="none">None</option>
+                        <option value="email">Email</option>
+                        <option value="url">URL</option>
+                        <option value="alpha">Letters</option>
+                        <option value="alphanum">Letters & Numbers</option>
+                        <option value="all">All characters</option>
+                        <option value="wordCount">Word limit</option>
+                        <option value="dateYear">Date(YYYY/MM/DD)</option>
+                        <option value="dateMonth">Date(MM/DD/YYYY)</option>
+                        <option value="dateDay">Date(DD/MM/YYYY)</option>
+                        <option value="num">Number (integer)</option>
+                        <option value="float">Floating point</option>
+                        <option value="regex">Regular expression</option>
+                      </select>
+                    </div>
+                    {e.validation === "email" && (
+                      <>
+                        <div className="flex gap-[29px] mt-[10px]">
+                          <p className="text-[13px] ml-[10px] text-[#7D848C]">
+                            Answer required
+                          </p>
+                          <input type="checkbox" />
+                        </div>
+                        <div className="flex gap-[30px] items-center pt-[7px] ml-[10px]">
+                          <p className="text-[#7D848C] text-[13px] w-[100px]">
+                            Error message
+                          </p>
+                          <input
+                            className="border w-[440px] p-[3px] text-[13px] focus:outline-none"
+                            placeholder="This field can only consist of a valid email address."
+                          />
+                        </div>
+                      </>
+                    )}
+                    {e.validation === "url" && (
+                      <>
+                        <div className="flex gap-[29px] mt-[10px]">
+                          <p className="text-[13px] ml-[10px] text-[#7D848C]">
+                            Answer required
+                          </p>
+                          <input type="checkbox" />
+                        </div>
+                        <div className="flex gap-[30px] items-center pt-[7px] ml-[10px]">
+                          <p className="text-[#7D848C] text-[13px] w-[100px]">
+                            Error message
+                          </p>
+                          <input
+                            className="border w-[440px] p-[3px] text-[13px] focus:outline-none"
+                            placeholder="This field can only consist of a valid URL (website)."
+                          />
+                        </div>
+                      </>
+                    )}
+                    {e.validation === "alpha" && (
+                      <>
+                        <div className="flex gap-[29px] mt-[10px]">
+                          <p className="text-[13px] ml-[10px] text-[#7D848C]">
+                            Answer required
+                          </p>
+                          <input type="checkbox" />
+                        </div>
+                        <div className="flex gap-[59px] mt-[10px]">
+                          <p className="text-[13px] ml-[10px] text-[#7D848C]">
+                            Limit length
+                          </p>
+                          <div className="flex items-center">
+                            <input
+                              className="w-[50px] focus:outline-none text-[13px] text-center"
+                              placeholder="Min"
+                            />
+                            <p className="text-[13px]">to</p>
+                            <input
+                              className="w-[50px] focus:outline-none text-[13px] text-center"
+                              placeholder="Max"
+                            />
+                            <p className="text-[13px]">characters</p>
+                          </div>
+                        </div>
+                        <div className="flex gap-[30px] items-center pt-[7px] ml-[10px]">
+                          <p className="text-[#7D848C] text-[13px] w-[100px]">
+                            Error message
+                          </p>
+                          <input
+                            className="border w-[440px] p-[3px] text-[13px] focus:outline-none placeholder:text-[13px]"
+                            placeholder="This field can only consist of letters."
+                          />
+                        </div>
+                      </>
+                    )}
+                    {e.validation === "alphanum" && (
+                      <>
+                        <div className="flex gap-[29px] mt-[10px]">
+                          <p className="text-[13px] ml-[10px] text-[#7D848C]">
+                            Answer required
+                          </p>
+                          <input type="checkbox" />
+                        </div>
+                        <div className="flex gap-[59px] mt-[10px]">
+                          <p className="text-[13px] ml-[10px] text-[#7D848C]">
+                            Limit length
+                          </p>
+                          <div className="flex items-center">
+                            <input
+                              className="w-[50px] focus:outline-none text-[13px] text-center"
+                              placeholder="Min"
+                            />
+                            <p className="text-[13px]">to</p>
+                            <input
+                              className="w-[50px] focus:outline-none text-[13px] text-center"
+                              placeholder="Max"
+                            />
+                            <p className="text-[13px]">characters</p>
+                          </div>
+                        </div>
+                        <div className="flex gap-[30px] items-center pt-[7px] ml-[10px]">
+                          <p className="text-[#7D848C] text-[13px] w-[100px]">
+                            Error message
+                          </p>
+                          <input
+                            className="border w-[440px] p-[3px] text-[13px] focus:outline-none placeholder:text-[13px]"
+                            placeholder="This field can only consist of letters or numbers."
+                          />
+                        </div>
+                      </>
+                    )}
+                    {e.validation === "all" && (
+                      <>
+                        <div className="flex gap-[29px] mt-[10px]">
+                          <p className="text-[13px] ml-[10px] text-[#7D848C]">
+                            Answer required
+                          </p>
+                          <input type="checkbox" />
+                        </div>
+                        <div className="flex gap-[59px] mt-[10px]">
+                          <p className="text-[13px] ml-[10px] text-[#7D848C]">
+                            Limit length
+                          </p>
+                          <div className="flex items-center">
+                            <input
+                              className="w-[50px] focus:outline-none text-[13px] text-center"
+                              placeholder="Min"
+                            />
+                            <p className="text-[13px]">to</p>
+                            <input
+                              className="w-[50px] focus:outline-none text-[13px] text-center"
+                              placeholder="Max"
+                            />
+                            <p className="text-[13px]">characters</p>
+                          </div>
+                        </div>
+                        <div className="flex gap-[30px] items-center pt-[7px] ml-[10px]">
+                          <p className="text-[#7D848C] text-[13px] w-[100px]">
+                            Error message
+                          </p>
+                          <input
+                            className="border w-[440px] p-[3px] text-[13px] focus:outline-none placeholder:text-[13px]"
+                            placeholder="This field must consist of between %MIN% and %MAX% characters."
+                          />
+                        </div>
+                      </>
+                    )}
+                    {e.validation === "wordCount" && (
+                      <>
+                        <div className="flex gap-[29px] mt-[10px]">
+                          <p className="text-[13px] ml-[10px] text-[#7D848C]">
+                            Answer required
+                          </p>
+                          <input type="checkbox" />
+                        </div>
+                        <div className="flex gap-[59px] mt-[10px]">
+                          <p className="text-[13px] ml-[10px] text-[#7D848C]">
+                            Limit length
+                          </p>
+                          <div className="flex items-center">
+                            <input
+                              className="w-[50px] focus:outline-none text-[13px] text-center"
+                              placeholder="Min"
+                            />
+                            <p className="text-[13px]">to</p>
+                            <input
+                              className="w-[50px] focus:outline-none text-[13px] text-center"
+                              placeholder="Max"
+                            />
+                            <p className="text-[13px]">characters</p>
+                          </div>
+                        </div>
+                        <div className="flex gap-[30px] items-center pt-[7px] ml-[10px]">
+                          <p className="text-[#7D848C] text-[13px] w-[100px]">
+                            Error message
+                          </p>
+                          <input
+                            className="border w-[440px] p-[3px] text-[13px] focus:outline-none placeholder:text-[13px]"
+                            placeholder="This field must consist of between %MIN% and %MAX% words."
+                          />
+                        </div>
+                      </>
+                    )}
+                    {e.validation === "dateYear" && (
+                      <>
+                        <div className="flex gap-[29px] mt-[10px]">
+                          <p className="text-[13px] ml-[10px] text-[#7D848C]">
+                            Answer required
+                          </p>
+                          <input type="checkbox" />
+                        </div>
+                        <div className="flex gap-[30px] items-center pt-[7px] ml-[10px]">
+                          <p className="text-[#7D848C] text-[13px] w-[100px]">
+                            Error message
+                          </p>
+                          <input
+                            className="border w-[440px] p-[3px] text-[13px] focus:outline-none"
+                            placeholder="This field must have a date in the form YYYY/MM/DD"
+                          />
+                        </div>
+                      </>
+                    )}
+                    {e.validation === "dateMonth" && (
+                      <>
+                        <div className="flex gap-[29px] mt-[10px]">
+                          <p className="text-[13px] ml-[10px] text-[#7D848C]">
+                            Answer required
+                          </p>
+                          <input type="checkbox" />
+                        </div>
+                        <div className="flex gap-[30px] items-center pt-[7px] ml-[10px]">
+                          <p className="text-[#7D848C] text-[13px] w-[100px]">
+                            Error message
+                          </p>
+                          <input
+                            className="border w-[440px] p-[3px] text-[13px] focus:outline-none"
+                            placeholder="This field must have a date in the form MM/DD/YYYY"
+                          />
+                        </div>
+                      </>
+                    )}
+                    {e.validation === "dateDay" && (
+                      <>
+                        <div className="flex gap-[29px] mt-[10px]">
+                          <p className="text-[13px] ml-[10px] text-[#7D848C]">
+                            Answer required
+                          </p>
+                          <input type="checkbox" />
+                        </div>
+                        <div className="flex gap-[30px] items-center pt-[7px] ml-[10px]">
+                          <p className="text-[#7D848C] text-[13px] w-[100px]">
+                            Error message
+                          </p>
+                          <input
+                            className="border w-[440px] p-[3px] text-[13px] focus:outline-none"
+                            placeholder="This field must have a date in the form DD/MM/YYYY"
+                          />
+                        </div>
+                      </>
+                    )}
+                    {e.validation === "num" && (
+                      <>
+                        <div className="flex gap-[29px] mt-[10px]">
+                          <p className="text-[13px] ml-[10px] text-[#7D848C]">
+                            Answer required
+                          </p>
+                          <input type="checkbox" />
+                        </div>
+                        <div className="flex gap-[62px] mt-[10px]">
+                          <p className="text-[13px] ml-[10px] text-[#7D848C]">
+                            Limit value
+                          </p>
+                          <div className="flex items-center">
+                            <p className="text-[13px]">Between</p>
+                            <input
+                              className="w-[50px] focus:outline-none text-[13px] text-center"
+                              placeholder="Min"
+                            />
+                            <p className="text-[13px]">and</p>
+                            <input
+                              className="w-[50px] focus:outline-none text-[13px] text-center"
+                              placeholder="Max"
+                            />
+                            <p className="text-[13px]">characters</p>
+                          </div>
+                        </div>
+                        <div className="flex gap-[30px] items-center pt-[7px] ml-[10px]">
+                          <p className="text-[#7D848C] text-[13px] w-[100px]">
+                            Error message
+                          </p>
+                          <input
+                            className="border w-[440px] p-[3px] text-[13px] focus:outline-none placeholder:text-[13px]"
+                            placeholder="This field can only consist of numbers."
+                          />
+                        </div>
+                      </>
+                    )}
+                    {e.validation === "float" && (
+                      <>
+                        <div className="flex gap-[29px] mt-[10px]">
+                          <p className="text-[13px] ml-[10px] text-[#7D848C]">
+                            Answer required
+                          </p>
+                          <input type="checkbox" />
+                        </div>
+                        <div className="flex gap-[59px] mt-[10px]">
+                          <p className="text-[13px] ml-[10px] text-[#7D848C]">
+                            Limit length
+                          </p>
+                          <div className="flex items-center">
+                            <input
+                              className="w-[50px] h-[25px] focus:outline-none text-[13px] text-center"
+                              placeholder="Min"
+                            />
+                            <p className="text-[13px]">to</p>
+                            <input
+                              className="w-[50px] h-[25px] focus:outline-none text-[13px] text-center"
+                              placeholder="Max"
+                            />
+                            <p className="text-[13px]">characters</p>
+                          </div>
+                        </div>
+                        <div className="flex gap-[29px] mt-[10px]">
+                          <p className="text-[13px] ml-[10px] text-[#7D848C]">
+                            Answer required
+                          </p>
+                          <input
+                            className="w-[50px] h-[25px] focus:outline-none text-[13px] text-center"
+                            placeholder="#"
+                          />
+                        </div>
+                        <div className="flex gap-[30px] items-center pt-[7px] ml-[10px]">
+                          <p className="text-[#7D848C] text-[13px] w-[100px]">
+                            Error message
+                          </p>
+                          <input
+                            className="border w-[440px] p-[3px] text-[13px] focus:outline-none placeholder:text-[13px]"
+                            placeholder="This field can only consist of numbers and decimals."
+                          />
+                        </div>
+                      </>
+                    )}
+                    {e.validation === "regex" && (
+                      <>
+                        <div className="flex gap-[29px] mt-[10px]">
+                          <p className="text-[13px] ml-[10px] text-[#7D848C]">
+                            Answer required
+                          </p>
+                          <input type="checkbox" />
+                        </div>
+                        <div className="flex gap-[59px] mt-[10px]">
+                          <p className="text-[13px] ml-[10px] mt-[5px] text-[#7D848C]">
+                            Regix value
+                          </p>
+                          <input
+                            className="text-[13px] focus:outline-none p-[3px]"
+                            placeholder="Enter a value"
+                          />
+                        </div>
+                        <div className="flex gap-[30px] items-center pt-[7px] ml-[10px]">
+                          <p className="text-[#7D848C] text-[13px] w-[100px]">
+                            Error message
+                          </p>
+                          <input
+                            className="border w-[440px] p-[3px] text-[13px] focus:outline-none placeholder:text-[13px]"
+                            placeholder="Invalid field input."
+                          />
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
             ))}
             <div className="pl-[24px] flex gap-[3px] mt-[5px]">
               <button
@@ -308,17 +777,12 @@ const TextFieldGrid = ({ onDelete, componentId }) => {
           <div class="flex mt-[30px]">
             <p class="text-[#7D848C] text-[13px] w-[180px]">Answer text area</p>
             <div class="flex items-center gap-[5px]">
-              <input type="radio" id="single" value="Single" />
-              <label for="single" class="text-[13px]">
+              <label class="text-[13px] flex gap-[5px]">
+                <input type="radio" value="Single" />
                 Single line
               </label>
-              <input
-                type="radio"
-                id="multiple"
-                class="ml-[10px]"
-                value="Multiple"
-              />
-              <label for="single" class="text-[13px]">
+              <label class="text-[13px] flex gap-[5px]">
+                <input type="radio" className="ml-[10px]" value="Single" />
                 Multiple line
               </label>
             </div>

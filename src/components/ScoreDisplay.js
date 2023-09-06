@@ -7,10 +7,14 @@ import {
   handleScore,
 } from "../redux/slices/ScoreDisplaySlice";
 import { useDispatch, useSelector } from "react-redux";
+import { setAllStateValues, setTokenId } from "../redux/slices/FormSlice";
+import axios from "axios";
 
 const ScoreDisplay = ({ onDelete, componentId }) => {
   const dispatch = useDispatch();
   // const scoreValue = useSelector((state) => state.ScoreDisplay.score);
+  const tokenId = useSelector((state) => state.formData.tokenId);
+  const scoreDisplayStates = useSelector((state) => state.ScoreDisplay.byId);
   const scoreValue = useSelector((state) => {
     const instance = state.ScoreDisplay.byId[componentId];
     if (!instance) {
@@ -18,6 +22,32 @@ const ScoreDisplay = ({ onDelete, componentId }) => {
     }
     return instance.score;
   });
+
+  const handleSave = async () => {
+    const values = {
+      form_data: scoreDisplayStates,
+      tokenId: tokenId,
+    };
+
+    await axios
+      .post("https://demo.sending.app/react-api", values)
+      .then((response) => {
+        console.log("Response:", response.data);
+        dispatch(setTokenId(response.data.tokenId));
+      })
+      .catch((error) => {
+        console.error("Error submitting form:", error);
+      });
+  };
+
+  const saveOverallState = () => {
+    // handleSave();
+    dispatch(
+      setAllStateValues({
+        overallStates: scoreDisplayStates,
+      })
+    );
+  };
   useEffect(() => {
     dispatch(addScoreDisplayInstance({ componentId }));
   }, []);
@@ -46,6 +76,7 @@ const ScoreDisplay = ({ onDelete, componentId }) => {
                     boxShadow: "0 1px 3px 0 rgba(40,60,70,0.2)",
                   }}
                   className="h-[36px] leading-[20px] text-[12px] pt-[8px] pb-[8px] pl-[10px] pr-[10px] bg-[#5cb85c] text-[white]"
+                  onClick={saveOverallState}
                 >
                   Save
                 </button>

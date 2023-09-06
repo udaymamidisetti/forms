@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
 const TextFieldForm = (props) => {
-  const { index } = props;
+  const { index, questionData } = props;
+  console.log(questionData);
   const question = useSelector((state) => state.textField.questionInput);
   const answerText = useSelector((state) => state.textField.answerText);
   const requiredOption = useSelector((state) => state.textField.requiredOption);

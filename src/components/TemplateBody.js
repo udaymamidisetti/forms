@@ -9,10 +9,14 @@ import { BiSolidGrid } from "react-icons/bi";
 import { LiaMedalSolid } from "react-icons/lia";
 import { RxHeading } from "react-icons/rx";
 import { FaArrowRight } from "react-icons/fa";
-import { Link, json } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import data from "../data";
 import { useDispatch, useSelector } from "react-redux";
-import { addOption, setChoicesOrder } from "../redux/slices/FormSlice";
+import {
+  addOption,
+  setChoicesOrder,
+  setTokenId,
+} from "../redux/slices/FormSlice";
 import TextField from "./TextField";
 import YesorNo from "./YesorNo";
 import MultipleChoice from "./MultipleChoice";
@@ -34,7 +38,9 @@ import TemplatePreview from "./TemplatePreview";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import { addInstance } from "../redux/slices/MultipleChoiceSlice";
 import Header from "./Header";
+import axios from "axios";
 const TemplateBody = () => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const id = useSelector((state) => state.formData.tokenId);
   console.log(id);
@@ -42,6 +48,8 @@ const TemplateBody = () => {
   const [drag, setDrag] = useState(true);
   const [display, setDisplay] = useState();
   const [draggedIndex, setDraggedIndex] = useState(null);
+  const overallStates = useSelector((state) => state.formData.allStateValues);
+  console.log(overallStates);
   const selectedOptions = useSelector(
     (state) => state.formData.selectedOptions
   );
@@ -154,6 +162,24 @@ const TemplateBody = () => {
     // const deletedOption = localStorage.getItem('selectedOptions').slice(index,1)
     // dataArray.slice(index, 1);
   };
+  const handleSave = async () => {
+    const values = {
+      form_data: overallStates,
+      tokenId: id,
+    };
+
+    await axios
+      .post("https://demo.sending.app/react-api", values)
+      .then((response) => {
+        console.log("Response:", response.data);
+        dispatch(setTokenId(response.data.tokenId));
+        window.open(`/uday/preview/${response.data.tokenId}`, "_blank");
+      })
+      .catch((error) => {
+        console.error("Error submitting form:", error);
+      });
+  };
+  const handlePreview = () => {};
   const draggingContent = () => {
     return (
       <Droppable droppableId="ITEMS">
@@ -781,11 +807,15 @@ const TemplateBody = () => {
                 Create a Template
               </button>
               {/* {array.length > 0 && ( */}
-              <Link to={`/uday/preview/${id}`} target="__blank">
-                <button className="bg-[#3c8dd5] w-full text-[white] mt-[20px] text-[14px] pt-[8px] pb-[8px]">
-                  Preview
-                </button>
-              </Link>
+              {/* <Link to={`/uday/preview/${id}`} target="__blank"> */}
+              <button
+                className="bg-[#3c8dd5] w-full text-[white] mt-[20px] text-[14px] pt-[8px] pb-[8px]"
+                onClick={handleSave}
+              >
+                Preview
+              </button>
+              {/* </Link> */}
+
               {/* )} */}
             </div>
           </div>

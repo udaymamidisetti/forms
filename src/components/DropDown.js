@@ -22,6 +22,7 @@ import {
   handleRandomChoices,
   handleImages,
   handleBulkAdd,
+  setOrder,
 } from "../redux/slices/DropDownSlice";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import { Editor } from "@tinymce/tinymce-react";
@@ -121,6 +122,7 @@ const DropDown = ({ onDelete, componentId }) => {
       setOrder({
         sourceIndex: source.index,
         destinationIndex: destination.index,
+        componentId: componentId,
       })
     );
   };
@@ -145,7 +147,7 @@ const DropDown = ({ onDelete, componentId }) => {
       });
   };
   const saveOverallState = () => {
-    handleSave();
+    // handleSave();
     dispatch(
       setAllStateValues({
         overallStates: dropDownState,

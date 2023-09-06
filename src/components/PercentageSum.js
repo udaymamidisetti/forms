@@ -19,10 +19,13 @@ import {
   handleRequiredOption,
 } from "../redux/slices/PercentageSumSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { setAllStateValues, setTokenId } from "../redux/slices/FormSlice";
 const PercentageSum = ({ onDelete, componentId }) => {
   const dispatch = useDispatch();
   const [showFull, setShowFull] = useState(false);
   // const [fData, setfData] = useState([...fieldData]);
+  const tokenId = useSelector((state) => state.formData.tokenId);
+  const percentageSumStates = useSelector((state) => state.PercentageSum);
   const question = useSelector((state) => {
     const instance = state.PercentageSum.byId[componentId];
     if (!instance) {
@@ -57,15 +60,34 @@ const PercentageSum = ({ onDelete, componentId }) => {
   const handleEditorFieldChange = (componentId, index) => (content) => {
     dispatch(handleFieldChange({ componentId, index, value: content }));
   };
-  const deleteFieldOption = (index) => {
-    setfData((prevData) => {
-      const updatedData = [...prevData];
-      updatedData.splice(index, 1);
-      return updatedData;
-    });
-  };
   const handleChange = (componentId) => (content) => {
     dispatch(handleInputChange({ componentId, value: content }));
+  };
+  // const handleSave = async () => {
+  //   const values = {
+  //     form_data: NetPromoterStates,
+  //     tokenId: tokenId,
+  //   };
+
+  //   await axios
+  //     .post("https://demo.sending.app/react-api", values)
+  //     .then((response) => {
+  //       console.log("Response:", response.data);
+  //       dispatch(setTokenId(response.data.tokenId));
+  //       Cookies.set("tokenId", response.data);
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error submitting form:", error);
+  //     });
+  // };
+
+  const saveOverallState = () => {
+    // handleSave();
+    dispatch(
+      setAllStateValues({
+        overallStates: percentageSumStates,
+      })
+    );
   };
   useEffect(() => {
     dispatch(addPercentageInstance({ componentId }));
@@ -96,6 +118,7 @@ const PercentageSum = ({ onDelete, componentId }) => {
                       boxShadow: "0 1px 3px 0 rgba(40,60,70,0.2)",
                     }}
                     className="h-[36px] leading-[20px] text-[12px] pt-[8px] pb-[8px] pl-[10px] pr-[10px] bg-[#5cb85c] text-[white]"
+                    onClick={saveOverallState}
                   >
                     Save
                   </button>
