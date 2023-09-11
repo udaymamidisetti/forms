@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   initialData: {
-    heading: "What question would you like to ask?",
+    heading: "Enter your heading here",
   },
   byId: {},
 };

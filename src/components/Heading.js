@@ -109,7 +109,7 @@ const Heading = ({ onDelete, componentId }) => {
                         /> */}
           <textarea
             placeholder="Enter you heading here"
-            className="border w-[100%] h-[80px] placeholder:text-[13px] p-[10px] focus:outline-none"
+            className="border w-[100%] h-[80px] placeholder:text-[13px] p-[10px] focus:outline-none text-[13px]"
             value={heading}
             //   onChange={handleChange}
             onChange={onChangeHeading}

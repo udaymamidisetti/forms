@@ -11,6 +11,9 @@ import HeadingForm from "../components/previewPageComponents/HeadingForm";
 import ScoreDisplayForm from "../components/previewPageComponents/ScoreDisplayForm";
 import MultipleChoiceGridForm from "../components/previewPageComponents/MultipleChoiceGridForm";
 import CustomTextForm from "../components/previewPageComponents/CustomTextForm";
+import NetPromoterForm from "../components/previewPageComponents/NetPromoterForm";
+import PercentageSumForm from "../components/previewPageComponents/PercentageSumForm";
+import RankingForm from "../components/previewPageComponents/RankingForm";
 
 const Preview = () => {
   const { id } = useParams();
@@ -112,9 +115,38 @@ const Preview = () => {
         return (
           <div key={i}>
             <div>
-              {e.slice(0, -1) === "TextField" && <div>Textfield</div>}
+              {e.slice(0, -1) === "TextField" && (
+                <TextFieldForm questionData={data[i][e]} index={i} />
+              )}
               {e.slice(0, -1) === "Multiplechoice" && (
-                <MultipleChoiceForm questionData={data[i][e]} />
+                <MultipleChoiceForm questionData={data[i][e]} index={i} />
+              )}
+              {e.slice(0, -1) === "Heading" && (
+                <HeadingForm questionData={data[i][e]} />
+              )}
+              {e.slice(0, -1) === "RatingScale" && (
+                <RatingScaleForm questionData={data[i][e]} index={i} />
+              )}
+              {e.slice(0, -1) === "ScoreDisplay" && (
+                <ScoreDisplayForm questionData={data[i][e]} index={i} />
+              )}
+              {e.slice(0, -1) === "YesNo" && (
+                <YesorNoForm questionData={data[i][e]} index={i} />
+              )}
+              {e.slice(0, -1) === "DropDown" && (
+                <DropDownForm questionData={data[i][e]} index={i} />
+              )}
+              {e.slice(0, -1) === "CustomText" && (
+                <CustomTextForm questionData={data[i][e]} index={i} />
+              )}
+              {e.slice(0, -1) === "NetPromoter" && (
+                <NetPromoterForm questionData={data[i][e]} index={i} />
+              )}
+              {e.slice(0, -1) === "PercentageSum" && (
+                <PercentageSumForm questionData={data[i][e]} index={i} />
+              )}
+              {e.slice(0, -1) === "Ranking" && (
+                <RankingForm questionData={data[i][e]} index={i} />
               )}
             </div>
           </div>

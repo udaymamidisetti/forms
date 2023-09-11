@@ -17,6 +17,7 @@ const CustomTextSlice = createSlice({
     },
     handleCustomText: (state, action) => {
       const { componentId, value } = action.payload;
+      console.log(componentId, value);
       state.byId[componentId].customText = value;
     },
   },

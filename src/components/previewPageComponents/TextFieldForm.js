@@ -3,10 +3,11 @@ import { useSelector } from "react-redux";
 const TextFieldForm = (props) => {
   const { index, questionData } = props;
   console.log(questionData);
-  const question = useSelector((state) => state.textField.questionInput);
-  const answerText = useSelector((state) => state.textField.answerText);
-  const requiredOption = useSelector((state) => state.textField.requiredOption);
-  const hideNumber = useSelector((state) => state.textField.hideNumber);
+  const { question, answerText, requiredOption, hideNumber } = questionData;
+  // const question = useSelector((state) => state.textField.questionInput);
+  // const answerText = useSelector((state) => state.textField.answerText);
+  // const requiredOption = useSelector((state) => state.textField.requiredOption);
+  // const hideNumber = useSelector((state) => state.textField.hideNumber);
   const [input, setInput] = useState("");
   const [textArea, setTextArea] = useState("");
   return (
@@ -21,10 +22,11 @@ const TextFieldForm = (props) => {
             ) : (
               ""
             )}
-            <p className="text-[13px]">
-              {requiredOption ? <span className="text-[red]">*</span> : ""}
-              {question}
-            </p>
+            {requiredOption ? <span className="text-[red]">*</span> : null}
+            <div
+              className="text-[13px]"
+              dangerouslySetInnerHTML={{ __html: question }}
+            />
           </div>
           {answerText === "single" ? (
             <input

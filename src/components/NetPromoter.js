@@ -27,6 +27,13 @@ const NetPromoter = ({ onDelete, componentId }) => {
     return instance.question;
   });
   console.log(question);
+  const displayText = useSelector((state) => {
+    const instance = state.NetPromoter.byId[componentId];
+    if (!instance) {
+      return false;
+    }
+    return instance.textLabels;
+  });
   const leftLabel = useSelector((state) => {
     const instance = state.NetPromoter.byId[componentId];
     if (!instance) {
@@ -165,44 +172,52 @@ const NetPromoter = ({ onDelete, componentId }) => {
               </label>
             </div>
           </div>
-          <div className="flex mt-[30px] items-center">
-            <p className="text-[#7D848C] text-[13px] w-[180px]">Left label</p>
-            <div className="flex items-center gap-[5px]">
-              <input
-                type="text"
-                id="required"
-                className="border focus:outline-none text-[12px] pl-[6px] pt-[3px] pb-[3px] w-[480px]"
-                value={leftLabel}
-                onChange={(e) =>
-                  dispatch(
-                    setLeftLabel({
-                      componentId: componentId,
-                      value: e.target.value,
-                    })
-                  )
-                }
-              />
-            </div>
-          </div>
-          <div className="flex mt-[30px] items-center">
-            <p className="text-[#7D848C] text-[13px] w-[180px]">Right label</p>
-            <div className="flex items-center gap-[5px]">
-              <input
-                type="text"
-                id="required"
-                className="border focus:outline-none text-[12px] pl-[6px] pt-[3px] pb-[3px] w-[480px]"
-                value={rightLabel}
-                onChange={(e) =>
-                  dispatch(
-                    setRightLabel({
-                      componentId: componentId,
-                      value: e.target.value,
-                    })
-                  )
-                }
-              />
-            </div>
-          </div>
+          {displayText && (
+            <>
+              <div className="flex mt-[30px] items-center">
+                <p className="text-[#7D848C] text-[13px] w-[180px]">
+                  Left label
+                </p>
+                <div className="flex items-center gap-[5px]">
+                  <input
+                    type="text"
+                    id="required"
+                    className="border focus:outline-none text-[12px] pl-[6px] pt-[3px] pb-[3px] w-[480px]"
+                    value={leftLabel}
+                    onChange={(e) =>
+                      dispatch(
+                        setLeftLabel({
+                          componentId: componentId,
+                          value: e.target.value,
+                        })
+                      )
+                    }
+                  />
+                </div>
+              </div>
+              <div className="flex mt-[30px] items-center">
+                <p className="text-[#7D848C] text-[13px] w-[180px]">
+                  Right label
+                </p>
+                <div className="flex items-center gap-[5px]">
+                  <input
+                    type="text"
+                    id="required"
+                    className="border focus:outline-none text-[12px] pl-[6px] pt-[3px] pb-[3px] w-[480px]"
+                    value={rightLabel}
+                    onChange={(e) =>
+                      dispatch(
+                        setRightLabel({
+                          componentId: componentId,
+                          value: e.target.value,
+                        })
+                      )
+                    }
+                  />
+                </div>
+              </div>
+            </>
+          )}
           <h1 className="mt-[30px] text-[22px] mb-[10px]">Options</h1>
           <div className="flex">
             <p className="text-[#7D848C] text-[13px] w-[180px]">Required</p>

@@ -2,15 +2,17 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 const RatingScaleForm = (props) => {
-  const { index } = props;
-  const question = useSelector((state) => state.RatingScale.questionInput);
-  const hideNumber = useSelector((state) => state.RatingScale.hideNumber);
-  const requiredOption = useSelector(
-    (state) => state.RatingScale.requiredOption
-  );
-  const agreedOptions = useSelector((state) => state.RatingScale.agreeOptions);
+  const { index, questionData } = props;
+  const { question, hideNumber, requiredOption, agreeOptions } = questionData;
+  console.log(agreeOptions);
+  // const question = useSelector((state) => state.RatingScale.questionInput);
+  // const hideNumber = useSelector((state) => state.RatingScale.hideNumber);
+  // const requiredOption = useSelector(
+  //   (state) => state.RatingScale.requiredOption
+  // );
+  // const agreedOptions = useSelector((state) => state.RatingScale.agreeOptions);
   const agreedOptionContent = () => {
-    switch (agreedOptions) {
+    switch (agreeOptions) {
       case "agree2":
         return (
           <div className="ml-[30px] mt-[10px]">
@@ -131,10 +133,11 @@ const RatingScaleForm = (props) => {
           ) : (
             ""
           )}
-          <p className="text-[13px]">
-            {requiredOption ? <span className="text-[red]">*</span> : ""}
-            {question}
-          </p>
+          {requiredOption ? <span className="text-[red]">*</span> : null}
+          <div
+            className="text-[13px]"
+            dangerouslySetInnerHTML={{ __html: question }}
+          />
         </div>
         {agreedOptionContent()}
       </div>

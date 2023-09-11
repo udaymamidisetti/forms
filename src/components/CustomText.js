@@ -1,12 +1,36 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { FaTrashCan } from "react-icons/fa6";
 import { HiOutlineClipboardDocument } from "react-icons/hi2";
 import { useDispatch, useSelector } from "react-redux";
-import { handleCustomText } from "../redux/slices/CustomTextSlice";
+import {
+  handleCustomText,
+  addcustomTextInstance,
+} from "../redux/slices/CustomTextSlice";
+import { setAllStateValues } from "../redux/slices/FormSlice";
 
-const CustomText = ({ onDelete }) => {
+const CustomText = ({ onDelete, componentId }) => {
   const dispatch = useDispatch();
-  const customText = useSelector((state) => state.CustomText.customText);
+  const customTextState = useSelector((state) => state.CustomText.byId);
+  const customText = useSelector((state) => {
+    const instance = state.CustomText.byId[componentId];
+    if (!instance) {
+      return;
+    }
+    return instance.customText;
+  });
+
+  const saveOverallState = () => {
+    // handleSave();
+    dispatch(
+      setAllStateValues({
+        overallStates: customTextState,
+      })
+    );
+  };
+  useEffect(() => {
+    dispatch(addcustomTextInstance({ componentId }));
+  }, []);
+
   return (
     <div>
       <div className="flex mt-[15px] bg-white w-[750px]">
@@ -31,6 +55,7 @@ const CustomText = ({ onDelete }) => {
                     boxShadow: "0 1px 3px 0 rgba(40,60,70,0.2)",
                   }}
                   className="h-[36px] leading-[20px] text-[12px] pt-[8px] pb-[8px] pl-[10px] pr-[10px] bg-[#5cb85c] text-[white]"
+                  onClick={saveOverallState}
                 >
                   Save
                 </button>
@@ -50,7 +75,14 @@ const CustomText = ({ onDelete }) => {
             className="text-[13px] border-[1px] focus:outline-none h-[100px] w-[100%] placeholder:text-[13px] p-[7px] mt-[20px]"
             placeholder="Enter your instructions here."
             value={customText}
-            onChange={(e) => dispatch(handleCustomText(e.target.value))}
+            onChange={(e) =>
+              dispatch(
+                handleCustomText({
+                  componentId: componentId,
+                  value: e.target.value,
+                })
+              )
+            }
           ></textarea>
           <div className="border mt-[20px]"></div>
 

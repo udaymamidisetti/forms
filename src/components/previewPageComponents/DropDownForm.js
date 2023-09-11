@@ -2,11 +2,12 @@ import React from "react";
 import { useSelector } from "react-redux";
 
 const DropDownForm = (props) => {
-  const { index } = props;
-  const question = useSelector((state) => state.DropDown.questionInput);
-  const hideNumber = useSelector((state) => state.DropDown.hideNumber);
-  const requiredOption = useSelector((state) => state.DropDown.requiredOption);
-  const options = useSelector((state) => state.DropDown.options);
+  const { index, questionData } = props;
+  const { question, hideNumber, requiredOption, options } = questionData;
+  // const question = useSelector((state) => state.DropDown.questionInput);
+  // const hideNumber = useSelector((state) => state.DropDown.hideNumber);
+  // const requiredOption = useSelector((state) => state.DropDown.requiredOption);
+  // const options = useSelector((state) => state.DropDown.options);
   return (
     <div>
       <div>
@@ -19,10 +20,11 @@ const DropDownForm = (props) => {
             ) : (
               ""
             )}
-            <p className="text-[13px]">
-              {requiredOption ? <span className="text-[red]">*</span> : ""}
-              {question}
-            </p>
+            {requiredOption ? <span className="text-[red]">*</span> : null}
+            <div
+              className="text-[13px]"
+              dangerouslySetInnerHTML={{ __html: question }}
+            />
           </div>
           {/* {options.map((e, index) => ( */}
           <div className="flex gap-[5px] ml-[40px] mt-[10px] cursor-pointer h-[30px] p-[5px] items-center">
@@ -32,7 +34,11 @@ const DropDownForm = (props) => {
               </label> */}
             <select className="w-full border focus:outline-none text-[14px] p-[5px]">
               {options.map((e, index) => (
-                <option key={index}>{e.title}</option>
+                // <option key={index}>{e.title}</option>
+                <option
+                  dangerouslySetInnerHTML={{ __html: e.title }}
+                  key={index}
+                />
               ))}
             </select>
           </div>

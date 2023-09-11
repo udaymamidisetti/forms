@@ -9,6 +9,9 @@ const initialState = {
     randomChoice: false,
     image: null,
     fields: [...fieldData],
+    sumofFields: "Equal",
+    sumInput: "100",
+    NumericType: "",
   },
   byId: {},
 };
@@ -64,6 +67,18 @@ const PercentageSumSlice = createSlice({
         title: value,
       };
     },
+    handleSumofFields: (state, action) => {
+      const { componentId, value } = action.payload;
+      state.byId[componentId].sumofFields = value;
+    },
+    handlesumInput: (state, action) => {
+      const { componentId, value } = action.payload;
+      state.byId[componentId].sumInput = value;
+    },
+    handleNumericType: (state, action) => {
+      const { componentId, value } = action.payload;
+      state.byId[componentId].NumericType = value;
+    },
   },
 });
 
@@ -77,5 +92,8 @@ export const {
   handleDeleteField,
   handleAddField,
   handleFieldChange,
+  handleSumofFields,
+  handlesumInput,
+  handleNumericType,
 } = PercentageSumSlice.actions;
 export default PercentageSumSlice.reducer;

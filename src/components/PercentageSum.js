@@ -15,8 +15,11 @@ import {
   handleHideNumber,
   handleImages,
   handleInputChange,
+  handleNumericType,
   handleRandomChoice,
   handleRequiredOption,
+  handleSumofFields,
+  handlesumInput,
 } from "../redux/slices/PercentageSumSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { setAllStateValues, setTokenId } from "../redux/slices/FormSlice";
@@ -25,7 +28,7 @@ const PercentageSum = ({ onDelete, componentId }) => {
   const [showFull, setShowFull] = useState(false);
   // const [fData, setfData] = useState([...fieldData]);
   const tokenId = useSelector((state) => state.formData.tokenId);
-  const percentageSumStates = useSelector((state) => state.PercentageSum);
+  const percentageSumStates = useSelector((state) => state.PercentageSum.byId);
   const question = useSelector((state) => {
     const instance = state.PercentageSum.byId[componentId];
     if (!instance) {
@@ -334,14 +337,37 @@ const PercentageSum = ({ onDelete, componentId }) => {
               </p>
               <div className="flex gap-[10px]">
                 <div>
-                  <select className="h-[34px] border w-[190px] text-[13px] pl-[6px]">
-                    <option>Equal To</option>
-                    <option>1</option>
-                    <option>1</option>
-                    <option>1</option>
+                  <select
+                    className="h-[34px] border w-[190px] text-[13px] pl-[6px] focus:outline-none"
+                    onChange={(e) =>
+                      dispatch(
+                        handleSumofFields({
+                          componentId: componentId,
+                          value: e.target.value,
+                        })
+                      )
+                    }
+                  >
+                    <option value="Equal">Equal To</option>
+                    <option value="Less">Less Than</option>
+                    <option value="Greater">Greater Than</option>
+                    <option value="LessEqual">Less Than or Equal To</option>
+                    <option value="GreaterEqual">
+                      Greater Than or Equal To
+                    </option>
                   </select>
                 </div>
-                <input className="h-[34px] border w-[70px]" />
+                <input
+                  className="h-[34px] border w-[70px] focus:outline-none"
+                  onChange={(e) =>
+                    dispatch(
+                      handlesumInput({
+                        componentId: componentId,
+                        value: e.target.value,
+                      })
+                    )
+                  }
+                />
               </div>
             </div>
 
@@ -350,11 +376,22 @@ const PercentageSum = ({ onDelete, componentId }) => {
                 Numeric Type
               </p>
               <div className="flex gap-[10px]">
-                <select className="h-[34px] border w-[85px] text-[13px] pl-[6px]">
-                  <option>Integer</option>
-                  <option>1</option>
-                  <option>1</option>
-                  <option>1</option>
+                <select
+                  className="h-[34px] border w-[85px] text-[13px] pl-[6px] focus:outline-none"
+                  onChange={(e) =>
+                    dispatch(
+                      handleNumericType({
+                        componentId: componentId,
+                        value: e.target.value,
+                      })
+                    )
+                  }
+                >
+                  <option value="None">None</option>
+                  <option value="Integer">Integer</option>
+                  <option value="Decimal">Decimal</option>
+                  <option value="Dollar">Dollar</option>
+                  <option value="Percentage">Percentage</option>
                 </select>
               </div>
             </div>

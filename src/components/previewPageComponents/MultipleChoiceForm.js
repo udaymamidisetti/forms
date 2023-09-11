@@ -4,7 +4,7 @@ import { shuffle } from "fast-shuffle";
 
 const MultipleChoiceForm = (props) => {
   const id = "multipleChoice1";
-  const { questionData } = props;
+  const { index,questionData } = props;
   const {
     question,
     hideNumber,
@@ -50,12 +50,12 @@ const MultipleChoiceForm = (props) => {
           <div className="flex items-center gap-[10px]">
             {hideNumber ? (
               <p className="bg-[#3A9CEA] pl-[8px] pr-[8px] pt-[4px] pb-[4px] text-[12px] rounded-md text-white font-semibold">
-                {/* {index + 1} */}
+                {index + 1}
               </p>
             ) : (
               ""
             )}
-            {requiredOption ? <span className="text-[red]">*</span> : ""}
+            {requiredOption ? <span className="text-[red]">*</span> : null}
             <div
               className="text-[13px]"
               dangerouslySetInnerHTML={{ __html: question }}

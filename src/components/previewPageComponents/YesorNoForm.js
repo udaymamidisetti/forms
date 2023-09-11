@@ -2,12 +2,13 @@ import React from "react";
 import { useSelector } from "react-redux";
 
 const YesorNoForm = (props) => {
-  const { index } = props;
+  const { index, questionData } = props;
+  const { yesorNoQuestion, requiredOption, hideNumber } = questionData;
 
-  const question = useSelector((state) => state.YesorNO.yesorNoQuestion);
-  const requiredOption = useSelector((state) => state.YesorNO.requiredOption);
-  const hideNumber = useSelector((state) => state.YesorNO.hideNumber);
-  console.log(question, requiredOption, hideNumber);
+  // const question = useSelector((state) => state.YesorNO.yesorNoQuestion);
+  // const requiredOption = useSelector((state) => state.YesorNO.requiredOption);
+  // const hideNumber = useSelector((state) => state.YesorNO.hideNumber);
+  // console.log(question, requiredOption, hideNumber);
   return (
     <div>
       <div>
@@ -20,10 +21,11 @@ const YesorNoForm = (props) => {
             ) : (
               ""
             )}
-            <p className="text-[13px]">
-              {requiredOption ? <span className="text-[red]">*</span> : ""}
-              {question}
-            </p>
+            {requiredOption ? <span className="text-[red]">*</span> : null}
+            <div
+              className="text-[13px]"
+              dangerouslySetInnerHTML={{ __html: yesorNoQuestion }}
+            />
           </div>
           <div className="ml-[50px] mt-[15px]">
             <label className="flex gap-[5px]">
