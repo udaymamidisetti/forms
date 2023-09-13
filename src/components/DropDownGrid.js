@@ -23,6 +23,8 @@ import {
   handleRandomChoices,
   handleRandomFields,
   handleRequiredOption,
+  addColumnWords,
+  addRowWords,
 } from "../redux/slices/DropdownGridSlice";
 
 const DropDownGrid = ({ onDelete, componentId }) => {
@@ -30,8 +32,10 @@ const DropDownGrid = ({ onDelete, componentId }) => {
   const [showFull, setShowFull] = useState(false);
   const [bulkInputText, setBulkInputText] = useState("");
   const [bulkArray, setBulkArray] = useState([]);
-  const [jData, setjData] = useState([...data]);
   const [open, setOpen] = useState(false);
+  const [rowText, setRowText] = useState("");
+  const [rowArray, setRowArray] = useState([]);
+  const [columnText, setColumnText] = useState("");
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const question = useSelector((state) => {
@@ -84,12 +88,20 @@ const DropDownGrid = ({ onDelete, componentId }) => {
   const handleEditorOptionChange = (componentId, index) => (content) => {
     dispatch(handleOptionChange({ componentId, index, value: content }));
   };
-  const deleteOption = (index) => {
-    setjData((prevData) => {
-      const updatedData = [...prevData];
-      updatedData.splice(index, 1);
-      return updatedData;
-    });
+  const handleRowText = (e) => {
+    setRowText(e.target.value);
+  };
+  const handleRowArray = (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      setRowArray((p) => [...p, { title: rowText }]);
+      dispatch(addRowWords({ componentId: componentId, value: rowText }));
+    }
+    // if ((e.key = "Enter")) {
+    //   e.preventDefault();
+    //   setRowArray((p) => [...p, { title: rowText }]);
+    //   dispatch(addRowWords({ componentId: componentId, value: rowText }));
+    // }
   };
   const style = {
     position: "absolute",
@@ -332,7 +344,20 @@ const DropDownGrid = ({ onDelete, componentId }) => {
             <div className="flex">
               <p className="text-[13px] w-[180px] text-[#737373]">Row labels</p>
               <div className="w-[100%]">
-                <textarea className="h-[150px] border w-[100%] focus:outline-none"></textarea>
+                <textarea
+                  className=" border w-[100%] focus:outline-none p-[5px] text-[13px]"
+                  value={rowText}
+                  onChange={handleRowText}
+                  onKeyDown={handleRowArray}
+                  // onKeyDown={}
+                ></textarea>
+                {/* <input
+                  tabIndex={1}
+                  type="text"
+                  value={rowText}
+                  onChange={handleRowText}
+                  onKeyDown={handleRowArray}
+                /> */}
                 <p className="mt-[5px] text-[13px] text-[#737373]">
                   Each line represents a row, HTML is OK.
                 </p>
@@ -343,7 +368,10 @@ const DropDownGrid = ({ onDelete, componentId }) => {
                 Column labels
               </p>
               <div className="w-[100%]">
-                <textarea className="h-[150px] border w-[100%] focus:outline-none"></textarea>
+                <textarea
+                  className="h-[150px] border w-[100%] focus:outline-none p-[5px] text-[14px]"
+                  onChange={(e) => setColumnText(e.target.value)}
+                ></textarea>
                 <p className="mt-[5px] text-[13px] text-[#737373]">
                   Each line represents a column, HTML is OK.
                 </p>

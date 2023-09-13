@@ -278,15 +278,15 @@ const TextFieldGrid = ({ onDelete, componentId }) => {
                         )
                       }
                     >
-                      <option value={10}>10%</option>
-                      <option value={20}>20%</option>
-                      <option value={30}>30%</option>
-                      <option value={40}>40%</option>
-                      <option value={50}>50%</option>
-                      <option value={60}>60%</option>
-                      <option value={70}>70%</option>
-                      <option value={80}>80%</option>
-                      <option value={90}>90%</option>
+                      <option value="10%">10%</option>
+                      <option value="20%">20%</option>
+                      <option value="30%">30%</option>
+                      <option value="40%">40%</option>
+                      <option value="50%">50%</option>
+                      <option value="60%">60%</option>
+                      <option value="70%">70%</option>
+                      <option value="80%">80%</option>
+                      <option value="90%">90%</option>
                     </select>
                   </div>
                 </div>
@@ -778,11 +778,36 @@ const TextFieldGrid = ({ onDelete, componentId }) => {
             <p class="text-[#7D848C] text-[13px] w-[180px]">Answer text area</p>
             <div class="flex items-center gap-[5px]">
               <label class="text-[13px] flex gap-[5px]">
-                <input type="radio" value="Single" />
+                <input
+                  name="multiple"
+                  type="radio"
+                  value="single"
+                  onChange={(e) =>
+                    dispatch(
+                      handleAnswerTextarea({
+                        componentId: componentId,
+                        value: e.target.value,
+                      })
+                    )
+                  }
+                />
                 Single line
               </label>
               <label class="text-[13px] flex gap-[5px]">
-                <input type="radio" className="ml-[10px]" value="Single" />
+                <input
+                  type="radio"
+                  className="ml-[10px]"
+                  value="multiple"
+                  name="multiple"
+                  onChange={(e) =>
+                    dispatch(
+                      handleAnswerTextarea({
+                        componentId: componentId,
+                        value: e.target.value,
+                      })
+                    )
+                  }
+                />
                 Multiple line
               </label>
             </div>

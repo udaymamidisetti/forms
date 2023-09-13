@@ -17,7 +17,7 @@ const initialState = {
     fieldsData: [...fieldData],
     scaleType: null,
     validation: "",
-    answerTextarea: "",
+    answerTextarea: "single",
   },
   byId: {},
 };

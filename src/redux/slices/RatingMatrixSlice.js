@@ -14,9 +14,16 @@ const initialState = {
     scoreDirection: "Ascending",
     randomFields: false,
     randomChoice: false,
-    columnWidth: null,
+    columnWidth: "40%",
     fieldsData: [...fieldData],
     scaleType: null,
+    options: [
+      "Agree Strongly",
+      "Agree",
+      "Neither Agree nor Disagree",
+      "Disagree",
+      "Disagree Strongly",
+    ],
   },
   byId: {},
 };

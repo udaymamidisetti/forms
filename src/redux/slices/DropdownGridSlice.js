@@ -19,6 +19,8 @@ const initialState = {
     scaleType: null,
     validation: "",
     answerTextarea: "",
+    rows: [],
+    columns: [],
   },
   byId: {},
 };
@@ -90,6 +92,14 @@ const DropDownGridSlice = createSlice({
       state.byId[componentId].optionsData.splice(0);
       state.byId[componentId].optionsData = bulkArray;
     },
+    addRowWords: (state, action) => {
+      const { componentId, value } = action.payload;
+      state.byId[componentId].rows.push(value);
+    },
+    addColumnWords: (state, action) => {
+      const { componentId, value } = action.payload;
+      state.byId[componentId].columns.push(value);
+    },
   },
 });
 
@@ -110,5 +120,7 @@ export const {
   handleDeleteOption,
   handleOptionChange,
   handleBulkAdd,
+  addColumnWords,
+  addRowWords,
 } = DropDownGridSlice.actions;
 export default DropDownGridSlice.reducer;

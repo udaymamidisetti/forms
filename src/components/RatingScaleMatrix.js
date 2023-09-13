@@ -270,17 +270,6 @@ const RatingScaleMatrix = ({ onDelete, componentId }) => {
                         Randomize Fields
                       </label>
                     </div>
-                    <div className="flex items-center gap-[5px] mt-[10px]">
-                      <label className="cursor-pointer text-[13px] flex items-center gap-[5px]">
-                        <input
-                          type="checkbox"
-                          onChange={() =>
-                            dispatch(handleRandomChoice({ componentId }))
-                          }
-                        />
-                        Randomize Choices
-                      </label>
-                    </div>
                   </div>
                 </div>
                 <div className="flex mt-[20px] items-center">

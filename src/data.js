@@ -23,13 +23,5 @@ const data = [
     image: null,
     position: "",
   },
-  {
-    title: "Option 4",
-    expanded: false,
-    includeImage: false,
-    includeOtherTextField: false,
-    image: null,
-    position: "",
-  },
 ];
 export default data;

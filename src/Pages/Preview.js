@@ -14,6 +14,8 @@ import CustomTextForm from "../components/previewPageComponents/CustomTextForm";
 import NetPromoterForm from "../components/previewPageComponents/NetPromoterForm";
 import PercentageSumForm from "../components/previewPageComponents/PercentageSumForm";
 import RankingForm from "../components/previewPageComponents/RankingForm";
+import TextFieldGridForm from "../components/previewPageComponents/TextFieldGridForm";
+import RatingScaleMatrixForm from "../components/previewPageComponents/RatingScaleMatrixForm";
 
 const Preview = () => {
   const { id } = useParams();
@@ -147,6 +149,15 @@ const Preview = () => {
               )}
               {e.slice(0, -1) === "Ranking" && (
                 <RankingForm questionData={data[i][e]} index={i} />
+              )}
+              {e.slice(0, -1) === "MultipleChoiceGrid" && (
+                <MultipleChoiceGridForm questionData={data[i][e]} index={i} />
+              )}
+              {e.slice(0, -1) === "TextFieldGrid" && (
+                <TextFieldGridForm questionData={data[i][e]} index={i} />
+              )}
+              {e.slice(0, -1) === "RatingScaleMatrix" && (
+                <RatingScaleMatrixForm questionData={data[i][e]} index={i} />
               )}
             </div>
           </div>

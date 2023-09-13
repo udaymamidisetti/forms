@@ -14,10 +14,5 @@ const fieldData = [
     expanded: false,
     validation: "",
   },
-  {
-    title: "Field 4",
-    expanded: false,
-    validation: "",
-  },
 ];
 export default fieldData;

@@ -3,7 +3,14 @@ import { useDispatch, useSelector } from "react-redux";
 
 const RatingScaleForm = (props) => {
   const { index, questionData } = props;
-  const { question, hideNumber, requiredOption, agreeOptions } = questionData;
+  const {
+    question,
+    hideNumber,
+    requiredOption,
+    agreeOptions,
+    image,
+    displayMode,
+  } = questionData;
   console.log(agreeOptions);
   // const question = useSelector((state) => state.RatingScale.questionInput);
   // const hideNumber = useSelector((state) => state.RatingScale.hideNumber);
@@ -15,106 +22,160 @@ const RatingScaleForm = (props) => {
     switch (agreeOptions) {
       case "agree2":
         return (
-          <div className="ml-[30px] mt-[10px]">
-            <div>
-              <label className="flex items-center gap-[5px]">
-                <input type="radio" />
-                Agree
-              </label>
-            </div>
-            <div className="mt-[5px]">
-              <label className="flex items-center gap-[5px]">
-                <input type="radio" />
-                Disagree
-              </label>
-            </div>
+          <div>
+            {displayMode === "Radio" ? (
+              <div className="ml-[30px] mt-[10px]">
+                <div>
+                  <label className="flex items-center gap-[5px]">
+                    <input type="radio" />
+                    Agree
+                  </label>
+                </div>
+                <div className="mt-[5px]">
+                  <label className="flex items-center gap-[5px]">
+                    <input type="radio" />
+                    Disagree
+                  </label>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <select className="border w-[90%] focus:outline-none p-[5px]">
+                  <option></option>
+                  <option>Agree</option>
+                  <option>Disagree</option>
+                </select>
+              </div>
+            )}
           </div>
         );
       case "agree3":
         return (
-          <div className="ml-[30px] mt-[10px]">
-            <div>
-              <label className="flex items-center gap-[5px]">
-                <input type="radio" />
-                Agree Strongly
-              </label>
-            </div>
-            <div className="mt-[5px]">
-              <label className="flex items-center gap-[5px]">
-                <input type="radio" />
-                Agree
-              </label>
-            </div>
-            <div className="mt-[5px]">
-              <label className="flex items-center gap-[5px]">
-                <input type="radio" />
-                Disagree Strongly
-              </label>
-            </div>
+          <div>
+            {displayMode === "Radio" ? (
+              <div className="ml-[30px] mt-[10px]">
+                <div>
+                  <label className="flex items-center gap-[5px]">
+                    <input type="radio" />
+                    Agree Strongly
+                  </label>
+                </div>
+                <div className="mt-[5px]">
+                  <label className="flex items-center gap-[5px]">
+                    <input type="radio" />
+                    Agree
+                  </label>
+                </div>
+                <div className="mt-[5px]">
+                  <label className="flex items-center gap-[5px]">
+                    <input type="radio" />
+                    Disagree Strongly
+                  </label>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <select className="border w-[90%] focus:outline-none p-[5px]">
+                  <option></option>
+                  <option>Agree Strongly</option>
+                  <option> Agree</option>
+                  <option>Disagree Strongly</option>
+                </select>
+              </div>
+            )}
           </div>
         );
       case "agree4":
         return (
-          <div className="ml-[30px] mt-[10px]">
-            <div>
-              <label className="flex items-center gap-[5px]">
-                <input type="radio" />
-                Agree Strongly
-              </label>
-            </div>
-            <div className="mt-[5px]">
-              <label className="flex items-center gap-[5px]">
-                <input type="radio" />
-                Agree
-              </label>
-            </div>
-            <div className="mt-[5px]">
-              <label className="flex items-center gap-[5px]">
-                <input type="radio" />
-                Disagree
-              </label>
-            </div>
-            <div className="mt-[5px]">
-              <label className="flex items-center gap-[5px]">
-                <input type="radio" />
-                Disagree Strongly
-              </label>
-            </div>
+          <div>
+            {displayMode === "Radio" ? (
+              <div className="ml-[30px] mt-[10px]">
+                <div>
+                  <label className="flex items-center gap-[5px]">
+                    <input type="radio" />
+                    Agree Strongly
+                  </label>
+                </div>
+                <div className="mt-[5px]">
+                  <label className="flex items-center gap-[5px]">
+                    <input type="radio" />
+                    Agree
+                  </label>
+                </div>
+                <div className="mt-[5px]">
+                  <label className="flex items-center gap-[5px]">
+                    <input type="radio" />
+                    Disagree
+                  </label>
+                </div>
+                <div className="mt-[5px]">
+                  <label className="flex items-center gap-[5px]">
+                    <input type="radio" />
+                    Disagree Strongly
+                  </label>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <select className="border w-[90%] focus:outline-none p-[5px]">
+                  <option></option>
+                  <option>Agree Strongly</option>
+                  <option>Agree</option>
+                  <option>Disagree</option>
+                  <option> Disagree Strongly</option>
+                </select>
+              </div>
+            )}
           </div>
         );
       case "agree5":
         return (
-          <div className="ml-[30px] mt-[10px]">
-            <div>
-              <label className="flex items-center gap-[5px]">
-                <input type="radio" />
-                Agree Strongly
-              </label>
-            </div>
-            <div className="mt-[5px]">
-              <label className="flex items-center gap-[5px]">
-                <input type="radio" />
-                Agree
-              </label>
-            </div>
-            <div className="mt-[5px]">
-              <label className="flex items-center gap-[5px]">
-                <input type="radio" />
-                Neither Agree nor Disagree
-              </label>
-            </div>
-            <div className="mt-[5px]">
-              <label className="flex items-center gap-[5px]">
-                <input type="radio" />
-                Disagree
-              </label>
-            </div>
-            <div className="mt-[5px]">
-              <label className="flex items-center gap-[5px]">
-                <input type="radio" />
-                Disagree Strongly
-              </label>
-            </div>
+          <div>
+            {displayMode === "Radio" ? (
+              <div className="ml-[30px] mt-[10px]">
+                <div>
+                  <label className="flex items-center gap-[5px]">
+                    <input type="radio" />
+                    Agree Strongly
+                  </label>
+                </div>
+                <div className="mt-[5px]">
+                  <label className="flex items-center gap-[5px]">
+                    <input type="radio" />
+                    Agree
+                  </label>
+                </div>
+                <div className="mt-[5px]">
+                  <label className="flex items-center gap-[5px]">
+                    <input type="radio" />
+                    Neither Agree nor Disagree
+                  </label>
+                </div>
+                <div className="mt-[5px]">
+                  <label className="flex items-center gap-[5px]">
+                    <input type="radio" />
+                    Disagree
+                  </label>
+                </div>
+                <div className="mt-[5px]">
+                  <label className="flex items-center gap-[5px]">
+                    <input type="radio" />
+                    Disagree Strongly
+                  </label>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <select className="border w-[90%] focus:outline-none p-[5px]">
+                  <option></option>
+                  <option>Agree Strongly</option>
+                  <option>Agree</option>
+                  <option>Neither Agree nor Disagree</option>
+                  <option>Disagree</option>
+                  <option> Disagree Strongly</option>
+                </select>
+              </div>
+            )}
           </div>
         );
       default:
@@ -139,6 +200,7 @@ const RatingScaleForm = (props) => {
             dangerouslySetInnerHTML={{ __html: question }}
           />
         </div>
+        {image === null ? "" : <img src={image} alt="image" />}
         {agreedOptionContent()}
       </div>
     </div>
