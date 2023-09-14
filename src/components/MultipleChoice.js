@@ -98,7 +98,9 @@ const MultipleChoice = ({ onDelete, dragHandleProps, componentId }) => {
     }
     return instance.options;
   });
-  const multipleChoiceState = useSelector((state) => state.MultipleChoice.byId);
+  const multipleChoiceState = useSelector(
+    (state) => state.MultipleChoice.byId[componentId]
+  );
   const choiceLayout = useSelector((state) => {
     const instance = state.MultipleChoice.byId[componentId];
     if (!instance) {
@@ -352,6 +354,7 @@ const MultipleChoice = ({ onDelete, dragHandleProps, componentId }) => {
     console.log(multipleChoiceState);
     dispatch(
       setAllStateValues({
+        componentId,
         overallStates: multipleChoiceState,
       })
     );

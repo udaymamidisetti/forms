@@ -28,7 +28,9 @@ const PercentageSum = ({ onDelete, componentId }) => {
   const [showFull, setShowFull] = useState(false);
   // const [fData, setfData] = useState([...fieldData]);
   const tokenId = useSelector((state) => state.formData.tokenId);
-  const percentageSumStates = useSelector((state) => state.PercentageSum.byId);
+  const percentageSumStates = useSelector(
+    (state) => state.PercentageSum.byId[componentId]
+  );
   const question = useSelector((state) => {
     const instance = state.PercentageSum.byId[componentId];
     if (!instance) {
@@ -88,6 +90,7 @@ const PercentageSum = ({ onDelete, componentId }) => {
     // handleSave();
     dispatch(
       setAllStateValues({
+        componentId,
         overallStates: percentageSumStates,
       })
     );

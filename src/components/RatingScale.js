@@ -22,7 +22,9 @@ import axios from "axios";
 const RatingScale = ({ onDelete, componentId }) => {
   const dispatch = useDispatch();
   const tokenId = useSelector((state) => state.formData.tokenId);
-  const ratingScaleStates = useSelector((state) => state.RatingScale.byId);
+  const ratingScaleStates = useSelector(
+    (state) => state.RatingScale.byId[componentId]
+  );
   const question = useSelector((state) => {
     const instance = state.RatingScale.byId[componentId];
     if (!instance) {
@@ -61,6 +63,7 @@ const RatingScale = ({ onDelete, componentId }) => {
     // handleSave();
     dispatch(
       setAllStateValues({
+        componentId,
         overallStates: ratingScaleStates,
       })
     );

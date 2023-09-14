@@ -27,7 +27,7 @@ const Ranking = ({ onDelete, componentId }) => {
   const [showFull, setShowFull] = useState(false);
   // const [fData, setfData] = useState([...fieldData]);
   const tokenId = useSelector((state) => state.formData.tokenId);
-  const rankingStates = useSelector((state) => state.Ranking.byId);
+  const rankingStates = useSelector((state) => state.Ranking.byId[componentId]);
   const question = useSelector((state) => {
     const instance = state.Ranking.byId[componentId];
     if (!instance) {
@@ -86,6 +86,7 @@ const Ranking = ({ onDelete, componentId }) => {
     // handleSave();
     dispatch(
       setAllStateValues({
+        componentId,
         overallStates: rankingStates,
       })
     );

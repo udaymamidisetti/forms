@@ -17,7 +17,9 @@ import { setAllStateValues, setTokenId } from "../redux/slices/FormSlice";
 
 const NetPromoter = ({ onDelete, componentId }) => {
   const dispatch = useDispatch();
-  const NetPromoterStates = useSelector((state) => state.NetPromoter.byId);
+  const NetPromoterStates = useSelector(
+    (state) => state.NetPromoter.byId[componentId]
+  );
   const tokenId = useSelector((state) => state.formData.tokenId);
   const question = useSelector((state) => {
     const instance = state.NetPromoter.byId[componentId];
@@ -74,6 +76,7 @@ const NetPromoter = ({ onDelete, componentId }) => {
     // handleSave();
     dispatch(
       setAllStateValues({
+        componentId,
         overallStates: NetPromoterStates,
       })
     );

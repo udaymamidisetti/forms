@@ -39,7 +39,7 @@ const RatingScaleMatrix = ({ onDelete, componentId }) => {
   const [newmodel, setNewmodel] = useState(false);
   const tokenId = useSelector((state) => state.formData.tokenId);
   const ratingScaleMatrixStates = useSelector(
-    (state) => state.RatingMatrix.byId
+    (state) => state.RatingMatrix.byId[componentId]
   );
   const question = useSelector((state) => {
     const instance = state.RatingMatrix.byId[componentId];
@@ -116,6 +116,7 @@ const RatingScaleMatrix = ({ onDelete, componentId }) => {
     // handleSave();
     dispatch(
       setAllStateValues({
+        componentId,
         overallStates: ratingScaleMatrixStates,
       })
     );

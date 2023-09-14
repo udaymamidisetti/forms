@@ -47,7 +47,7 @@ const MultipleChoiceGrid = ({ onDelete, componentId }) => {
     (state) => state.formData.allStateValues
   );
   const multipleChoiceGridState = useSelector(
-    (state) => state.MultipleChoiceGrid.byId
+    (state) => state.MultipleChoiceGrid.byId[componentId]
   );
   const question = useSelector((state) => {
     const instance = state.MultipleChoiceGrid.byId[componentId];
@@ -205,6 +205,7 @@ const MultipleChoiceGrid = ({ onDelete, componentId }) => {
     // handleSave();
     dispatch(
       setAllStateValues({
+        componentId,
         overallStates: multipleChoiceGridState,
       })
     );

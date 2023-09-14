@@ -23,7 +23,7 @@ const YesorNo = ({ onDelete, componentId }) => {
     return instance.yesorNoQuestion;
   });
   console.log(question);
-  const yesornoStates = useSelector((state) => state.YesorNO.byId);
+  const yesornoStates = useSelector((state) => state.YesorNO.byId[componentId]);
   const tokenId = useSelector((state) => state.formData.tokenId);
   // const handleChange = useCallback(
   //   (e) => {
@@ -60,6 +60,7 @@ const YesorNo = ({ onDelete, componentId }) => {
     // handleSave();
     dispatch(
       setAllStateValues({
+        componentId,
         overallStates: yesornoStates,
       })
     );

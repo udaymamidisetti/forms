@@ -14,7 +14,9 @@ const ScoreDisplay = ({ onDelete, componentId }) => {
   const dispatch = useDispatch();
   // const scoreValue = useSelector((state) => state.ScoreDisplay.score);
   const tokenId = useSelector((state) => state.formData.tokenId);
-  const scoreDisplayStates = useSelector((state) => state.ScoreDisplay.byId);
+  const scoreDisplayStates = useSelector(
+    (state) => state.ScoreDisplay.byId[componentId]
+  );
   const scoreValue = useSelector((state) => {
     const instance = state.ScoreDisplay.byId[componentId];
     if (!instance) {
@@ -44,6 +46,7 @@ const ScoreDisplay = ({ onDelete, componentId }) => {
     // handleSave();
     dispatch(
       setAllStateValues({
+        componentId,
         overallStates: scoreDisplayStates,
       })
     );

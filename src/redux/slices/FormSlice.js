@@ -84,42 +84,20 @@ const formSlice = createSlice({
     setAllStateValues: (state, action) => {
       const { overallStates, componentId } = action.payload;
       console.log(componentId);
-      const key = Object.keys(overallStates)[0];
-      const index = state.allStateValues.findIndex((obj) => key in obj);
-      // console.log(
-      //   Object.keys(state.allStateValues).includes(Object.keys(overallStates))
-      // );
-      // if (
-      //   Object.keys(state.allStateValues).includes(Object.keys(overallStates))
-      // ) {
-      //   return;
-      // } else {
-      //   state.allStateValues = [...state.allStateValues, overallStates];
-      // }
-      // const index = state.allStateValues.findIndex(
-      //   (obj) => obj.key === componentId
-      // );
-      console.log(index);
+      // const key = Object.keys(overallStates[componentId])[0];
+      // console.log(key);
+      const index = state.allStateValues.findIndex(
+        (obj) => obj.componentId === componentId
+      );
+      // console.log(index);
       if (index !== -1) {
-        state.allStateValues[index] = overallStates;
+        state.allStateValues[index].overallStates = {
+          ...state.allStateValues[index].overallStates,
+          ...overallStates,
+        };
       } else {
-        state.allStateValues.push(overallStates);
+        state.allStateValues.push({ componentId, overallStates });
       }
-      // const doesObjExist = overallStates.some((obj) => {
-      //   for (const prop in state.allStateValues) {
-      //     if (obj[prop] !== state.allStateValues[prop]) {
-      //       return false;
-      //     }
-      //   }
-      //   return true;
-      // });
-      // console.log(doesObjExist);
-      // if (doesObjExist) {
-      //   state.allStateValues = [...state.allStateValues, overallStates];
-      // } else {
-      //   return;
-      // }
-      // console.log(state.allStateValues);
     },
   },
 });

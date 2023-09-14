@@ -14,7 +14,7 @@ const initialState = {
     scoreDirection: "Ascending",
     randomFields: false,
     randomChoice: false,
-    columnWidth: null,
+    columnWidth: "40%",
     optionsData: [...data],
     scaleType: null,
     validation: "",

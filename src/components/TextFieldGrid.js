@@ -31,7 +31,9 @@ const TextFieldGrid = ({ onDelete, componentId }) => {
   const [showFull, setShowFull] = useState(false);
   const [fData, setfData] = useState([...fieldData]);
   const tokenId = useSelector((state) => state.formData.tokenId);
-  const textFieldGridStates = useSelector((state) => state.TextFieldGrid.byId);
+  const textFieldGridStates = useSelector(
+    (state) => state.TextFieldGrid.byId[componentId]
+  );
   const question = useSelector((state) => {
     const instance = state.TextFieldGrid.byId[componentId];
     if (!instance) {
@@ -113,6 +115,7 @@ const TextFieldGrid = ({ onDelete, componentId }) => {
     // handleSave();
     dispatch(
       setAllStateValues({
+        componentId,
         overallStates: textFieldGridStates,
       })
     );

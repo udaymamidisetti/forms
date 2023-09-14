@@ -26,6 +26,7 @@ import {
   addColumnWords,
   addRowWords,
 } from "../redux/slices/DropdownGridSlice";
+import { setAllStateValues } from "../redux/slices/FormSlice";
 
 const DropDownGrid = ({ onDelete, componentId }) => {
   const dispatch = useDispatch();
@@ -52,6 +53,9 @@ const DropDownGrid = ({ onDelete, componentId }) => {
     }
     return instance.optionsData;
   });
+  const dropDownGridState = useSelector(
+    (state) => state.DropDownGrid.byId[componentId]
+  );
   const handleChange = (componentId) => (content) => {
     dispatch(handleInputChange({ componentId, value: content }));
   };
@@ -91,17 +95,33 @@ const DropDownGrid = ({ onDelete, componentId }) => {
   const handleRowText = (e) => {
     setRowText(e.target.value);
   };
+  const handleColumnText = (e) => {
+    setColumnText(e.target.value);
+  };
   const handleRowArray = (event) => {
     if (event.key === "Enter") {
       event.preventDefault();
-      setRowArray((p) => [...p, { title: rowText }]);
+      setRowArray((p) => [...p, rowText]);
+      setRowText("");
       dispatch(addRowWords({ componentId: componentId, value: rowText }));
     }
-    // if ((e.key = "Enter")) {
-    //   e.preventDefault();
-    //   setRowArray((p) => [...p, { title: rowText }]);
-    //   dispatch(addRowWords({ componentId: componentId, value: rowText }));
-    // }
+  };
+  const handleColumnArray = (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      setColumnText((p) => [...p, columnText]);
+      setColumnText("");
+      dispatch(addColumnWords({ componentId: componentId, value: columnText }));
+    }
+  };
+
+  const saveOverallState = () => {
+    // handleSave();
+    dispatch(
+      setAllStateValues({
+        overallStates: dropDownGridState,
+      })
+    );
   };
   const style = {
     position: "absolute",
@@ -143,6 +163,7 @@ const DropDownGrid = ({ onDelete, componentId }) => {
                       boxShadow: "0 1px 3px 0 rgba(40,60,70,0.2)",
                     }}
                     className="h-[36px] leading-[20px] text-[12px] pt-[8px] pb-[8px] pl-[10px] pr-[10px] bg-[#5cb85c] text-[white]"
+                    onClick={saveOverallState}
                   >
                     Save
                   </button>
@@ -211,8 +232,8 @@ const DropDownGrid = ({ onDelete, componentId }) => {
                     )
                   }
                 >
-                  <option>Yes</option>
-                  <option>No</option>
+                  <option value="Yes">Yes</option>
+                  <option value="No">No</option>
                 </select>
               </div>
             </div>
@@ -293,15 +314,15 @@ const DropDownGrid = ({ onDelete, componentId }) => {
                           )
                         }
                       >
-                        <option value={10}>10%</option>
-                        <option value={20}>20%</option>
-                        <option value={30}>30%</option>
-                        <option value={40}>40%</option>
-                        <option value={50}>50%</option>
-                        <option value={60}>60%</option>
-                        <option value={70}>70%</option>
-                        <option value={80}>80%</option>
-                        <option value={90}>90%</option>
+                        <option value="10%">10%</option>
+                        <option value="20%">20%</option>
+                        <option value="30%">30%</option>
+                        <option value="40%">40%</option>
+                        <option value="50%">50%</option>
+                        <option value="60%">60%</option>
+                        <option value="70%">70%</option>
+                        <option value="80%">80%</option>
+                        <option value="90%">90%</option>
                       </select>
                     </div>
                   </div>
@@ -345,14 +366,14 @@ const DropDownGrid = ({ onDelete, componentId }) => {
               <p className="text-[13px] w-[180px] text-[#737373]">Row labels</p>
               <div className="w-[100%]">
                 <textarea
-                  className=" border w-[100%] focus:outline-none p-[5px] text-[13px]"
+                  className="h-[150px] border w-[100%] focus:outline-none p-[5px] text-[13px]"
                   value={rowText}
                   onChange={handleRowText}
                   onKeyDown={handleRowArray}
-                  // onKeyDown={}
-                ></textarea>
+                >
+                  {/* {rowText} */}
+                </textarea>
                 {/* <input
-                  tabIndex={1}
                   type="text"
                   value={rowText}
                   onChange={handleRowText}
@@ -370,7 +391,9 @@ const DropDownGrid = ({ onDelete, componentId }) => {
               <div className="w-[100%]">
                 <textarea
                   className="h-[150px] border w-[100%] focus:outline-none p-[5px] text-[14px]"
-                  onChange={(e) => setColumnText(e.target.value)}
+                  onChange={handleColumnText}
+                  onKeyDown={handleColumnArray}
+                  value={columnText}
                 ></textarea>
                 <p className="mt-[5px] text-[13px] text-[#737373]">
                   Each line represents a column, HTML is OK.

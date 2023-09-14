@@ -20,7 +20,9 @@ const TextField = ({ onDelete, componentId }) => {
   const dispatch = useDispatch();
   const questionInput = useSelector((state) => state.textField.questionInput);
   const tokenId = useSelector((state) => state.formData.tokenId);
-  const textFieldStates = useSelector((state) => state.textField.byId);
+  const textFieldStates = useSelector(
+    (state) => state.textField.byId[componentId]
+  );
   const question = useSelector((state) => {
     const instance = state.textField.byId[componentId];
     if (!instance) {
@@ -68,6 +70,7 @@ const TextField = ({ onDelete, componentId }) => {
     // handleSave();
     dispatch(
       setAllStateValues({
+        componentId,
         overallStates: textFieldStates,
       })
     );

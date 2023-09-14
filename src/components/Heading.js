@@ -11,7 +11,7 @@ import { setAllStateValues, setTokenId } from "../redux/slices/FormSlice";
 
 const Heading = ({ onDelete, componentId }) => {
   const dispatch = useDispatch();
-  const headingState = useSelector((state) => state.Heading.byId);
+  const headingState = useSelector((state) => state.Heading.byId[componentId]);
   const tokenId = useSelector((state) => state.formData.tokenId);
   const applicationState = useSelector(
     (state) => state.formData.allStateValues
@@ -51,6 +51,7 @@ const Heading = ({ onDelete, componentId }) => {
     // handleSave();
     dispatch(
       setAllStateValues({
+        componentId,
         overallStates: headingState,
       })
     );

@@ -10,7 +10,9 @@ import { setAllStateValues } from "../redux/slices/FormSlice";
 
 const CustomText = ({ onDelete, componentId }) => {
   const dispatch = useDispatch();
-  const customTextState = useSelector((state) => state.CustomText.byId);
+  const customTextState = useSelector(
+    (state) => state.CustomText.byId[componentId]
+  );
   const customText = useSelector((state) => {
     const instance = state.CustomText.byId[componentId];
     if (!instance) {
@@ -23,6 +25,7 @@ const CustomText = ({ onDelete, componentId }) => {
     // handleSave();
     dispatch(
       setAllStateValues({
+        componentId,
         overallStates: customTextState,
       })
     );

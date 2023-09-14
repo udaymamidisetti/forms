@@ -34,7 +34,9 @@ import Cookies from "js-cookie";
 
 const DropDown = ({ onDelete, componentId }) => {
   const dispatch = useDispatch();
-  const dropDownState = useSelector((state) => state.DropDown.byId);
+  const dropDownState = useSelector(
+    (state) => state.DropDown.byId[componentId]
+  );
   const applicationState = useSelector(
     (state) => state.formData.allStateValues
   );
@@ -150,6 +152,7 @@ const DropDown = ({ onDelete, componentId }) => {
     // handleSave();
     dispatch(
       setAllStateValues({
+        componentId,
         overallStates: dropDownState,
       })
     );
