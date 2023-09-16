@@ -19,8 +19,8 @@ const initialState = {
     scaleType: null,
     validation: "",
     answerTextarea: "",
-    rows: [],
-    columns: [],
+    rows: ["Row 1\nRow 2"],
+    columns: ["Column 1\nColumn 2"],
   },
   byId: {},
 };
@@ -94,11 +94,18 @@ const DropDownGridSlice = createSlice({
     },
     addRowWords: (state, action) => {
       const { componentId, value } = action.payload;
-      state.byId[componentId].rows.push(value);
+      const rowValue = value.toString();
+      // console.log(value.split("\n"));
+      const rowArray = rowValue.split("\n");
+      // state.byId[componentId].rows.splice(0);
+      state.byId[componentId].rows = rowArray;
     },
     addColumnWords: (state, action) => {
       const { componentId, value } = action.payload;
-      state.byId[componentId].columns.push(value);
+      const columnValue = value.toString();
+      const columnArray = columnValue.split("\n");
+      // state.byId[componentId].columns.splice(0);
+      state.byId[componentId].columns = columnArray;
     },
   },
 });

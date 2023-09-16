@@ -34,9 +34,9 @@ const DropDownGrid = ({ onDelete, componentId }) => {
   const [bulkInputText, setBulkInputText] = useState("");
   const [bulkArray, setBulkArray] = useState([]);
   const [open, setOpen] = useState(false);
-  const [rowText, setRowText] = useState("");
+  const [rowText, setRowText] = useState(["Row 1\nRow 2"]);
   const [rowArray, setRowArray] = useState([]);
-  const [columnText, setColumnText] = useState("");
+  const [columnText, setColumnText] = useState(["Column 1\nColumn 2"]);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const question = useSelector((state) => {
@@ -56,6 +56,20 @@ const DropDownGrid = ({ onDelete, componentId }) => {
   const dropDownGridState = useSelector(
     (state) => state.DropDownGrid.byId[componentId]
   );
+  const rows = useSelector((state) => {
+    const instance = state.DropDownGrid.byId[componentId];
+    if (!instance) {
+      return;
+    }
+    return instance.rows;
+  });
+  const columns = useSelector((state) => {
+    const instance = state.DropDownGrid.byId[componentId];
+    if (!instance) {
+      return;
+    }
+    return instance.columns;
+  });
   const handleChange = (componentId) => (content) => {
     dispatch(handleInputChange({ componentId, value: content }));
   };
@@ -92,33 +106,38 @@ const DropDownGrid = ({ onDelete, componentId }) => {
   const handleEditorOptionChange = (componentId, index) => (content) => {
     dispatch(handleOptionChange({ componentId, index, value: content }));
   };
-  const handleRowText = (e) => {
-    setRowText(e.target.value);
+  const handleRowText = (event) => {
+    setRowText(event.target.value);
+    dispatch(addRowWords({ componentId: componentId, value: rowText }));
   };
   const handleColumnText = (e) => {
     setColumnText(e.target.value);
+    dispatch(addColumnWords({ componentId: componentId, value: columnText }));
   };
-  const handleRowArray = (event) => {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      setRowArray((p) => [...p, rowText]);
-      setRowText("");
-      dispatch(addRowWords({ componentId: componentId, value: rowText }));
-    }
-  };
-  const handleColumnArray = (event) => {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      setColumnText((p) => [...p, columnText]);
-      setColumnText("");
-      dispatch(addColumnWords({ componentId: componentId, value: columnText }));
-    }
-  };
+  // const handleRowArray = (event) => {
+  //   if (event.key === "Enter") {
+  //     event.preventDefault();
+  //     setRowText(rowText + "\n");
+  //     console.log(rowText);
+  //     // setRowArray((p) => [...p, rowText]);
+  //     // setRowText("");
+  //     dispatch(addRowWords({ componentId: componentId, value: rowText }));
+  //   }
+  // };
+  // const handleColumnArray = (event) => {
+  //   if (event.key === "Enter") {
+  //     event.preventDefault();
+  //     // setColumnText((p) => [...p, columnText]);
+  //     // setColumnText("");
+  //     dispatch(addColumnWords({ componentId: componentId, value: columnText }));
+  //   }
+  // };
 
   const saveOverallState = () => {
     // handleSave();
     dispatch(
       setAllStateValues({
+        componentId,
         overallStates: dropDownGridState,
       })
     );
@@ -366,12 +385,13 @@ const DropDownGrid = ({ onDelete, componentId }) => {
               <p className="text-[13px] w-[180px] text-[#737373]">Row labels</p>
               <div className="w-[100%]">
                 <textarea
+                  wrap="off"
                   className="h-[150px] border w-[100%] focus:outline-none p-[5px] text-[13px]"
                   value={rowText}
                   onChange={handleRowText}
-                  onKeyDown={handleRowArray}
+                  // onKeyDown={handleRowArray}
                 >
-                  {/* {rowText} */}
+                  {rows}
                 </textarea>
                 {/* <input
                   type="text"
@@ -390,11 +410,13 @@ const DropDownGrid = ({ onDelete, componentId }) => {
               </p>
               <div className="w-[100%]">
                 <textarea
-                  className="h-[150px] border w-[100%] focus:outline-none p-[5px] text-[14px]"
+                  className="h-[150px] border w-[100%] focus:outline-none p-[5px] text-[13px]"
                   onChange={handleColumnText}
-                  onKeyDown={handleColumnArray}
+                  // onKeyDown={handleColumnArray}
                   value={columnText}
-                ></textarea>
+                >
+                  {columns}
+                </textarea>
                 <p className="mt-[5px] text-[13px] text-[#737373]">
                   Each line represents a column, HTML is OK.
                 </p>
