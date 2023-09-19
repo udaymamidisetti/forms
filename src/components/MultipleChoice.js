@@ -822,14 +822,14 @@ const MultipleChoice = ({ onDelete, dragHandleProps, componentId }) => {
             </div>
           ) : (
             <div
-              className="transition-opacity duration-200 ease-in-expo"
+              className="transition-opacity duration-200 ease-in-expo ml-[10px]"
               // onClick={setMinimize(() => !minimize)}
             >
               {" "}
               <div>
                 <div
                   dangerouslySetInnerHTML={{ __html: question }}
-                  className="text-[13px] font-bold mt-[5px] ml-[4px] transition-opacity duration-200 ease-in-expo"
+                  className="text-[13px] font-bold mt-[5px] transition-opacity duration-200 ease-in-expo"
                 />
                 {optionData.map((e, index) => (
                   <div

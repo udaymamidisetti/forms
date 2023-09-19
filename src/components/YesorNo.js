@@ -25,18 +25,9 @@ const YesorNo = ({ onDelete, componentId }) => {
   console.log(question);
   const yesornoStates = useSelector((state) => state.YesorNO.byId[componentId]);
   const tokenId = useSelector((state) => state.formData.tokenId);
-  // const handleChange = useCallback(
-  //   (e) => {
-  //     const { value } = e.target;
-  //     dispatch(handleQuestionInput(value));
-  //   },
-  //   [dispatch]
-  // );
+
   const handleChange = (componentId) => (content) => {
     dispatch(handleQuestionInput({ componentId, value: content }));
-  };
-  const handleEditorOptionChange = (componentId, index) => (content) => {
-    // dispatch(handleOptionChange({ componentId, index, value: content }));
   };
   const handleSave = async () => {
     const values = {

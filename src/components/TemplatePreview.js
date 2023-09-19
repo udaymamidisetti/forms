@@ -8,9 +8,10 @@ const TemplatePreview = () => {
   const selectedOptions = useSelector(
     (state) => state.formData.selectedOptions
   );
+  const state = useSelector((state) => state.formData.allStateValues);
   return (
     <>
-      {tokenId === 0 ? (
+      {state.length === 0 ? (
         <div className="flex justify-center items-center pt-[20px]">
           <h1 className="text-[24px] pt-[20px] pb-[30px] text-white">
             Choose a{" "}

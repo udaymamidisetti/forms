@@ -37,9 +37,9 @@ const formSlice = createSlice({
       state.tokenId = action.payload;
     },
     deleteToken: (state, action) => {
-      alert("Are you sure you want to delete ?");
+      // confirm("Are you sure you want to delete ?");
       // Cookies.remove("tokenId");
-      state.tokenId = null;
+      state.tokenId = 0;
     },
     setOption: (state, action) => {
       state.options = state.options;
@@ -99,6 +99,12 @@ const formSlice = createSlice({
         state.allStateValues.push({ componentId, overallStates });
       }
     },
+    deleteState: (state, action) => {
+      const indexToDelete = action.payload;
+      if (indexToDelete >= 0 && indexToDelete < state.allStateValues.length) {
+        state.allStateValues.splice(indexToDelete, 1);
+      }
+    },
   },
 });
 
@@ -114,5 +120,6 @@ export const {
   moveItems,
   copyItems,
   setAllStateValues,
+  deleteState,
 } = formSlice.actions;
 export default formSlice.reducer;
