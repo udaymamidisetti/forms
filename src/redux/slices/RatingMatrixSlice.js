@@ -16,7 +16,7 @@ const initialState = {
     randomChoice: false,
     columnWidth: "40%",
     fieldsData: [...fieldData],
-    scaleType: null,
+    scaleType: 2,
     options: [
       "Agree Strongly",
       "Agree",
@@ -24,6 +24,7 @@ const initialState = {
       "Disagree",
       "Disagree Strongly",
     ],
+    minimize: false,
   },
   byId: {},
 };
@@ -34,9 +35,14 @@ const RatingMatrixSlice = createSlice({
   reducers: {
     addRatingMatrixInstance: (state, action) => {
       const { componentId } = action.payload;
-      state.byId[componentId] = {
-        ...state.initialData,
-      };
+      const componentExists = Object.keys(state.byId).includes(componentId);
+      if (!componentExists) {
+        // If it doesn't exist, add a new instance
+        // state.allIds.push(componentId);
+        state.byId[componentId] = {
+          ...state.initialData,
+        };
+      }
     },
     handleInputChange: (state, action) => {
       const { componentId, value } = action.payload;
@@ -114,6 +120,10 @@ const RatingMatrixSlice = createSlice({
       const { componentId, value } = action.payload;
       state.byId[componentId].scaleType = value;
     },
+    toggleMinimize: (state, action) => {
+      const { componentId } = action.payload;
+      state.byId[componentId].minimize = !state.byId[componentId].minimize;
+    },
   },
 });
 
@@ -135,5 +145,6 @@ export const {
   handleDeleteField,
   handleFieldChange,
   handleScaleType,
+  toggleMinimize,
 } = RatingMatrixSlice.actions;
 export default RatingMatrixSlice.reducer;

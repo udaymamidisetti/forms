@@ -33,6 +33,9 @@ import {
   addMultipleChoiceInstance,
   deleteMultipleChoiceInstance,
   setOptionPositionImage,
+  toggleMinimize,
+  handleRemoveImage,
+  handleRemoveOptionImage,
 } from "../redux/slices/MultipleChoiceSlice";
 import { deleteToken } from "../redux/slices/FormSlice";
 import {
@@ -46,7 +49,11 @@ import Cookies from "js-cookie";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import { Editor } from "@tinymce/tinymce-react";
 import { useRef } from "react";
+import { FiMove } from "react-icons/fi";
+import { MdOutlineModeEdit } from "react-icons/md";
 // import { v4 as uuidv4 } from "uuid";
+import { v4 as uuid } from "uuid";
+import { Tooltip as ReactTooltip } from "react-tooltip";
 
 const MultipleChoice = ({ onDelete, dragHandleProps, componentId }) => {
   console.log(componentId);
@@ -60,11 +67,10 @@ const MultipleChoice = ({ onDelete, dragHandleProps, componentId }) => {
   const question = useSelector((state) => {
     const instance = state.MultipleChoice.byId[componentId];
     if (!instance) {
-      return;
+      return "What question would you like to ask?";
     }
     return instance.question;
   });
-  console.log(question);
   const requiredOption = useSelector((state) => {
     const instance = state.MultipleChoice.byId[componentId];
     if (!instance) {
@@ -72,7 +78,6 @@ const MultipleChoice = ({ onDelete, dragHandleProps, componentId }) => {
     }
     return instance.requiredOption;
   });
-  console.log(requiredOption);
   const hideNumber = useSelector((state) => {
     const instance = state.MultipleChoice.byId[componentId];
     if (!instance) {
@@ -87,7 +92,22 @@ const MultipleChoice = ({ onDelete, dragHandleProps, componentId }) => {
     }
     return instance.randomChoice;
   });
-  const images = useSelector((state) => state.MultipleChoice.images);
+  const minimize = useSelector((state) => {
+    const instance = state.MultipleChoice.byId[componentId];
+    if (!instance) {
+      return false;
+    }
+    return instance.minimize;
+  });
+  console.log(minimize);
+  const image = useSelector((state) => {
+    const instance = state.MultipleChoice.byId[componentId];
+    if (!instance) {
+      return null;
+    }
+    return instance.image;
+  });
+  console.log(image);
   const multipleAnswers = useSelector(
     (state) => state.MultipleChoice.multipleAnswers
   );
@@ -118,8 +138,9 @@ const MultipleChoice = ({ onDelete, dragHandleProps, componentId }) => {
   const [open, setOpen] = useState(false);
   const [otherText, setOtherText] = useState("");
   const [bulkArray, setBulkArray] = useState([]);
-  const [minimize, setMinimize] = useState(true);
+  // const [minimize, setMinimize] = useState(true);
   const [quillText, setQuillText] = useState("");
+  const [newData, setNewData] = useState([]);
   // const [includeImage, setIncludeImage] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -242,14 +263,33 @@ const MultipleChoice = ({ onDelete, dragHandleProps, componentId }) => {
             <div className="flex mt-[15px]">
               <p className="text-[#7D848C] text-[13px] w-[180px]">Media</p>
               <div className="flex items-center gap-[5px]">
-                <input
-                  type="file"
-                  onChange={(e) =>
-                    dispatch(
-                      handleImages({ componentId, value: e.target.files[0] })
-                    )
-                  }
-                />
+                {image === null ? (
+                  <input
+                    type="file"
+                    accept="image/png, image/jpeg"
+                    onChange={(e) =>
+                      dispatch(
+                        handleImages({ componentId, value: e.target.files[0] })
+                      )
+                    }
+                  />
+                ) : (
+                  <div>
+                    <img
+                      src={image}
+                      alt="image"
+                      className="h-[150px] w-[150px] "
+                    />
+                    <button
+                      className="p-[5px] border-[1px] border-solid rounded-md mt-[5px] text-[14px]"
+                      onClick={() =>
+                        dispatch(handleRemoveImage({ componentId }))
+                      }
+                    >
+                      Remove
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -285,14 +325,6 @@ const MultipleChoice = ({ onDelete, dragHandleProps, componentId }) => {
   const handledeleteToken = () => {
     onDelete();
     dispatch(deleteToken());
-  };
-
-  const handleDragStart = (e, optionId) => {
-    e.dataTransfer.setData("text/plain", optionId);
-  };
-
-  const handleDragOver = (e) => {
-    e.preventDefault();
   };
 
   // const handleDrop = (e, targetOptionId) => {
@@ -358,31 +390,46 @@ const MultipleChoice = ({ onDelete, dragHandleProps, componentId }) => {
         overallStates: multipleChoiceState,
       })
     );
+    dispatch(toggleMinimize({ componentId }));
   };
 
   useEffect(() => {
-    dispatch(addMultipleChoiceInstance({ componentId }));
-  }, []);
+    // dispatch(addMultipleChoiceInstance({ componentId }));
+    // getAllOptionValues();
+  }, [componentId]);
+  const getAllOptionValues = async () => {
+    const values = {
+      tokenId: id,
+    };
+    axios
+      .post("https://demo.sending.app/react-api", values)
+      .then((response) => {
+        console.log(response.data.form_data);
+        setNewData(JSON.parse(response.data.form_data));
+        console.log(data);
+      })
+      .catch((e) => console.log(e));
+  };
 
   return (
     <div>
       <div>
         <div className="w-[750px] flex transition-opacity duration-200 ease-in-expo mt-[15px] bg-white relative">
-          <div className="w-[40px] bg-[#43AED8]">
-            {minimize ? (
+          <div className="w-[40px] bg-[#43AED8] ">
+            {/* {minimize ? (
               <HiMiniArrowsPointingIn
                 className="text-[white] ml-[10px] mt-[10px] mr-[10px] text-[19px] cursor-pointer"
-                onClick={() => setMinimize(false)}
+                onClick={() => dispatch(toggleMinimize({ componentId }))}
               />
             ) : (
               <HiArrowsPointingOut
                 className="text-[white] ml-[10px] mt-[10px] mr-[10px] text-[19px] cursor-pointer"
-                onClick={() => setMinimize(true)}
+                onClick={() => dispatch(toggleMinimize({ componentId }))}
               />
-            )}
+            )} */}
           </div>
           {minimize ? (
-            <div className="flex-1 p-[20px] transition-all duration-200 ease-in-expo ">
+            <div className="flex-1 p-[20px] transition-all duration-200 ease-in-expo w-[1px]">
               <div className="flex justify-between flex-1 w-[670px]">
                 <h1 className="text-[22px] text-[#333]">Multiple Choice</h1>
                 <div className="flex">
@@ -664,19 +711,42 @@ const MultipleChoice = ({ onDelete, dragHandleProps, componentId }) => {
                                         <p className="text-[13px] text-[#333]">
                                           Image
                                         </p>
-                                        <input
-                                          type="file"
-                                          // value={e.includeImage}
-                                          onChange={(e) =>
-                                            dispatch(
-                                              handleSetImage({
-                                                url: e.target.files[0],
-                                                index: index,
-                                                componentId: componentId,
-                                              })
-                                            )
-                                          }
-                                        />
+                                        {e.image === null ? (
+                                          <input
+                                            type="file"
+                                            // value={e.includeImage}
+                                            onChange={(e) =>
+                                              dispatch(
+                                                handleSetImage({
+                                                  url: e.target.files[0],
+                                                  index: index,
+                                                  componentId: componentId,
+                                                })
+                                              )
+                                            }
+                                          />
+                                        ) : (
+                                          <div>
+                                            <img
+                                              src={e.image}
+                                              alt="n"
+                                              className="h-[100px] w-[100px]"
+                                            />
+                                            <button
+                                              className="p-[5px] border-[1px] text-[14px] border-solid rounded-md mt-[10px]"
+                                              onClick={() =>
+                                                dispatch(
+                                                  handleRemoveOptionImage({
+                                                    index: index,
+                                                    componentId: componentId,
+                                                  })
+                                                )
+                                              }
+                                            >
+                                              Remove
+                                            </button>
+                                          </div>
+                                        )}
                                       </div>
                                       <div className="flex items-center gap-[47px] ml-[17px] mt-[10px] pb-[15px]">
                                         <p className="text-[13px] text-[#333]">
@@ -821,33 +891,74 @@ const MultipleChoice = ({ onDelete, dragHandleProps, componentId }) => {
               </section>
             </div>
           ) : (
-            <div
-              className="transition-opacity duration-200 ease-in-expo ml-[10px]"
-              // onClick={setMinimize(() => !minimize)}
-            >
-              {" "}
-              <div>
-                <div
-                  dangerouslySetInnerHTML={{ __html: question }}
-                  className="text-[13px] font-bold mt-[5px] transition-opacity duration-200 ease-in-expo"
-                />
-                {optionData.map((e, index) => (
+            <>
+              <div
+                className="transition-opacity duration-200 ease-in-expo ml-[10px] pointer-events-none"
+                // onClick={setMinimize(() => !minimize)}
+              >
+                {" "}
+                <div className="p-[15px]">
                   <div
-                    key={index}
-                    className="flex gap-[5px] items-center mt-[10px] ml-[10px] mb-[10px]"
-                  >
-                    <input type="radio" />
+                    dangerouslySetInnerHTML={{ __html: question }}
+                    className="text-[13px] font-bold mt-[5px] transition-opacity duration-200 ease-in-expo"
+                  />
+                  {optionData.map((e, index) => (
                     <div
-                      dangerouslySetInnerHTML={{ __html: e.title }}
-                      className="text-[12px] text-[#555]"
-                    />
-                  </div>
-                ))}
-              </div>
-              {/* <div>
+                      key={index}
+                      className="flex gap-[5px] items-center mt-[10px] ml-[10px] mb-[10px]"
+                    >
+                      <input type="radio" />
+                      <div
+                        dangerouslySetInnerHTML={{ __html: e.title }}
+                        className="text-[12px] text-[#555]"
+                      />
+                    </div>
+                  ))}
+                </div>
+                {/* <div>
                 <RiDragMove2Fill {...dragHandleProps} />
               </div> */}
-            </div>
+              </div>
+              <div
+                className="ml-auto h-[35px] mt-[10px] mr-[10px] bottom-[90px] right-[20px] flex items-center gap-[11px] p-[10px] justify-around"
+                style={{
+                  boxShadow: "0 1px 3px 0 rgba(40,60,70,0.2)",
+                }}
+              >
+                <button
+                  className="p-[5px] text-[14px] font-bold"
+                  onClick={() => {
+                    dispatch(addMultipleChoiceInstance({ componentId }));
+                    dispatch(toggleMinimize({ componentId }));
+                  }}
+                  data-tooltip-id="Edit"
+                >
+                  Edit
+                </button>
+                <ReactTooltip
+                  id="Edit"
+                  place="top"
+                  content="Edit Your Choice"
+                />
+                <FiMove className="text-[20px] text-[#eee] cursor-all-scroll hover:text-[black] hidden" />
+                {/* <MdOutlineModeEdit
+                  className="text-[20px] cursor-pointer text-[#eee] hover:text-[black]"
+                  onClick={() => {
+                    dispatch(addMultipleChoiceInstance({ componentId }));
+                    dispatch(toggleMinimize({ componentId }));
+                  }}
+                /> */}
+
+                {/* <HiOutlineClipboardDocument className=" text-[16px] text-[#eee] cursor-pointer" /> */}
+                <FaTrashCan
+                  data-tooltip-id="Delete"
+                  size={16}
+                  className="text-[20px] text-[#eee] cursor-pointer hover:text-[black]"
+                  onClick={handledeleteToken}
+                />
+                <ReactTooltip id="Delete" place="top" content="Delete" />
+              </div>
+            </>
           )}
         </div>
       </div>

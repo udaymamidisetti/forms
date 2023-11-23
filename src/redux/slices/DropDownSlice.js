@@ -10,7 +10,8 @@ const initialState = {
     randomchoices: false,
     options: data,
     isExpanded: false,
-    image: "",
+    image: null,
+    minimize: false,
   },
   byId: {},
 };
@@ -21,10 +22,27 @@ export const DropDownSlice = createSlice({
   reducers: {
     addDropdownInstance: (state, action) => {
       const { componentId } = action.payload;
-      state.byId[componentId] = {
-        ...state.initialData,
-      };
+      // const componentExists = Object.keys(state.byId).some(
+      //   (instance) => instance.componentId === componentId
+      // );
+
+      // if (!componentExists) {
+      //   state.byId[componentId] = {
+      //     ...state.initialData,
+      //   };
+      // }
+      const componentExists = Object.keys(state.byId).includes(componentId);
+      if (!componentExists) {
+        // If it doesn't exist, add a new instance
+        // state.allIds.push(componentId);
+        state.byId[componentId] = {
+          ...state.initialData,
+        };
+      }
+      // state.byId[componentId] = { ...state.initialData };
+      console.log(Object.keys(state.byId));
     },
+
     handleInputChange: (state, action) => {
       const { componentId, value } = action.payload;
       state.byId[componentId].question = value;
@@ -67,6 +85,10 @@ export const DropDownSlice = createSlice({
       const { componentId, value } = action.payload;
       state.byId[componentId].image = URL.createObjectURL(value);
     },
+    handleRemoveImage: (state, action) => {
+      const { componentId } = action.payload;
+      state.byId[componentId].image = null;
+    },
     deleteOptionContent: (state, action) => {
       const { componentId, i } = action.payload;
       console.log(componentId, i);
@@ -92,6 +114,10 @@ export const DropDownSlice = createSlice({
         removedOption
       );
     },
+    toggleMinimize: (state, action) => {
+      const { componentId } = action.payload;
+      state.byId[componentId].minimize = !state.byId[componentId].minimize;
+    },
   },
 });
 export const {
@@ -108,6 +134,8 @@ export const {
   handleImages,
   handleBulkAdd,
   setOrder,
+  toggleMinimize,
+  handleRemoveImage,
 } = DropDownSlice.actions;
 
 export default DropDownSlice.reducer;

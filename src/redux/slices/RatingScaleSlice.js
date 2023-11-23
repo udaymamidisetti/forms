@@ -11,6 +11,7 @@ const initialState = {
     naCondition: false,
     displayMode: "Radio",
     scoreDirection: "Ascending",
+    minimize: false,
   },
   byId: {},
 };
@@ -21,9 +22,14 @@ export const RatingScaleSlice = createSlice({
   reducers: {
     addRatingScaleInstance: (state, action) => {
       const { componentId } = action.payload;
-      state.byId[componentId] = {
-        ...state.initialData,
-      };
+      const componentExists = Object.keys(state.byId).includes(componentId);
+      if (!componentExists) {
+        // If it doesn't exist, add a new instance
+        // state.allIds.push(componentId);
+        state.byId[componentId] = {
+          ...state.initialData,
+        };
+      }
     },
     handleInputChange: (state, action) => {
       const { componentId, value } = action.payload;
@@ -63,6 +69,10 @@ export const RatingScaleSlice = createSlice({
       const { componentId, value } = action.payload;
       state.byId[componentId].scoreDirection = value;
     },
+    toggleMinimize: (state, action) => {
+      const { componentId } = action.payload;
+      state.byId[componentId].minimize = !state.byId[componentId].minimize;
+    },
   },
 });
 
@@ -77,5 +87,6 @@ export const {
   handleImages,
   handleChoiceLayout,
   handleScoreDirection,
+  toggleMinimize,
 } = RatingScaleSlice.actions;
 export default RatingScaleSlice.reducer;

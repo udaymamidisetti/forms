@@ -27,14 +27,23 @@ import {
   handleImages,
   handleBulkAdd,
   setOrder,
+  toggleMinimize,
+  handleRemoveImage,
 } from "../redux/slices/DropDownSlice";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import { Editor } from "@tinymce/tinymce-react";
 import { useRef } from "react";
 import data from "../data";
-import { setAllStateValues, setTokenId } from "../redux/slices/FormSlice";
+import {
+  deleteToken,
+  setAllStateValues,
+  setTokenId,
+} from "../redux/slices/FormSlice";
 import axios from "axios";
 import Cookies from "js-cookie";
+import { MdOutlineModeEdit } from "react-icons/md";
+import { FiMove } from "react-icons/fi";
+import { Tooltip as ReactTooltip } from "react-tooltip";
 
 const DropDown = ({ onDelete, componentId }) => {
   const dispatch = useDispatch();
@@ -47,7 +56,7 @@ const DropDown = ({ onDelete, componentId }) => {
   const question = useSelector((state) => {
     const instance = state.DropDown.byId[componentId];
     if (!instance) {
-      return;
+      return "What question would you like to ask?";
     }
     return instance.question;
   });
@@ -59,11 +68,25 @@ const DropDown = ({ onDelete, componentId }) => {
     }
     return instance.options;
   });
+  const minimize = useSelector((state) => {
+    const instance = state.DropDown.byId[componentId];
+    if (!instance) {
+      return false;
+    }
+    return instance.minimize;
+  });
+  const image = useSelector((state) => {
+    const instance = state.DropDown.byId[componentId];
+    if (!instance) {
+      return;
+    }
+    return instance.image;
+  });
   const tokenId = useSelector((state) => state.formData.tokenId);
   const [showAll, setShowAll] = useState(false);
   const [bulkInputText, setBulkInputText] = useState("");
   const [bulkArray, setBulkArray] = useState([]);
-  const [minimize, setMinimize] = useState(true);
+  // const [minimize, setMinimize] = useState(true);
   // const [jData, setjData] = useState([...data]);
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
@@ -134,7 +157,7 @@ const DropDown = ({ onDelete, componentId }) => {
     );
   };
   useEffect(() => {
-    dispatch(addDropdownInstance({ componentId }));
+    // dispatch(addDropdownInstance({ componentId }));
   }, []);
   const handleSave = async () => {
     const values = {
@@ -161,23 +184,28 @@ const DropDown = ({ onDelete, componentId }) => {
         overallStates: dropDownState,
       })
     );
+    dispatch(toggleMinimize({ componentId }));
+  };
+  const handledeleteToken = () => {
+    onDelete();
+    dispatch(deleteToken());
   };
   return (
     <div>
       <div>
         <div className="w-[750px] flex transition-opacity duration-200 ease-in-expo mt-[15px] bg-white">
-          <div className="w-[40px] bg-[#43AED8]">
-            {minimize ? (
+          <div className="w-[42px] bg-[#43AED8]">
+            {/* {minimize ? (
               <HiMiniArrowsPointingIn
                 className="text-[white] ml-[10px] mt-[10px] mr-[10px] text-[19px] cursor-pointer"
-                onClick={() => setMinimize(false)}
+                onClick={() => dispatch(toggleMinimize({ componentId }))}
               />
             ) : (
               <HiArrowsPointingOut
                 className="text-[white] ml-[10px] mt-[10px] mr-[10px] text-[19px] cursor-pointer"
-                onClick={() => setMinimize(true)}
+                onClick={() => dispatch(toggleMinimize({ componentId }))}
               />
-            )}
+            )} */}
           </div>
           {minimize ? (
             <div className="flex-1 p-[20px] transition-all duration-200 ease-in-expo ">
@@ -338,18 +366,36 @@ const DropDown = ({ onDelete, componentId }) => {
                       Media
                     </p>
                     <div>
-                      <input
-                        type="file"
-                        className=""
-                        onChange={(e) =>
-                          dispatch(
-                            handleImages({
-                              componentId,
-                              value: e.target.files[0],
-                            })
-                          )
-                        }
-                      />
+                      {image === null ? (
+                        <input
+                          type="file"
+                          className=""
+                          onChange={(e) =>
+                            dispatch(
+                              handleImages({
+                                componentId,
+                                value: e.target.files[0],
+                              })
+                            )
+                          }
+                        />
+                      ) : (
+                        <div>
+                          <img
+                            src={image}
+                            alt="image"
+                            className="h-[150px] w-[150px] "
+                          />
+                          <button
+                            className="p-[5px] border-[1px] border-solid rounded-md mt-[5px] text-[14px]"
+                            onClick={() =>
+                              dispatch(handleRemoveImage({ componentId }))
+                            }
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </>
@@ -509,16 +555,16 @@ const DropDown = ({ onDelete, componentId }) => {
             </div>
           ) : (
             <div
-              className="transition-opacity duration-200 ease-in-expo ml-[10px] flex-1 pointer-events-none"
+              className="w-full transition-opacity flex duration-200 ease-in-expo pl-[10px]"
               // onClick={setMinimize(() => !minimize)}
             >
               {" "}
-              <div>
+              <div className="flex-1 pointer-events-none pt-[10px]">
                 <div
                   dangerouslySetInnerHTML={{ __html: question }}
                   className="text-[13px] font-bold mt-[10px] transition-opacity duration-200 ease-in-expo"
                 />
-                <select className="border w-[90%] focus:outline-none text-[14px] mt-[10px] mb-[10px] p-[5px]">
+                <select className="border w-[114%] rounded-sm focus:outline-none text-[14px] mt-[20px] mb-[10px] p-[5px]">
                   {optionData.map((e, index) => (
                     <option
                       dangerouslySetInnerHTML={{ __html: e.title }}
@@ -527,9 +573,36 @@ const DropDown = ({ onDelete, componentId }) => {
                   ))}
                 </select>
               </div>
-              {/* <div>
-                  <RiDragMove2Fill {...dragHandleProps} />
-                </div> */}
+              <div
+                className="ml-auto h-[35px] mt-[10px] mr-[10px] bottom-[90px] right-[20px] flex items-center gap-[11px] p-[10px] justify-around"
+                style={{
+                  boxShadow: "0 1px 3px 0 rgba(40,60,70,0.2)",
+                }}
+              >
+                <button
+                  className="p-[5px] text-[14px] font-bold"
+                  onClick={() => {
+                    dispatch(addDropdownInstance({ componentId }));
+                    dispatch(toggleMinimize({ componentId }));
+                  }}
+                  data-tooltip-id="Edit"
+                >
+                  Edit
+                </button>
+                <ReactTooltip
+                  id="Edit"
+                  place="top"
+                  content="Edit Your Choice"
+                />
+
+                <FaTrashCan
+                  data-tooltip-id="Delete"
+                  size={16}
+                  className="text-[20px] text-[#eee] cursor-pointer hover:text-[black]"
+                  onClick={handledeleteToken}
+                />
+                <ReactTooltip id="Delete" place="top" content="Delete" />
+              </div>
             </div>
           )}
         </div>

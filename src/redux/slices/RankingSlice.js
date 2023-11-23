@@ -11,6 +11,7 @@ const initialState = {
     randomChoice: false,
     choiceLayout: "Vertical",
     image: null,
+    minimize: false,
   },
   byId: {},
 };
@@ -21,9 +22,14 @@ const RankingSlice = createSlice({
   reducers: {
     addRankingInstance: (state, action) => {
       const { componentId } = action.payload;
-      state.byId[componentId] = {
-        ...state.initialData,
-      };
+      const componentExists = Object.keys(state.byId).includes(componentId);
+      if (!componentExists) {
+        // If it doesn't exist, add a new instance
+        // state.allIds.push(componentId);
+        state.byId[componentId] = {
+          ...state.initialData,
+        };
+      }
     },
     handleInputChange: (state, action) => {
       const { componentId, value } = action.payload;
@@ -68,6 +74,10 @@ const RankingSlice = createSlice({
       // return [...state.options, action.payload];
       state.byId[componentId].fields.push(value);
     },
+    toggleMinimize: (state, action) => {
+      const { componentId } = action.payload;
+      state.byId[componentId].minimize = !state.byId[componentId].minimize;
+    },
   },
 });
 
@@ -81,5 +91,6 @@ export const {
   handleFieldChange,
   handleDeleteField,
   handleAddField,
+  toggleMinimize,
 } = RankingSlice.actions;
 export default RankingSlice.reducer;

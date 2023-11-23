@@ -15,6 +15,7 @@ const initialState = {
     image: null,
     fieldsData: [...fieldData],
     multipleAnswers: false,
+    minimize: false,
   },
   byId: {},
 };
@@ -25,9 +26,14 @@ const MultipleChoiceGridSlice = createSlice({
   reducers: {
     addMultipleChoiceGridInstance: (state, action) => {
       const { componentId } = action.payload;
-      state.byId[componentId] = {
-        ...state.initialData,
-      };
+      const componentExists = Object.keys(state.byId).includes(componentId);
+      if (!componentExists) {
+        // If it doesn't exist, add a new instance
+        // state.allIds.push(componentId);
+        state.byId[componentId] = {
+          ...state.initialData,
+        };
+      }
     },
     handleQuestionChange: (state, action) => {
       const { componentId, value } = action.payload;
@@ -154,6 +160,10 @@ const MultipleChoiceGridSlice = createSlice({
         removedOption
       );
     },
+    toggleMinimize: (state, action) => {
+      const { componentId } = action.payload;
+      state.byId[componentId].minimize = !state.byId[componentId].minimize;
+    },
   },
 });
 export const {
@@ -177,5 +187,6 @@ export const {
   setIncludeImage,
   handleBulkAdd,
   setOrder,
+  toggleMinimize,
 } = MultipleChoiceGridSlice.actions;
 export default MultipleChoiceGridSlice.reducer;

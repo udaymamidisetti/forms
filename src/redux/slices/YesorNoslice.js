@@ -1,10 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  initialState: {
+  initialData: {
     yesorNoQuestion: "What question would you like to ask?",
     requiredOption: false,
     hideNumber: true,
+    minimize: false,
   },
   byId: {},
 };
@@ -14,9 +15,14 @@ export const YesorNoslice = createSlice({
   reducers: {
     addYesorNoInstance: (state, action) => {
       const { componentId } = action.payload;
-      state.byId[componentId] = {
-        ...state.initialState,
-      };
+      const componentExists = Object.keys(state.byId).includes(componentId);
+      if (!componentExists) {
+        // If it doesn't exist, add a new instance
+        // state.allIds.push(componentId);
+        state.byId[componentId] = {
+          ...state.initialData,
+        };
+      }
     },
     handleQuestionInput: (state, action) => {
       const { componentId, value } = action.payload;
@@ -33,6 +39,10 @@ export const YesorNoslice = createSlice({
       const { componentId } = action.payload;
       state.byId[componentId].hideNumber = !state.byId[componentId].hideNumber;
     },
+    toggleMinimize: (state, action) => {
+      const { componentId } = action.payload;
+      state.byId[componentId].minimize = !state.byId[componentId].minimize;
+    },
   },
 });
 export const {
@@ -40,5 +50,6 @@ export const {
   handleRequiredOption,
   handleHideNumber,
   addYesorNoInstance,
+  toggleMinimize,
 } = YesorNoslice.actions;
 export default YesorNoslice.reducer;

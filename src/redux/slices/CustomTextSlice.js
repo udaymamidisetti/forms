@@ -11,9 +11,17 @@ const CustomTextSlice = createSlice({
   reducers: {
     addcustomTextInstance: (state, action) => {
       const { componentId } = action.payload;
-      state.byId[componentId] = {
-        ...state.initialData,
-      };
+      // state.byId[componentId] = {
+      //   ...state.initialData,
+      // };
+      const componentExists = Object.keys(state.byId).includes(componentId);
+      if (!componentExists) {
+        // If it doesn't exist, add a new instance
+        // state.allIds.push(componentId);
+        state.byId[componentId] = {
+          ...state.initialData,
+        };
+      }
     },
     handleCustomText: (state, action) => {
       const { componentId, value } = action.payload;

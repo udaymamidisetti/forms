@@ -9,6 +9,7 @@ const initialState = {
     requiredOption: false,
     hideNumber: true,
     image: null,
+    minimize: null,
   },
   byId: {},
 };
@@ -18,9 +19,14 @@ const NetPromoterSlice = createSlice({
   reducers: {
     addNetPromoterInstance: (state, action) => {
       const { componentId } = action.payload;
-      state.byId[componentId] = {
-        ...state.initialData,
-      };
+      const componentExists = Object.keys(state.byId).includes(componentId);
+      if (!componentExists) {
+        // If it doesn't exist, add a new instance
+        // state.allIds.push(componentId);
+        state.byId[componentId] = {
+          ...state.initialData,
+        };
+      }
     },
     handleInputChange: (state, action) => {
       const { componentId, value } = action.payload;
@@ -68,6 +74,10 @@ const NetPromoterSlice = createSlice({
       const { componentId, value } = action.payload;
       state.byId[componentId].image = URL.createObjectURL(value);
     },
+    toggleMinimize: (state, action) => {
+      const { componentId } = action.payload;
+      state.byId[componentId].minimize = !state.byId[componentId].minimize;
+    },
   },
 });
 
@@ -80,5 +90,6 @@ export const {
   setRequired,
   setHideNumber,
   handleInputChange,
+  toggleMinimize,
 } = NetPromoterSlice.actions;
 export default NetPromoterSlice.reducer;

@@ -21,6 +21,7 @@ const initialState = {
     answerTextarea: "",
     rows: ["Row 1\nRow 2"],
     columns: ["Column 1\nColumn 2"],
+    minimize: false,
   },
   byId: {},
 };
@@ -31,9 +32,17 @@ const DropDownGridSlice = createSlice({
   reducers: {
     addDropdownGridInstance: (state, action) => {
       const { componentId } = action.payload;
-      state.byId[componentId] = {
-        ...state.initialData,
-      };
+      // state.byId[componentId] = {
+      //   ...state.initialData,
+      // };
+      const componentExists = Object.keys(state.byId).includes(componentId);
+      if (!componentExists) {
+        // If it doesn't exist, add a new instance
+        // state.allIds.push(componentId);
+        state.byId[componentId] = {
+          ...state.initialData,
+        };
+      }
     },
     handleInputChange: (state, action) => {
       const { componentId, value } = action.payload;
@@ -107,6 +116,10 @@ const DropDownGridSlice = createSlice({
       // state.byId[componentId].columns.splice(0);
       state.byId[componentId].columns = columnArray;
     },
+    toggleMinimize: (state, action) => {
+      const { componentId } = action.payload;
+      state.byId[componentId].minimize = !state.byId[componentId].minimize;
+    },
   },
 });
 
@@ -129,5 +142,6 @@ export const {
   handleBulkAdd,
   addColumnWords,
   addRowWords,
+  toggleMinimize,
 } = DropDownGridSlice.actions;
 export default DropDownGridSlice.reducer;

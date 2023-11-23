@@ -18,6 +18,7 @@ const initialState = {
     scaleType: null,
     validation: "",
     answerTextarea: "single",
+    minimize: false,
   },
   byId: {},
 };
@@ -27,9 +28,14 @@ const TextFieldGridSlice = createSlice({
   reducers: {
     addTextfieldGridInstance: (state, action) => {
       const { componentId } = action.payload;
-      state.byId[componentId] = {
-        ...state.initialData,
-      };
+      const componentExists = Object.keys(state.byId).includes(componentId);
+      if (!componentExists) {
+        // If it doesn't exist, add a new instance
+        // state.allIds.push(componentId);
+        state.byId[componentId] = {
+          ...state.initialData,
+        };
+      }
     },
     handleInputChange: (state, action) => {
       const { componentId, value } = action.payload;
@@ -90,6 +96,10 @@ const TextFieldGridSlice = createSlice({
       const { componentId, value } = action.payload;
       state.byId[componentId].answerTextarea = value;
     },
+    toggleMinimize: (state, action) => {
+      const { componentId } = action.payload;
+      state.byId[componentId].minimize = !state.byId[componentId].minimize;
+    },
   },
 });
 
@@ -107,5 +117,6 @@ export const {
   handleValidation,
   handleFieldChange,
   handleAnswerTextarea,
+  toggleMinimize,
 } = TextFieldGridSlice.actions;
 export default TextFieldGridSlice.reducer;

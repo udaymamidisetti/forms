@@ -35,14 +35,19 @@ import {
   setIncludeImage,
   handleBulkAdd,
   setOrder,
+  toggleMinimize,
 } from "../redux/slices/MultipleChoiceGridSlice";
 import { useDispatch } from "react-redux";
 import { Editor } from "@tinymce/tinymce-react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { deleteOptionContent } from "../redux/slices/MultipleChoiceSlice";
-import { setAllStateValues, setTokenId } from "../redux/slices/FormSlice";
+import {
+  deleteToken,
+  setAllStateValues,
+  setTokenId,
+} from "../redux/slices/FormSlice";
 import axios from "axios";
-
+import { Tooltip as ReactTooltip } from "react-tooltip";
 const MultipleChoiceGrid = ({ onDelete, componentId }) => {
   const editorRef = useRef(null);
   const dispatch = useDispatch();
@@ -56,9 +61,16 @@ const MultipleChoiceGrid = ({ onDelete, componentId }) => {
   const question = useSelector((state) => {
     const instance = state.MultipleChoiceGrid.byId[componentId];
     if (!instance) {
-      return;
+      return "What question would you like to ask?";
     }
     return instance.question;
+  });
+  const minimize = useSelector((state) => {
+    const instance = state.MultipleChoiceGrid.byId[componentId];
+    if (!instance) {
+      return false;
+    }
+    return instance.minimize;
   });
   const fieldsData = useSelector((state) => {
     const instance = state.MultipleChoiceGrid.byId[componentId];
@@ -79,7 +91,6 @@ const MultipleChoiceGrid = ({ onDelete, componentId }) => {
   const [bulkArray, setBulkArray] = useState([]);
   const [showFull, setShowFull] = useState(false);
   const [open, setOpen] = useState(false);
-  const [minimize, setMinimize] = useState(true);
   const [jData, setJdata] = useState([...data]);
   const [fData, setfData] = useState([...fieldData]);
   const handleOpen = () => setOpen(true);
@@ -214,81 +225,19 @@ const MultipleChoiceGrid = ({ onDelete, componentId }) => {
         overallStates: multipleChoiceGridState,
       })
     );
+    dispatch(toggleMinimize({ componentId }));
   };
-
-  useEffect(() => {
-    dispatch(addMultipleChoiceGridInstance({ componentId }));
-  }, []);
+  const handledeleteToken = () => {
+    onDelete();
+    dispatch(deleteToken());
+  };
 
   return (
     <div>
       <div>
         <div className="w-[750px] flex transition-opacity duration-200 ease-in-expo mt-[15px] bg-white">
-          <div className="w-[40px] bg-[#43AED8]">
-            {minimize ? (
-              <HiMiniArrowsPointingIn
-                className="text-[white] ml-[10px] mt-[10px] mr-[10px] text-[19px] cursor-pointer"
-                onClick={() => setMinimize(false)}
-              />
-            ) : (
-              <HiArrowsPointingOut
-                className="text-[white] ml-[10px] mt-[10px] mr-[10px] text-[19px] cursor-pointer"
-                onClick={() => setMinimize(true)}
-              />
-            )}
-          </div>
+          <div className="w-[40px] bg-[#43AED8]"></div>
           {minimize ? (
-            <div className="flex-1 ml-[10px]">
-              <div
-                dangerouslySetInnerHTML={{ __html: question }}
-                className="text-[13px] font-bold mt-[5px] transition-opacity duration-200 ease-in-expo"
-              />
-              <table>
-                <thead>
-                  <tr>
-                    <th style={{ width: `40%` }}>&nbsp;</th>
-                    {optionsData.map((e, i) => (
-                      <th
-                        className="font-normal"
-                        style={{ width: "7%" }}
-                        key={i}
-                      >
-                        <div
-                          className="text-[13px] text-[#555]"
-                          dangerouslySetInnerHTML={{ __html: e.title }}
-                        />
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-
-                <tbody>
-                  <tr>
-                    <td style={{ width: `40%` }}>
-                      {fieldsData.map((e, i) => (
-                        <div
-                          key={i}
-                          className="pt-[10px] text-[14px] text-[#555]"
-                          dangerouslySetInnerHTML={{ __html: e.title }}
-                        />
-                      ))}
-                    </td>
-                    {optionsData.map((j, l) => (
-                      <td style={{ width: "7%" }} key={l}>
-                        {fieldsData.map((e, i) => (
-                          <div className="text-center pt-[10px]">
-                            <div className="text-center">
-                              <input type="radio" />
-                            </div>
-                          </div>
-                        ))}
-                      </td>
-                    ))}
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          ) : (
             <div className="flex-1 p-[20px] transition-all duration-200 ease-in-expo ">
               <div className="flex justify-between flex-1">
                 <h1 className="text-[22px] text-[#333]">
@@ -849,6 +798,89 @@ const MultipleChoiceGrid = ({ onDelete, componentId }) => {
                   Save
                 </button>
               </section>
+            </div>
+          ) : (
+            <div className="flex-1 ml-[10px]">
+              <div className="flex items-center">
+                <div
+                  dangerouslySetInnerHTML={{ __html: question }}
+                  className="text-[13px] font-bold mt-[5px] transition-opacity duration-200 ease-in-expo"
+                />
+                <div
+                  className="ml-auto h-[35px] mt-[10px] mr-[10px] bottom-[90px] right-[20px] flex items-center gap-[11px] p-[10px] justify-around"
+                  style={{
+                    boxShadow: "0 1px 3px 0 rgba(40,60,70,0.2)",
+                  }}
+                >
+                  <button
+                    className="p-[5px] text-[14px] font-bold"
+                    onClick={() => {
+                      dispatch(addMultipleChoiceGridInstance({ componentId }));
+                      dispatch(toggleMinimize({ componentId }));
+                    }}
+                    data-tooltip-id="Edit"
+                  >
+                    Edit
+                  </button>
+                  <ReactTooltip
+                    id="Edit"
+                    place="top"
+                    content="Edit Your Choice"
+                  />
+
+                  <FaTrashCan
+                    data-tooltip-id="Delete"
+                    size={16}
+                    className="text-[20px] text-[#eee] cursor-pointer hover:text-[black]"
+                    onClick={handledeleteToken}
+                  />
+                  <ReactTooltip id="Delete" place="top" content="Delete" />
+                </div>
+              </div>
+              <table className="pointer-events-none mt-[10px]">
+                <thead>
+                  <tr>
+                    <th style={{ width: `40%` }}>&nbsp;</th>
+                    {optionsData.map((e, i) => (
+                      <th
+                        className="font-normal"
+                        style={{ width: "7%" }}
+                        key={i}
+                      >
+                        <div
+                          className="text-[13px] text-[#555]"
+                          dangerouslySetInnerHTML={{ __html: e.title }}
+                        />
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <tr>
+                    <td style={{ width: `40%` }}>
+                      {fieldsData.map((e, i) => (
+                        <div
+                          key={i}
+                          className="pt-[10px] text-[14px] text-[#555]"
+                          dangerouslySetInnerHTML={{ __html: e.title }}
+                        />
+                      ))}
+                    </td>
+                    {optionsData.map((j, l) => (
+                      <td style={{ width: "7%" }} key={l}>
+                        {fieldsData.map((e, i) => (
+                          <div className="text-center pt-[10px]">
+                            <div className="text-center">
+                              <input type="radio" />
+                            </div>
+                          </div>
+                        ))}
+                      </td>
+                    ))}
+                  </tr>
+                </tbody>
+              </table>
             </div>
           )}
         </div>

@@ -14,6 +14,7 @@ import {
   deleteOptionByIndex,
   moveItems,
   reorderItems,
+  setTokenId,
 } from "../redux/slices/FormSlice";
 import PageBreak from "./PageBreak";
 import ScoreDisplay from "./ScoreDisplay";
@@ -24,13 +25,16 @@ import Ranking from "./Ranking";
 import RatingScaleMatrix from "./RatingScaleMatrix";
 import RatingScale from "./RatingScale";
 import TextFieldGrid from "./TextFieldGrid";
-import { TextField } from "@mui/material";
 import NetPromoter from "./NetPromoter";
 import YesorNo from "./YesorNo";
 import { Link } from "react-router-dom";
 import { RiDragMove2Fill } from "react-icons/ri";
 import { FaArrowRight } from "react-icons/fa6";
 import TemplatePreview from "./TemplatePreview";
+import axios from "axios";
+import { addMultipleChoiceInstance } from "../redux/slices/MultipleChoiceSlice";
+import TextField from "./TextField";
+import { Tooltip as ReactTooltip } from "react-tooltip";
 // import console = require('console');
 
 // a little function to help us with reordering the result
@@ -232,6 +236,8 @@ const ITEMS = [
 
 const NewTemplate = () => {
   const dispatch = useDispatch();
+  const overallStates = useSelector((state) => state.formData.allStateValues);
+  const id = useSelector((state) => state.formData.tokenId);
   // const state = useSelector((state) => state.formData.items);
   const [state, setState] = useState({
     [uuid()]: [],
@@ -337,6 +343,24 @@ const NewTemplate = () => {
   // Normally you would want to split things out into separate components.
   // But in this example everything is just done in one place for simplicity
 
+  const handleSave = async () => {
+    const values = {
+      form_data: overallStates,
+      tokenId: id,
+    };
+
+    await axios
+      .post("https://demo.sending.app/react-api", values)
+      .then((response) => {
+        console.log("Response:", response.data);
+        dispatch(setTokenId(response.data.tokenId));
+        window.open(`/uday/preview/${response.data.tokenId}`, "_blank");
+      })
+      .catch((error) => {
+        console.error("Error submitting form:", error);
+      });
+  };
+
   return (
     <>
       <TemplatePreview />
@@ -358,7 +382,7 @@ const NewTemplate = () => {
                 <Droppable key={list} droppableId={list}>
                   {(provided, snapshot) => (
                     <div
-                      className="w-[750px] bg-white h-[420px]"
+                      className="w-[750px] h-[420px]"
                       ref={provided.innerRef}
                       // isDraggingOver={snapshot.isDraggingOver}
                     >
@@ -387,22 +411,32 @@ const NewTemplate = () => {
                                       d="M3,15H21V13H3V15M3,19H21V17H3V19M3,11H21V9H3V11M3,5V7H21V5H3Z"
                                     />
                                   </svg> */}
-                                  <RiDragMove2Fill className="absolute z-10 left-[500px]" />
+                                  <RiDragMove2Fill
+                                    data-tooltip-id="my-tooltip-1"
+                                    className="text-[20px] ml-[10px] mt-[10px] text-[#eee] cursor-all-scroll hover:text-[black] absolute z-10"
+                                  />
+                                  <ReactTooltip
+                                    id="my-tooltip-1"
+                                    place="top"
+                                    content="Move"
+                                  />
                                 </div>
                                 {item.content === "MultipleChoice" && (
                                   <MultipleChoice
                                     key={`${item.content}-${index}`}
                                     index={index}
-                                    componentId={`component${index + 1}`}
+                                    componentId={item.id}
                                     onDelete={() => deleteOption(item.id)}
-                                    dragHandleProps={item.dragHandleProps}
+                                    dragHandleProps={provided.dragHandleProps}
                                   />
                                 )}
                                 {item.content === "MultipleChoiceGrid" && (
                                   <MultipleChoiceGrid
                                     key={`${item.content}-${index}`}
                                     index={index}
-                                    componentId={`component${index + 1}`}
+                                    componentId={`MultipleChoiceGrid${
+                                      index + 1
+                                    }`}
                                     onDelete={() => deleteOption(item.id)}
                                   />
                                 )}
@@ -410,7 +444,7 @@ const NewTemplate = () => {
                                   <DropDown
                                     key={`${item.content}-${index}`}
                                     index={index}
-                                    componentId={`component${index + 1}`}
+                                    componentId={item.id}
                                     onDelete={() => deleteOption(item.id)}
                                   />
                                 )}
@@ -418,103 +452,103 @@ const NewTemplate = () => {
                                   <DropDownGrid
                                     key={`${item.content}-${index}`}
                                     index={index}
-                                    componentId={`component${index + 1}`}
+                                    componentId={item.id}
                                     onDelete={() => deleteOption(item.id)}
                                   />
                                 )}
-                                {item.content === "YesNo" && (
+                                {item.content === "Yes/No" && (
                                   <YesorNo
                                     key={`${item.content}-${index}`}
                                     index={index}
-                                    componentId={`component${index + 1}`}
-                                    onDelete={() => deleteOption(index)}
+                                    componentId={item.id}
+                                    onDelete={() => deleteOption(item.id)}
                                   />
                                 )}
                                 {item.content === "NetPromoter" && (
                                   <NetPromoter
                                     key={`${item.content}-${index}`}
                                     index={index}
-                                    componentId={`component${index + 1}`}
-                                    onDelete={() => deleteOption(index)}
+                                    componentId={item.id}
+                                    onDelete={() => deleteOption(item.id)}
                                   />
                                 )}
                                 {item.content === "TextField" && (
                                   <TextField
                                     key={`${item.content}-${index}`}
                                     index={index}
-                                    componentId={`component${index + 1}`}
-                                    onDelete={() => deleteOption(index)}
+                                    componentId={item.id}
+                                    onDelete={() => deleteOption(item.id)}
                                   />
                                 )}
                                 {item.content === "TextFieldGrid" && (
                                   <TextFieldGrid
                                     key={`${item.content}-${index}`}
                                     index={index}
-                                    componentId={`component${index + 1}`}
-                                    onDelete={() => deleteOption(index)}
+                                    componentId={item.id}
+                                    onDelete={() => deleteOption(item.id)}
                                   />
                                 )}
                                 {item.content === "RatingScale" && (
                                   <RatingScale
                                     key={`${item.content}-${index}`}
                                     index={index}
-                                    componentId={`component${index + 1}`}
-                                    onDelete={() => deleteOption(index)}
+                                    componentId={item.id}
+                                    onDelete={() => deleteOption(item.id)}
                                   />
                                 )}
                                 {item.content === "RatingScaleMatrix" && (
                                   <RatingScaleMatrix
                                     key={`${item.content}-${index}`}
                                     index={index}
-                                    componentId={`component${index + 1}`}
-                                    onDelete={() => deleteOption(index)}
+                                    componentId={item.id}
+                                    onDelete={() => deleteOption(item.id)}
                                   />
                                 )}
                                 {item.content === "Ranking" && (
                                   <Ranking
                                     key={`${item.content}-${index}`}
                                     index={index}
-                                    componentId={`component${index + 1}`}
-                                    onDelete={() => deleteOption(index)}
+                                    componentId={item.id}
+                                    onDelete={() => deleteOption(item.id)}
                                   />
                                 )}
                                 {item.content === "PercentageSum" && (
                                   <PercentageSum
                                     key={`${item.content}-${index}`}
                                     index={index}
-                                    componentId={`component${index + 1}`}
-                                    onDelete={() => deleteOption(index)}
+                                    componentId={item.id}
+                                    onDelete={() => deleteOption(item.id)}
                                   />
                                 )}
                                 {item.content === "Heading" && (
                                   <Heading
                                     key={`${item.content}-${index}`}
                                     index={index}
-                                    componentId={`component${index + 1}`}
-                                    onDelete={() => deleteOption(index)}
+                                    componentId={item.id}
+                                    onDelete={() => deleteOption(item.id)}
                                   />
                                 )}
                                 {item.content === "CustomText" && (
                                   <CustomText
                                     key={`${item.content}-${index}`}
                                     index={index}
-                                    componentId={`component${index + 1}`}
-                                    onDelete={() => deleteOption(index)}
+                                    componentId={item.id}
+                                    onDelete={() => deleteOption(item.id)}
                                   />
                                 )}
                                 {item.content === "ScoreDisplay" && (
                                   <ScoreDisplay
                                     key={`${item.content}-${index}`}
                                     index={index}
-                                    componentId={`component${index + 1}`}
-                                    onDelete={() => deleteOption(index)}
+                                    componentId={item.id}
+                                    onDelete={() => deleteOption(item.id)}
                                   />
                                 )}
                                 {item.content === "PageBreak" && (
                                   <PageBreak
                                     key={`${item.content}-${index}`}
                                     index={index}
-                                    componentId={`component${index + 1}`}
+                                    componentId={`PageBreak${index + 1}`}
                                     onDelete={() => deleteOption(index)}
                                   />
                                 )}
@@ -581,11 +615,13 @@ const NewTemplate = () => {
                     )}
                   </Draggable>
                 ))}
-                <Link to="/uday/preview">
-                  <button className="bg-[#3c8dd5] w-[140px] ml-[70px] text-[white] mt-[20px] text-[14px] pt-[8px] pb-[8px]">
-                    Preview
-                  </button>
-                </Link>
+
+                <button
+                  className="bg-[#3c8dd5] w-[140px] ml-[70px] text-[white] mt-[20px] text-[14px] pt-[8px] pb-[8px]"
+                  onClick={handleSave}
+                >
+                  Preview
+                </button>
               </Kiosk>
             )}
           </Droppable>

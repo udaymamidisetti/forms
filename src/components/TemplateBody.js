@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { PiArrowCircleRightBold } from "react-icons/pi";
 import { PiArrowCircleDownBold } from "react-icons/pi";
 import { PiCircleHalfFill } from "react-icons/pi";
@@ -35,7 +35,6 @@ import { deleteOptionByIndex } from "../redux/slices/FormSlice";
 import PageBreak from "./PageBreak";
 import TemplatePreview from "./TemplatePreview";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
-import Header from "./Header";
 import axios from "axios";
 const TemplateBody = () => {
   const dispatch = useDispatch();
@@ -65,6 +64,7 @@ const TemplateBody = () => {
     // }
     switch (source.droppableId) {
       case destination.droppableId:
+        console.log("Ordered");
         dispatch(
           setChoicesOrder({
             sourceIndex: source.index,
@@ -76,6 +76,7 @@ const TemplateBody = () => {
         // const droppedOption = result.draggableId;
         // dispatch(addOption(droppedOption));
         // break;
+        console.log("Ordered");
         dispatch(
           setChoicesOrder({
             sourceIndex: source.index,

@@ -16,6 +16,7 @@ const initialState = {
     multipleAnswers: false,
     bulkOptions: [],
     position: "",
+    minimize: false,
   },
   byId: {},
 };
@@ -26,9 +27,25 @@ export const MultipleChoiceSlice = createSlice({
   reducers: {
     addMultipleChoiceInstance: (state, action) => {
       const { componentId } = action.payload;
-      state.byId[componentId] = {
-        ...state.initialData,
-      };
+      // const componentExists = Object.keys(state.byId).some(
+      //   (instance) => instance.componentId === componentId
+      // );
+      const componentExists = Object.keys(state.byId).includes(componentId);
+      if (!componentExists) {
+        // If it doesn't exist, add a new instance
+        // state.allIds.push(componentId);
+        state.byId[componentId] = {
+          ...state.initialData,
+        };
+      }
+
+      // if (!componentExists) {
+      //   state.byId[componentId] = {
+      //     ...state.initialData,
+      //   };
+      // }
+      // state.byId[componentId] = { ...state.initialData };
+      console.log(Object.keys(state.byId));
     },
     deleteMultipleChoiceInstance: (state, action) => {
       const { componentId } = action.payload;
@@ -104,6 +121,10 @@ export const MultipleChoiceSlice = createSlice({
       const { componentId, value } = action.payload;
       state.byId[componentId].image = URL.createObjectURL(value);
     },
+    handleRemoveImage: (state, action) => {
+      const { componentId } = action.payload;
+      state.byId[componentId].image = null;
+    },
     handleMultipleAnswers: (state) => {
       state.multipleAnswers = !state.multipleAnswers;
     },
@@ -139,9 +160,17 @@ export const MultipleChoiceSlice = createSlice({
       const { url, index, componentId } = action.payload;
       state.byId[componentId].options[index].image = URL.createObjectURL(url);
     },
+    handleRemoveOptionImage: (state, action) => {
+      const { index, componentId } = action.payload;
+      state.byId[componentId].options[index].image = null;
+    },
     setOptionPositionImage: (state, action) => {
       const { index, componentId, value } = action.payload;
       state.byId[componentId].options[index].position = value;
+    },
+    toggleMinimize: (state, action) => {
+      const { componentId } = action.payload;
+      state.byId[componentId].minimize = !state.byId[componentId].minimize;
     },
   },
 });
@@ -168,6 +197,9 @@ export const {
   addMultipleChoiceInstance,
   deleteMultipleChoiceInstance,
   setOptionPositionImage,
+  toggleMinimize,
+  handleRemoveImage,
+  handleRemoveOptionImage,
 } = MultipleChoiceSlice.actions;
 
 export default MultipleChoiceSlice.reducer;
