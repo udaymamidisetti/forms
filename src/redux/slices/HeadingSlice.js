@@ -28,9 +28,14 @@ const headingSlice = createSlice({
       // state.heading.push({ componentId, value });
       // state.heading = action.payload;
     },
+    toggleMinimize: (state, action) => {
+      const { componentId } = action.payload;
+      state.byId[componentId].minimize = !state.byId[componentId].minimize;
+    },
   },
 });
 
-export const { addHeadingInstance, handleHeading } = headingSlice.actions;
+export const { addHeadingInstance, handleHeading, toggleMinimize } =
+  headingSlice.actions;
 
 export default headingSlice.reducer;

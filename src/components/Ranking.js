@@ -20,7 +20,11 @@ import {
   handleRequiredOption,
   toggleMinimize,
 } from "../redux/slices/RankingSlice";
-import { setAllStateValues, setTokenId } from "../redux/slices/FormSlice";
+import {
+  deleteToken,
+  setAllStateValues,
+  setTokenId,
+} from "../redux/slices/FormSlice";
 import axios from "axios";
 import { Tooltip as ReactTooltip } from "react-tooltip";
 

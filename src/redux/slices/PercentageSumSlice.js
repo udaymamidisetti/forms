@@ -12,6 +12,7 @@ const initialState = {
     sumofFields: "Equal",
     sumInput: "100",
     NumericType: "",
+    minimize: false,
   },
   byId: {},
 };
@@ -84,6 +85,10 @@ const PercentageSumSlice = createSlice({
       const { componentId, value } = action.payload;
       state.byId[componentId].NumericType = value;
     },
+    toggleMinimize: (state, action) => {
+      const { componentId } = action.payload;
+      state.byId[componentId].minimize = !state.byId[componentId].minimize;
+    },
   },
 });
 
@@ -100,5 +105,6 @@ export const {
   handleSumofFields,
   handlesumInput,
   handleNumericType,
+  toggleMinimize,
 } = PercentageSumSlice.actions;
 export default PercentageSumSlice.reducer;
