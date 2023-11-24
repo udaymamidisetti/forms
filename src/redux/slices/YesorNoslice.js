@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   initialData: {
+    name: "YesNo",
     yesorNoQuestion: "What question would you like to ask?",
     requiredOption: false,
     hideNumber: true,

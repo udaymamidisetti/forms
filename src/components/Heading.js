@@ -8,7 +8,11 @@ import {
   toggleMinimize,
 } from "../redux/slices/HeadingSlice";
 import axios from "axios";
-import { setAllStateValues, setTokenId } from "../redux/slices/FormSlice";
+import {
+  deleteToken,
+  setAllStateValues,
+  setTokenId,
+} from "../redux/slices/FormSlice";
 import { Tooltip as ReactTooltip } from "react-tooltip";
 
 const Heading = ({ onDelete, componentId }) => {
@@ -74,7 +78,7 @@ const Heading = ({ onDelete, componentId }) => {
     <div>
       {minimize ? (
         <div className="flex mt-[15px] bg-white w-[750px]">
-          <div className="w-[40px] bg-[#43AED8] h-[420px]"></div>
+          <div className="w-[40px] bg-[#000] h-[420px]"></div>
           <div className="flex-1 p-[20px]">
             <div className="flex justify-between flex-1">
               <h1 className="text-[22px] text-[#333]">Edit Heading</h1>
@@ -142,12 +146,12 @@ const Heading = ({ onDelete, componentId }) => {
         </div>
       ) : (
         <div className="flex gap-[10px] bg-white mt-[15px]">
-          <div className="w-[40px] bg-[#43AED8]"></div>
+          <div className="w-[40px] bg-[#000]"></div>
           <div className="flex-1">
             <div className="flex items-center">
               <div
                 dangerouslySetInnerHTML={{ __html: heading }}
-                className="text-[13px] font-bold mt-[5px] transition-opacity duration-200 ease-in-expo"
+                className="text-[13px] font-bold mt-[5px] transition-opacity duration-200 ease-in-expo pb-[10px]"
               />
               <div
                 className="ml-auto h-[35px] mt-[10px] mr-[10px] bottom-[90px] right-[20px] flex items-center gap-[11px] p-[10px] justify-around"

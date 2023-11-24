@@ -50,7 +50,7 @@ const Preview = () => {
       .catch((e) => console.log(e));
   };
   // console.log(Object.keys(data));
-  const keys = [...data].map((item) => Object.values(item)[0]);
+  const keys = [...data].map((item) => Object.values(item)[1]);
   console.log(keys);
   const getOptionContent = (optionId) => {
     const option = options.find((opt) => opt.id === optionId);
@@ -114,108 +114,108 @@ const Preview = () => {
       ))} */}
       {/* {console.log(Object.values(data))} */}
       {keys.map((e, i) => {
-        console.log(data);
+        console.log(e.name);
         return (
           <div key={i}>
             <div>
-              {e.slice(0, -1) === "TextField" && (
+              {e.name === "TextField" && (
                 <TextFieldForm
                   questionData={data[i].overallStates}
                   index={i}
                   key={`${keys}-${i}`}
                 />
               )}
-              {e.slice(0, -1) === "Multiplechoice" && (
+              {e.name === "MultipleChoice" && (
                 <MultipleChoiceForm
                   questionData={data[i].overallStates}
                   index={i}
                   key={`${keys}-${i}`}
                 />
               )}
-              {e.slice(0, -1) === "Heading" && (
+              {e.name === "Heading" && (
                 <HeadingForm
                   questionData={data[i].overallStates}
                   key={`${keys}-${i}`}
                 />
               )}
-              {e.slice(0, -1) === "RatingScale" && (
+              {e.name === "RatingScale" && (
                 <RatingScaleForm
                   questionData={data[i].overallStates}
                   index={i}
                   key={`${keys}-${i}`}
                 />
               )}
-              {e.slice(0, -1) === "ScoreDisplay" && (
+              {e.name === "ScoreDisplay" && (
                 <ScoreDisplayForm
                   questionData={data[i].overallStates}
                   index={i}
                   key={`${keys}-${i}`}
                 />
               )}
-              {e.slice(0, -1) === "YesNo" && (
+              {e.name === "YesNo" && (
                 <YesorNoForm
                   questionData={data[i].overallStates}
                   index={i}
                   key={`${keys}-${i}`}
                 />
               )}
-              {e.slice(0, -1) === "DropDown" && (
+              {e.name === "DropDown" && (
                 <DropDownForm
                   questionData={data[i].overallStates}
                   index={i}
                   key={`${keys}-${i}`}
                 />
               )}
-              {e.slice(0, -1) === "CustomText" && (
+              {e.name === "CustomText" && (
                 <CustomTextForm
                   questionData={data[i].overallStates}
                   index={i}
                   key={`${keys}-${i}`}
                 />
               )}
-              {e.slice(0, -1) === "NetPromoter" && (
+              {e.name === "NetPromoter" && (
                 <NetPromoterForm
                   questionData={data[i].overallStates}
                   index={i}
                   key={`${keys}-${i}`}
                 />
               )}
-              {e.slice(0, -1) === "PercentageSum" && (
+              {e.name === "PercentageSum" && (
                 <PercentageSumForm
                   questionData={data[i].overallStates}
                   index={i}
                   key={`${keys}-${i}`}
                 />
               )}
-              {e.slice(0, -1) === "Ranking" && (
+              {e.name === "Ranking" && (
                 <RankingForm
                   questionData={data[i].overallStates}
                   index={i}
                   key={`${keys}-${i}`}
                 />
               )}
-              {e.slice(0, -1) === "MultipleChoiceGrid" && (
+              {e.name === "MultipleChoiceGrid" && (
                 <MultipleChoiceGridForm
                   questionData={data[i].overallStates}
                   index={i}
                   key={`${keys}-${i}`}
                 />
               )}
-              {e.slice(0, -1) === "TextFieldGrid" && (
+              {e.name === "TextFieldGrid" && (
                 <TextFieldGridForm
                   questionData={data[i].overallStates}
                   index={i}
                   key={`${keys}-${i}`}
                 />
               )}
-              {e.slice(0, -1) === "RatingScaleMatrix" && (
+              {e.name === "RatingScaleMatrix" && (
                 <RatingScaleMatrixForm
                   questionData={data[i].overallStates}
                   index={i}
                   key={`${keys}-${i}`}
                 />
               )}
-              {e.slice(0, -1) === "DropDownGrid" && (
+              {e.name === "DropDownGrid" && (
                 <DropDownGridForm
                   questionData={data[i].overallStates}
                   index={i}

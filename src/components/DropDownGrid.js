@@ -26,6 +26,7 @@ import {
   addColumnWords,
   addRowWords,
   toggleMinimize,
+  handleRemoveImage,
 } from "../redux/slices/DropdownGridSlice";
 import { deleteToken, setAllStateValues } from "../redux/slices/FormSlice";
 import { Tooltip as ReactTooltip } from "react-tooltip";
@@ -47,6 +48,13 @@ const DropDownGrid = ({ onDelete, componentId }) => {
       return "What question would you like to ask?";
     }
     return instance.question;
+  });
+  const image = useSelector((state) => {
+    const instance = state.DropDownGrid.byId[componentId];
+    if (!instance) {
+      return null;
+    }
+    return instance.image;
   });
   const optionsData = useSelector((state) => {
     const instance = state.DropDownGrid.byId[componentId];
@@ -173,7 +181,7 @@ const DropDownGrid = ({ onDelete, componentId }) => {
       <div>
         {minimize ? (
           <div className="w-[750px] flex transition-opacity duration-200 ease-in-expo mt-[15px] bg-white">
-            <div className="w-[40px] bg-[#43AED8]"></div>
+            <div className="w-[40px] bg-[#000]"></div>
             <div className="flex-1 p-[20px] transition-all duration-200 ease-in-expo ">
               <div className="flex justify-between flex-1">
                 <h1 className="text-[22px] text-[#333]">Dropdown Grid</h1>
@@ -378,18 +386,36 @@ const DropDownGrid = ({ onDelete, componentId }) => {
                       Media
                     </p>
                     <div>
-                      <input
-                        type="file"
-                        className=""
-                        onChange={(e) =>
-                          dispatch(
-                            handleImages({
-                              componentId,
-                              value: e.target.files[0],
-                            })
-                          )
-                        }
-                      />
+                      {image === null ? (
+                        <input
+                          type="file"
+                          className=""
+                          onChange={(e) =>
+                            dispatch(
+                              handleImages({
+                                componentId,
+                                value: e.target.files[0],
+                              })
+                            )
+                          }
+                        />
+                      ) : (
+                        <div>
+                          <img
+                            src={image}
+                            alt="image"
+                            className="h-[150px] w-[150px] "
+                          />
+                          <button
+                            className="p-[5px] border-[1px] border-solid rounded-md mt-[5px] text-[14px]"
+                            onClick={() =>
+                              dispatch(handleRemoveImage({ componentId }))
+                            }
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </>
@@ -554,7 +580,7 @@ const DropDownGrid = ({ onDelete, componentId }) => {
           </div>
         ) : (
           <div className="flex gap-[10px] mt-[15px] bg-white">
-            <div className="w-[40px] bg-[#43AED8]"></div>
+            <div className="w-[40px] bg-[#000]"></div>
             <div className="flex-1">
               <div className="flex items-center">
                 <div

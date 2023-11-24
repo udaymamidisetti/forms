@@ -82,6 +82,7 @@ const DropDown = ({ onDelete, componentId }) => {
     }
     return instance.image;
   });
+
   const tokenId = useSelector((state) => state.formData.tokenId);
   const [showAll, setShowAll] = useState(false);
   const [bulkInputText, setBulkInputText] = useState("");
@@ -194,7 +195,7 @@ const DropDown = ({ onDelete, componentId }) => {
     <div>
       <div>
         <div className="w-[750px] flex transition-opacity duration-200 ease-in-expo mt-[15px] bg-white">
-          <div className="w-[42px] bg-[#43AED8]">
+          <div className="w-[42px] bg-[#000]">
             {/* {minimize ? (
               <HiMiniArrowsPointingIn
                 className="text-[white] ml-[10px] mt-[10px] mr-[10px] text-[19px] cursor-pointer"

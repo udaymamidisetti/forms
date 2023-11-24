@@ -46,9 +46,21 @@ const formSlice = createSlice({
     },
     setChoicesOrder: (state, action) => {
       const { sourceIndex, destinationIndex } = action.payload;
-      const [removedOption] = state.selectedOptions.splice(sourceIndex, 1);
-      state.selectedOptions.splice(destinationIndex, 0, removedOption);
+      const [removedOption] = state.allStateValues.splice(sourceIndex, 1);
+      state.allStateValues.splice(destinationIndex, 0, removedOption);
     },
+    // setOrder: (state, action) => {
+    //   const { sourceIndex, destinationIndex, componentId } = action.payload;
+    //   const [removedOption] = state.byId[componentId].options.splice(
+    //     sourceIndex,
+    //     1
+    //   );
+    //   state.byId[componentId].options.splice(
+    //     destinationIndex,
+    //     0,
+    //     removedOption
+    //   );
+    // },
     reorderItems: (state, action) => {
       const { droppableId, sourceIndex, destinationIndex } = action.payload;
       const list = state[droppableId];

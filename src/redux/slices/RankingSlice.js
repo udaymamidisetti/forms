@@ -3,6 +3,7 @@ import fieldData from "../../fieldData";
 
 const initialState = {
   initialData: {
+    name: "Ranking",
     question: "<p>What question would you like to ask?</p>",
     requiredOption: false,
     hideNumber: true,

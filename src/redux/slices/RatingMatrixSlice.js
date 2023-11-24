@@ -3,6 +3,7 @@ import fieldData from "../../fieldData";
 
 const initialState = {
   initialData: {
+    name: "RatingScaleMatrix",
     question: "What question would you like to ask?",
     requiredOption: false,
     hideNumber: true,

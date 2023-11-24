@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   initialData: {
+    name: "TextField",
     question: "What question would you like to ask?",
     answerText: "single",
     requiredOption: false,
@@ -60,6 +61,10 @@ export const TextFieldSlice = createSlice({
       const { componentId } = action.payload;
       state.byId[componentId].minimize = !state.byId[componentId].minimize;
     },
+    handleRemoveImage: (state, action) => {
+      const { componentId } = action.payload;
+      state.byId[componentId].image = null;
+    },
   },
 });
 export const {
@@ -72,6 +77,7 @@ export const {
   handleInitialValue,
   handleImages,
   toggleMinimize,
+  handleRemoveImage,
 } = TextFieldSlice.actions;
 
 export default TextFieldSlice.reducer;

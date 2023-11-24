@@ -12,6 +12,7 @@ import {
   handleInitialValue,
   handleImages,
   toggleMinimize,
+  handleRemoveImage,
 } from "../redux/slices/TextFieldSlice";
 import { Editor } from "@tinymce/tinymce-react";
 import {
@@ -35,6 +36,13 @@ const TextField = ({ onDelete, componentId }) => {
       return "What question would you like to ask?";
     }
     return instance.question;
+  });
+  const image = useSelector((state) => {
+    const instance = state.textField.byId[componentId];
+    if (!instance) {
+      return null;
+    }
+    return instance.image;
   });
   const radioValue = useSelector((state) => {
     const instance = state.textField.byId[componentId];
@@ -102,7 +110,7 @@ const TextField = ({ onDelete, componentId }) => {
     <div>
       {minimize ? (
         <div className="flex mt-[15px] bg-white w-[750px]">
-          <div className="w-[40px] bg-[#43AED8]"></div>
+          <div className="w-[40px] bg-[#000]"></div>
           <div className="flex-1 p-[20px]">
             <div className="flex justify-between flex-1">
               <h1 className="text-[22px] text-[#333]">Text Field</h1>
@@ -266,18 +274,36 @@ const TextField = ({ onDelete, componentId }) => {
                 <div className="flex mt-[20px] items-center">
                   <p className="text-[#7D848C] text-[13px] w-[180px]">Media</p>
                   <div>
-                    <input
-                      type="file"
-                      className=""
-                      onChange={(e) =>
-                        dispatch(
-                          handleImages({
-                            componentId,
-                            value: e.target.files[0],
-                          })
-                        )
-                      }
-                    />
+                    {image === null ? (
+                      <input
+                        type="file"
+                        className=""
+                        onChange={(e) =>
+                          dispatch(
+                            handleImages({
+                              componentId,
+                              value: e.target.files[0],
+                            })
+                          )
+                        }
+                      />
+                    ) : (
+                      <div>
+                        <img
+                          src={image}
+                          alt="image"
+                          className="h-[150px] w-[150px] "
+                        />
+                        <button
+                          className="p-[5px] border-[1px] border-solid rounded-md mt-[5px] text-[14px]"
+                          onClick={() =>
+                            dispatch(handleRemoveImage({ componentId }))
+                          }
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="flex mt-[20px] items-center">
@@ -338,7 +364,7 @@ const TextField = ({ onDelete, componentId }) => {
         </div>
       ) : (
         <div className="flex gap-[10px] bg-white mt-[15px]">
-          <div className="w-[40px] bg-[#43AED8]"></div>
+          <div className="w-[40px] bg-[#000]"></div>
           <div className="flex-1">
             <div className="flex items-center">
               <div

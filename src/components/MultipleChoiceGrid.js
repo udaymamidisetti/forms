@@ -36,6 +36,7 @@ import {
   handleBulkAdd,
   setOrder,
   toggleMinimize,
+  handleRemoveImage,
 } from "../redux/slices/MultipleChoiceGridSlice";
 import { useDispatch } from "react-redux";
 import { Editor } from "@tinymce/tinymce-react";
@@ -64,6 +65,13 @@ const MultipleChoiceGrid = ({ onDelete, componentId }) => {
       return "What question would you like to ask?";
     }
     return instance.question;
+  });
+  const image = useSelector((state) => {
+    const instance = state.MultipleChoiceGrid.byId[componentId];
+    if (!instance) {
+      return;
+    }
+    return instance.image;
   });
   const minimize = useSelector((state) => {
     const instance = state.MultipleChoiceGrid.byId[componentId];
@@ -236,7 +244,7 @@ const MultipleChoiceGrid = ({ onDelete, componentId }) => {
     <div>
       <div>
         <div className="w-[750px] flex transition-opacity duration-200 ease-in-expo mt-[15px] bg-white">
-          <div className="w-[40px] bg-[#43AED8]"></div>
+          <div className="w-[40px] bg-[#000]"></div>
           {minimize ? (
             <div className="flex-1 p-[20px] transition-all duration-200 ease-in-expo ">
               <div className="flex justify-between flex-1">
@@ -452,19 +460,37 @@ const MultipleChoiceGrid = ({ onDelete, componentId }) => {
                     <p className="text-[#7D848C] text-[13px] w-[180px]">
                       Media
                     </p>
-                    <div>
-                      <input
-                        type="file"
-                        className=""
-                        onChange={(e) =>
-                          dispatch(
-                            handleSetImage({
-                              componentId,
-                              value: e.target.files[0],
-                            })
-                          )
-                        }
-                      />
+                    <div className="flex items-center gap-[5px]">
+                      {image === null ? (
+                        <input
+                          type="file"
+                          accept="image/png, image/jpeg"
+                          onChange={(e) =>
+                            dispatch(
+                              handleSetImage({
+                                componentId,
+                                value: e.target.files[0],
+                              })
+                            )
+                          }
+                        />
+                      ) : (
+                        <div>
+                          <img
+                            src={image}
+                            alt="image"
+                            className="h-[150px] w-[150px] "
+                          />
+                          <button
+                            className="p-[5px] border-[1px] border-solid rounded-md mt-[5px] text-[14px]"
+                            onClick={() =>
+                              dispatch(handleRemoveImage({ componentId }))
+                            }
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </>

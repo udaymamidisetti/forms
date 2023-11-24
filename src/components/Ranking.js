@@ -114,7 +114,7 @@ const Ranking = ({ onDelete, componentId }) => {
       <div>
         {minimize ? (
           <div className="flex mt-[15px] bg-white w-[750px]">
-            <div className="w-[40px] bg-[#43AED8]"></div>
+            <div className="w-[40px] bg-[#000]"></div>
             <div className="flex-1 p-[20px]">
               <div className="flex justify-between flex-1">
                 <h1 className="text-[22px] text-[#333]">Ranking</h1>
@@ -358,7 +358,7 @@ const Ranking = ({ onDelete, componentId }) => {
           </div>
         ) : (
           <div className="flex gap-[10px] bg-white mt-[15px]">
-            <div className="w-[40px] bg-[#43AED8]"></div>
+            <div className="w-[40px] bg-[#000]"></div>
             <div className="flex-1">
               <div className="flex items-center">
                 <div

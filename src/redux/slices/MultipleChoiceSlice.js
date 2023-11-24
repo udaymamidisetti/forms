@@ -4,6 +4,7 @@ import { useRef } from "react";
 
 const initialState = {
   initialData: {
+    name: "MultipleChoice",
     question: "<p>What question would you like to ask?</p>",
     answerText: null,
     requiredOption: false,

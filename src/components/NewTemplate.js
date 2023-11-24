@@ -14,6 +14,7 @@ import {
   deleteOptionByIndex,
   moveItems,
   reorderItems,
+  setChoicesOrder,
   setTokenId,
 } from "../redux/slices/FormSlice";
 import PageBreak from "./PageBreak";
@@ -35,6 +36,7 @@ import axios from "axios";
 import { addMultipleChoiceInstance } from "../redux/slices/MultipleChoiceSlice";
 import TextField from "./TextField";
 import { Tooltip as ReactTooltip } from "react-tooltip";
+import hand from "../assets/hand-drawn-arrow.png";
 // import console = require('console');
 
 // a little function to help us with reordering the result
@@ -49,13 +51,13 @@ const reorder = (list, startIndex, endIndex) => {
  * Moves an item from one list to another list.
  */
 const copy = (source, destination, droppableSource, droppableDestination) => {
-  console.log("==> dest", destination);
-
   const sourceClone = Array.from(source);
   const destClone = Array.from(destination);
   const item = sourceClone[droppableSource.index];
 
-  destClone.splice(droppableDestination.index, 0, { ...item, id: uuid() });
+  // Always add the new item at the last position in the destination array
+  destClone.splice(destClone.length, 0, { ...item, id: uuid() });
+
   return destClone;
 };
 
@@ -242,6 +244,7 @@ const NewTemplate = () => {
   const [state, setState] = useState({
     [uuid()]: [],
   });
+  const lenstate = useSelector((state) => state.formData.allStateValues);
   // const onDragEnd = (result) => {
 
   //   const { source, destination } = result;
@@ -295,6 +298,12 @@ const NewTemplate = () => {
 
     switch (source.droppableId) {
       case destination.droppableId:
+        dispatch(
+          setChoicesOrder({
+            sourceIndex: source.index,
+            destinationIndex: destination.index,
+          })
+        );
         setState({
           [destination.droppableId]: reorder(
             state[source.droppableId],
@@ -363,7 +372,27 @@ const NewTemplate = () => {
 
   return (
     <>
-      <TemplatePreview />
+      {lenstate.length === 0 ? (
+        <div className="flex justify-center items-center pt-[20px]">
+          <h1 className="text-[24px] pt-[20px] pb-[30px] text-white">
+            Choose an option and drag and drop a question to get started
+          </h1>
+          <img src={hand} alt="" className="h-[42px]" />
+        </div>
+      ) : (
+        <div className="flex justify-center items-center gap-[35px] pt-[50px] transition-all duration-200 ease-in-expo">
+          <h1 className="text-[24px] pt-[20px] pb-[30px] text-white">
+            Looking good!
+          </h1>
+
+          <button
+            className="bg-[#0c9ec7] text-[white] pt-[7px] pb-[7px] pl-[20px] pr-[20px] rounded-[3px]"
+            onClick={handleSave}
+          >
+            Preview your work so far?
+          </button>
+        </div>
+      )}
       <DragDropContext onDragEnd={onDragEnd}>
         <div className="flex justify-center mt-[10px]">
           <Content>
@@ -563,13 +592,6 @@ const NewTemplate = () => {
                               Drag a question from the list on the right
                               <FaArrowRight />
                             </h1>
-                            <p className={` w-full`}>
-                              or, you can{" "}
-                              <span className="text-[#3c8dd5] cursor-pointer">
-                                learn more about FourEyes here
-                              </span>{" "}
-                              :-)
-                            </p>
                           </div>
                         </div>
                       ) : (
@@ -616,12 +638,12 @@ const NewTemplate = () => {
                   </Draggable>
                 ))}
 
-                <button
+                {/* <button
                   className="bg-[#3c8dd5] w-[140px] ml-[70px] text-[white] mt-[20px] text-[14px] pt-[8px] pb-[8px]"
                   onClick={handleSave}
                 >
                   Preview
-                </button>
+                </button> */}
               </Kiosk>
             )}
           </Droppable>

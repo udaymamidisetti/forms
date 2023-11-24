@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import fieldData from "../../fieldData";
 const initialState = {
   initialData: {
+    name: "TextFieldGrid",
     question: "What question would you like to ask?",
     requiredOption: false,
     hideNumber: true,
@@ -100,6 +101,10 @@ const TextFieldGridSlice = createSlice({
       const { componentId } = action.payload;
       state.byId[componentId].minimize = !state.byId[componentId].minimize;
     },
+    handleRemoveImage: (state, action) => {
+      const { componentId } = action.payload;
+      state.byId[componentId].image = null;
+    },
   },
 });
 
@@ -118,5 +123,6 @@ export const {
   handleFieldChange,
   handleAnswerTextarea,
   toggleMinimize,
+  handleRemoveImage,
 } = TextFieldGridSlice.actions;
 export default TextFieldGridSlice.reducer;

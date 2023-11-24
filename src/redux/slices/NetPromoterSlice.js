@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import data from "../../data";
 const initialState = {
   initialData: {
+    name: "NetPromoter",
     question: "<p>What question would you like to ask?</p>",
     textLabels: false,
     leftLabel: "Not at all likely",
@@ -78,6 +79,10 @@ const NetPromoterSlice = createSlice({
       const { componentId } = action.payload;
       state.byId[componentId].minimize = !state.byId[componentId].minimize;
     },
+    handleRemoveImage: (state, action) => {
+      const { componentId } = action.payload;
+      state.byId[componentId].image = null;
+    },
   },
 });
 
@@ -91,5 +96,6 @@ export const {
   setHideNumber,
   handleInputChange,
   toggleMinimize,
+  handleRemoveImage,
 } = NetPromoterSlice.actions;
 export default NetPromoterSlice.reducer;

@@ -393,29 +393,25 @@ const MultipleChoice = ({ onDelete, dragHandleProps, componentId }) => {
     dispatch(toggleMinimize({ componentId }));
   };
 
-  useEffect(() => {
-    // dispatch(addMultipleChoiceInstance({ componentId }));
-    // getAllOptionValues();
-  }, [componentId]);
-  const getAllOptionValues = async () => {
-    const values = {
-      tokenId: id,
-    };
-    axios
-      .post("https://demo.sending.app/react-api", values)
-      .then((response) => {
-        console.log(response.data.form_data);
-        setNewData(JSON.parse(response.data.form_data));
-        console.log(data);
-      })
-      .catch((e) => console.log(e));
-  };
+  // const getAllOptionValues = async () => {
+  //   const values = {
+  //     tokenId: id,
+  //   };
+  //   axios
+  //     .post("https://demo.sending.app/react-api", values)
+  //     .then((response) => {
+  //       console.log(response.data.form_data);
+  //       setNewData(JSON.parse(response.data.form_data));
+  //       console.log(data);
+  //     })
+  //     .catch((e) => console.log(e));
+  // };
 
   return (
     <div>
       <div>
         <div className="w-[750px] flex transition-opacity duration-200 ease-in-expo mt-[15px] bg-white relative">
-          <div className="w-[40px] bg-[#43AED8] ">
+          <div className="w-[40px] bg-[#000]">
             {/* {minimize ? (
               <HiMiniArrowsPointingIn
                 className="text-[white] ml-[10px] mt-[10px] mr-[10px] text-[19px] cursor-pointer"

@@ -160,7 +160,7 @@ const RatingScaleMatrix = ({ onDelete, componentId }) => {
       <div>
         {minimize ? (
           <div className="w-[750px] flex transition-opacity duration-200 ease-in-expo mt-[15px] bg-white">
-            <div className="w-[40px] bg-[#43AED8]"></div>
+            <div className="w-[40px] bg-[#000]"></div>
             <div className="flex-1 p-[20px] transition-all duration-200 ease-in-expo ">
               <div className="flex justify-between flex-1">
                 <h1 className="text-[22px] text-[#333]">Rating Scale Matrix</h1>
@@ -560,7 +560,7 @@ const RatingScaleMatrix = ({ onDelete, componentId }) => {
           </div>
         ) : (
           <div className="flex gap-[10px] bg-white mt-[15px]">
-            <div className="w-[40px] bg-[#43AED8]"></div>
+            <div className="w-[40px] bg-[#000]"></div>
             <div className="flex-1">
               <div className="flex items-center">
                 <div

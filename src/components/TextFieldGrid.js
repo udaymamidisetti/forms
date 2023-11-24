@@ -23,6 +23,7 @@ import {
   handleFieldChange,
   handleAnswerTextarea,
   toggleMinimize,
+  handleRemoveImage,
 } from "../redux/slices/TextFieldGridSlice";
 import {
   deleteToken,
@@ -60,6 +61,13 @@ const TextFieldGrid = ({ onDelete, componentId }) => {
       return fieldData;
     }
     return instance.fieldsData;
+  });
+  const image = useSelector((state) => {
+    const instance = state.TextFieldGrid.byId[componentId];
+    if (!instance) {
+      return null;
+    }
+    return instance.image;
   });
   const validation = useSelector((state) => {
     const instance = state.TextFieldGrid.byId[componentId];
@@ -142,7 +150,7 @@ const TextFieldGrid = ({ onDelete, componentId }) => {
     <div>
       {minimize ? (
         <div className="w-[750px] flex transition-opacity duration-200 ease-in-expo mt-[15px] bg-white">
-          <div className="w-[40px] bg-[#43AED8]"></div>
+          <div className="w-[40px] bg-[#000]"></div>
           <div className="flex-1 p-[20px] transition-all duration-200 ease-in-expo ">
             <div className="flex justify-between flex-1">
               <h1 className="text-[22px] text-[#333]">Text Field Grid</h1>
@@ -330,18 +338,36 @@ const TextFieldGrid = ({ onDelete, componentId }) => {
                 <div className="flex mt-[20px] items-center">
                   <p className="text-[#7D848C] text-[13px] w-[180px]">Media</p>
                   <div>
-                    <input
-                      type="file"
-                      className=""
-                      onChange={(e) =>
-                        dispatch(
-                          handleImages({
-                            componentId,
-                            value: e.target.files[0],
-                          })
-                        )
-                      }
-                    />
+                    {image === null ? (
+                      <input
+                        type="file"
+                        className=""
+                        onChange={(e) =>
+                          dispatch(
+                            handleImages({
+                              componentId,
+                              value: e.target.files[0],
+                            })
+                          )
+                        }
+                      />
+                    ) : (
+                      <div>
+                        <img
+                          src={image}
+                          alt="image"
+                          className="h-[150px] w-[150px] "
+                        />
+                        <button
+                          className="p-[5px] border-[1px] border-solid rounded-md mt-[5px] text-[14px]"
+                          onClick={() =>
+                            dispatch(handleRemoveImage({ componentId }))
+                          }
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               </>
@@ -857,7 +883,7 @@ const TextFieldGrid = ({ onDelete, componentId }) => {
         </div>
       ) : (
         <div className="flex gap-[10px] bg-white mt-[15px]">
-          <div className="w-[40px] bg-[#43AED8]"></div>
+          <div className="w-[40px] bg-[#000]"></div>
           <div className="flex-1">
             <div className="flex items-center">
               <div

@@ -3,6 +3,7 @@ import data from "../../data";
 
 const initialState = {
   initialData: {
+    name: "DropDown",
     question: "What question would you like to ask?",
     answerText: null,
     requiredOption: false,
@@ -117,6 +118,10 @@ export const DropDownSlice = createSlice({
     toggleMinimize: (state, action) => {
       const { componentId } = action.payload;
       state.byId[componentId].minimize = !state.byId[componentId].minimize;
+    },
+    handleRemoveImage: (state, action) => {
+      const { componentId } = action.payload;
+      state.byId[componentId].image = null;
     },
   },
 });

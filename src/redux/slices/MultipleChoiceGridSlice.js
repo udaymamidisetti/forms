@@ -4,6 +4,7 @@ import fieldData from "../../fieldData";
 
 const initialState = {
   initialData: {
+    name: "MultipleChoiceGrid",
     question: "What question would you like to ask?",
     AnswerRequired: false,
     HideNumber: true,
@@ -164,6 +165,10 @@ const MultipleChoiceGridSlice = createSlice({
       const { componentId } = action.payload;
       state.byId[componentId].minimize = !state.byId[componentId].minimize;
     },
+    handleRemoveImage: (state, action) => {
+      const { componentId } = action.payload;
+      state.byId[componentId].image = null;
+    },
   },
 });
 export const {
@@ -188,5 +193,6 @@ export const {
   handleBulkAdd,
   setOrder,
   toggleMinimize,
+  handleRemoveImage,
 } = MultipleChoiceGridSlice.actions;
 export default MultipleChoiceGridSlice.reducer;

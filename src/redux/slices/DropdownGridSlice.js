@@ -3,6 +3,7 @@ import fieldData from "../../fieldData";
 import data from "../../data";
 const initialState = {
   initialData: {
+    name: "DropDownGrid",
     question: "What question would you like to ask?",
     requiredOption: "No",
     hideNumber: true,
@@ -120,6 +121,10 @@ const DropDownGridSlice = createSlice({
       const { componentId } = action.payload;
       state.byId[componentId].minimize = !state.byId[componentId].minimize;
     },
+    handleRemoveImage: (state, action) => {
+      const { componentId } = action.payload;
+      state.byId[componentId].image = null;
+    },
   },
 });
 
@@ -143,5 +148,6 @@ export const {
   addColumnWords,
   addRowWords,
   toggleMinimize,
+  handleRemoveImage,
 } = DropDownGridSlice.actions;
 export default DropDownGridSlice.reducer;

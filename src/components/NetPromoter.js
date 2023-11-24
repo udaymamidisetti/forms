@@ -11,6 +11,7 @@ import {
   handleImages,
   handleInputChange,
   toggleMinimize,
+  handleRemoveImage,
 } from "../redux/slices/NetPromoterSlice";
 import { Editor } from "@tinymce/tinymce-react";
 import { useSelector, useDispatch } from "react-redux";
@@ -33,6 +34,13 @@ const NetPromoter = ({ onDelete, componentId }) => {
       return "What question would you like to ask?";
     }
     return instance.question;
+  });
+  const image = useSelector((state) => {
+    const instance = state.NetPromoter.byId[componentId];
+    if (!instance) {
+      return null;
+    }
+    return instance.image;
   });
   console.log(question);
   const displayText = useSelector((state) => {
@@ -103,7 +111,7 @@ const NetPromoter = ({ onDelete, componentId }) => {
     <div className="mt-[20px] bg-white">
       {minimize ? (
         <div className="flex transition-opacity duration-200 ease-in-expo mt-[15px] bg-white">
-          <div className="w-[40px] bg-[#43AED8]"></div>
+          <div className="w-[40px] bg-[#000]"></div>
           <div className="flex-1 p-[20px] transition-all duration-200 ease-in-expo ">
             <div className="flex justify-between flex-1">
               <h1 className="text-[22px] text-[#333]">Net Promoter® Score</h1>
@@ -295,19 +303,37 @@ const NetPromoter = ({ onDelete, componentId }) => {
                 </div>
                 <div className="flex mt-[20px] items-center">
                   <p className="text-[#7D848C] text-[13px] w-[180px]">Media</p>
-                  <div>
-                    <input
-                      type="file"
-                      className=""
-                      onChange={(e) =>
-                        dispatch(
-                          handleImages({
-                            componentId,
-                            value: e.target.files[0],
-                          })
-                        )
-                      }
-                    />
+                  <div className="flex items-center gap-[5px]">
+                    {image === null ? (
+                      <input
+                        type="file"
+                        accept="image/png, image/jpeg"
+                        onChange={(e) =>
+                          dispatch(
+                            handleImages({
+                              componentId,
+                              value: e.target.files[0],
+                            })
+                          )
+                        }
+                      />
+                    ) : (
+                      <div>
+                        <img
+                          src={image}
+                          alt="image"
+                          className="h-[150px] w-[150px] "
+                        />
+                        <button
+                          className="p-[5px] border-[1px] border-solid rounded-md mt-[5px] text-[14px]"
+                          onClick={() =>
+                            dispatch(handleRemoveImage({ componentId }))
+                          }
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               </>
@@ -331,7 +357,7 @@ const NetPromoter = ({ onDelete, componentId }) => {
       ) : (
         <>
           <div className="flex gap-[10px]">
-            <div className="w-[40px] bg-[#43AED8]"></div>
+            <div className="w-[40px] bg-[#000]"></div>
             <div className="flex-1">
               <div className="flex items-center">
                 <div

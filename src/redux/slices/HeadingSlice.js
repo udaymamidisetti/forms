@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   initialData: {
+    name: "Heading",
     heading: "Enter your heading here",
   },
   byId: {},

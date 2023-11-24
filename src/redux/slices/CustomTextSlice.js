@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   initialData: {
+    name: "CustomText",
     customText: "",
   },
   byId: {},

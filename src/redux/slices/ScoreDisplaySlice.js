@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  initialData: { score: "Your score is :", hide: true },
+  initialData: { name: "ScoreDisplay", score: "Your score is :", hide: true },
   byId: {},
 };
 

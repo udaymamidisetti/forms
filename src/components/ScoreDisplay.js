@@ -58,7 +58,7 @@ const ScoreDisplay = ({ onDelete, componentId }) => {
   return (
     <div>
       <div className="flex mt-[15px] bg-white w-[750px]">
-        <div className="w-[40px] bg-[#43AED8] h-[420px]"></div>
+        <div className="w-[40px] bg-[#000] h-[420px]"></div>
         <div className="flex-1 p-[20px]">
           <div className="flex justify-between flex-1">
             <h1 className="text-[22px] text-[#333]">Edit Score Display</h1>
